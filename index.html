@@ -14,165 +14,198 @@ body{font-family:-apple-system,sans-serif;background:#0f172a;color:#e2e8f0;min-h
 .card{background:#1e293b;border-radius:12px;padding:14px;margin-bottom:10px}
 .badge{display:inline-block;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700}
 .stat-card{background:#1e293b;border-radius:12px;padding:14px;text-align:center;border-left:3px solid}
-.input{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px 12px;color:#e2e8f0;font-size:13px;width:100%;outline:none}
-.label{font-size:11px;color:#64748b;margin-bottom:4px;font-weight:600}
-.btn-primary{background:linear-gradient(135deg,#3b82f6,#06b6d4);border:none;border-radius:10px;padding:14px;color:white;font-weight:700;font-size:14px;width:100%;cursor:pointer}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:100;display:flex;align-items:flex-end;justify-content:center}
+.inp{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px 12px;color:#e2e8f0;font-size:13px;width:100%;outline:none}
+.lbl{font-size:11px;color:#64748b;margin-bottom:4px;font-weight:600}
+.btn-p{background:linear-gradient(135deg,#3b82f6,#06b6d4);border:none;border-radius:10px;padding:14px;color:white;font-weight:700;font-size:14px;width:100%;cursor:pointer}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:100;display:flex;align-items:flex-end;justify-content:center}
 .modal{background:#1e293b;border-radius:20px 20px 0 0;padding:24px;width:100%;max-height:85vh;overflow-y:auto}
-.neck-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
-.neck-item{background:#0f172a;border-radius:8px;padding:10px;text-align:center;border:2px solid #334155;cursor:pointer}
-.neck-green{border-color:#22c55e!important;background:#052e16!important}
-.neck-red{border-color:#ef4444!important;background:#1a0000!important}
-.phase-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px}
-.phase-tab{white-space:nowrap;padding:6px 14px;border-radius:20px;border:none;font-size:12px;font-weight:600;cursor:pointer;background:#1e293b;color:#64748b}
-.phase-tab.active{background:linear-gradient(135deg,#3b82f6,#06b6d4);color:white}
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#22c55e;color:white;padding:12px 20px;border-radius:10px;font-weight:700;z-index:200}
+.ng{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.ni{background:#0f172a;border-radius:8px;padding:10px;text-align:center;border:2px solid #334155;cursor:pointer}
+.ni.g{border-color:#22c55e;background:#052e16}
+.ni.r{border-color:#ef4444;background:#1a0000}
+.ptabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px}
+.ptab{white-space:nowrap;padding:6px 14px;border-radius:20px;border:none;font-size:12px;font-weight:600;cursor:pointer;background:#1e293b;color:#64748b}
+.ptab.active{background:linear-gradient(135deg,#3b82f6,#06b6d4);color:white}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#22c55e;color:white;padding:12px 20px;border-radius:10px;font-weight:700;z-index:200;white-space:nowrap}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <script>
-var PHASES=['契約済み・打ち合わせ中','仮契約済み','追客中','失注・長期フォロー'];
-var NECKS=['土地','建物','メーカー','親族','時期','お金'];
+var PH=['契約済み・打ち合わせ中','仮契約済み','追客中','失注・長期フォロー'];
+var NK=['土地','建物','メーカー','親族','時期','お金'];
 var NS=['未確認','要対応','解決済み'];
 var NI={'未確認':'⬜','要対応':'🔴','解決済み':'🟢'};
-var NC={'未確認':'','要対応':'neck-red','解決済み':'neck-green'};
-var customers=[
-{id:1,name:'田中 雄一',phase:'追客中',rank:'S',budget:'4000万円',land:'土地あり',firstVisit:'2024-03-05',lastContact:'2026-03-03',nextAction:'間取り提案書を送付',competitor:'積水ハウス',urgent:true,memo:'',aiResult:'',family:[{name:'田中 花子',relation:'奥様',birthday:'1985-05-03'}],events:[{type:'工場見学',date:'2026-03-15'}],necks:{土地:'解決済み',建物:'要対応',メーカー:'要対応',親族:'解決済み',時期:'未確認',お金:'要対応'}},
-{id:2,name:'佐藤 美咲',phase:'仮契約済み',rank:'A',budget:'3500万円',land:'土地なし',firstVisit:'2024-06-10',lastContact:'2026-02-28',nextAction:'土地情報を共有する',competitor:'タマホーム',urgent:false,memo:'',aiResult:'',family:[{name:'佐藤 健',relation:'ご主人',birthday:'1990-11-20'}],events:[],necks:{土地:'要対応',建物:'解決済み',メーカー:'解決済み',親族:'解決済み',時期:'要対応',お金:'解決済み'}},
-{id:3,name:'山本 健太',phase:'失注・長期フォロー',rank:'C',budget:'3000万円',land:'土地なし',firstVisit:'2023-11-15',lastContact:'2026-01-10',nextAction:'ライフプランニングへ案内',competitor:'未確認',urgent:true,memo:'',aiResult:'',family:[],events:[{type:'ライフプランニング',date:'2026-03-20'}],necks:{土地:'要対応',建物:'未確認',メーカー:'要対応',親族:'要対応',時期:'要対応',お金:'要対応'}}
+var NC={'未確認':'','要対応':'r','解決済み':'g'};
+var CS=[
+{id:1,name:'田中 雄一',phase:'追客中',rank:'S',budget:'4000万円',land:'土地あり',fv:'2024-03-05',lc:'2026-03-03',na:'間取り提案書を送付',comp:'積水ハウス',urg:true,memo:'',air:'',family:[{name:'田中 花子',rel:'奥様',bd:'1985-05-03'}],events:[{type:'工場見学',date:'2026-03-15'}],necks:{土地:'解決済み',建物:'要対応',メーカー:'要対応',親族:'解決済み',時期:'未確認',お金:'要対応'}},
+{id:2,name:'佐藤 美咲',phase:'仮契約済み',rank:'A',budget:'3500万円',land:'土地なし',fv:'2024-06-10',lc:'2026-02-28',na:'土地情報を共有する',comp:'タマホーム',urg:false,memo:'',air:'',family:[{name:'佐藤 健',rel:'ご主人',bd:'1990-11-20'}],events:[],necks:{土地:'要対応',建物:'解決済み',メーカー:'解決済み',親族:'解決済み',時期:'要対応',お金:'解決済み'}},
+{id:3,name:'山本 健太',phase:'失注・長期フォロー',rank:'C',budget:'3000万円',land:'土地なし',fv:'2023-11-15',lc:'2026-01-10',na:'ライフプランニングへ案内',comp:'未確認',urg:true,memo:'',air:'',family:[],events:[{type:'ライフプランニング',date:'2026-03-20'}],necks:{土地:'要対応',建物:'未確認',メーカー:'要対応',親族:'要対応',時期:'要対応',お金:'要対応'}}
 ];
-var tab='dashboard',phase='追客中',sel=null,showDet=false,showAdd=false,toast=null,analyzing=false,recording=false,recTime=0,recog=null,recTimer=null,finalTxt='';
-var nc={name:'',phone:'',phase:'追客中',rank:'A',budget:'',land:'土地なし',competitor:'',firstVisit:''};
+var TAB='dashboard',PHASE='追客中',SEL=null,DET=false,ADD=false,TOAST=null,ANA=false,REC=false,RT=0,recog=null,rtimer=null,ft='';
+var NC2={name:'',phone:'',phase:'追客中',rank:'A',budget:'',comp:'',fv:''};
 
-function days(d){if(!d)return'-';var x=Math.floor((new Date()-new Date(d))/86400000);return x===0?'今日':x===1?'昨日':x+'日前';}
+function dago(d){if(!d)return'-';var x=Math.floor((new Date()-new Date(d))/86400000);return x===0?'今日':x===1?'昨日':x+'日前';}
 function rc(r){return r==='S'?'#ef4444':r==='A'?'#f97316':r==='B'?'#3b82f6':'#64748b';}
-function fmt(s){return('0'+Math.floor(s/60)).slice(-2)+':'+('0'+(s%60)).slice(-2);}
-function showT(m){toast=m;render();setTimeout(function(){toast=null;render();},3000);}
+function ft2(s){return('0'+Math.floor(s/60)).slice(-2)+':'+('0'+(s%60)).slice(-2);}
+function toast(m){TOAST=m;render();setTimeout(function(){TOAST=null;render();},3000);}
 
-function cycleNeck(n){
-  if(!sel)return;
-  var i=NS.indexOf(sel.necks[n]);
-  var nx=NS[(i+1)%NS.length];
-  sel.necks[n]=nx;
-  customers=customers.map(function(c){if(c.id===sel.id)c.necks[n]=nx;return c;});
+function cn(n){
+  if(!SEL)return;
+  var i=NS.indexOf(SEL.necks[n]);
+  SEL.necks[n]=NS[(i+1)%NS.length];
+  CS=CS.map(function(c){if(c.id===SEL.id)c.necks[n]=SEL.necks[n];return c;});
   render();
 }
 
 function addC(){
-  if(!nc.name.trim()){alert('名前を入力してください');return;}
-  customers.push({id:Date.now(),name:nc.name,phone:nc.phone,phase:nc.phase,rank:nc.rank,budget:nc.budget,land:nc.land,competitor:nc.competitor,firstVisit:nc.firstVisit,lastContact:new Date().toISOString().split('T')[0],nextAction:'初回フォロー',urgent:false,memo:'',aiResult:'',family:[],events:[],necks:{土地:'未確認',建物:'未確認',メーカー:'未確認',親族:'未確認',時期:'未確認',お金:'未確認'}});
-  showAdd=false;
-  nc={name:'',phone:'',phase:'追客中',rank:'A',budget:'',land:'土地なし',competitor:'',firstVisit:''};
-  showT('✅ 顧客を登録しました');
+  if(!NC2.name.trim()){alert('名前を入力してください');return;}
+  CS.push({id:Date.now(),name:NC2.name,phone:NC2.phone,phase:NC2.phase,rank:NC2.rank,budget:NC2.budget,land:'土地なし',fv:NC2.fv,lc:new Date().toISOString().split('T')[0],na:'初回フォロー',comp:NC2.comp,urg:false,memo:'',air:'',family:[],events:[],necks:{土地:'未確認',建物:'未確認',メーカー:'未確認',親族:'未確認',時期:'未確認',お金:'未確認'}});
+  ADD=false;NC2={name:'',phone:'',phase:'追客中',rank:'A',budget:'',comp:'',fv:''};
+  toast('追加しました');
 }
 
-function startRec(){
+function startR(){
   var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){alert('ChromeまたはSafariをお使いください');return;}
+  if(!SR){alert('ChromeかSafariをお使いください');return;}
   recog=new SR();recog.lang='ja-JP';recog.continuous=true;recog.interimResults=true;
-  finalTxt=sel?(sel.memo||')':'';
-  recog.onresult=function(e){var it='',nf='';for(var i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)nf+=e.results[i][0].transcript;else it+=e.results[i][0].transcript;}if(nf)finalTxt+=nf;if(sel){sel.memo=finalTxt+it;customers=customers.map(function(c){if(c.id===sel.id)c.memo=finalTxt+it;return c;});render();}};
-  recog.onerror=function(e){if(e.error==='not-allowed')alert('マイクを許可してください');stopRec();};
-  recog.start();recording=true;recTime=0;
-  recTimer=setInterval(function(){recTime++;render();},1000);render();
+  ft=SEL?(SEL.memo||''):'';
+  recog.onresult=function(e){
+    var it='',nf='';
+    for(var i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)nf+=e.results[i][0].transcript;else it+=e.results[i][0].transcript;}
+    if(nf)ft+=nf;
+    if(SEL){SEL.memo=ft+it;CS=CS.map(function(c){if(c.id===SEL.id)c.memo=ft+it;return c;});render();}
+  };
+  recog.onerror=function(){stopR();};
+  recog.start();REC=true;RT=0;
+  rtimer=setInterval(function(){RT++;render();},1000);render();
 }
-
-function stopRec(){if(recog){recog.stop();recog=null;}clearInterval(recTimer);recording=false;render();}
-
-function updateMemo(v){if(!sel)return;sel.memo=v;customers=customers.map(function(c){if(c.id===sel.id)c.memo=v;return c;});}
+function stopR(){if(recog){recog.stop();recog=null;}clearInterval(rtimer);REC=false;render();}
+function um(v){if(!SEL)return;SEL.memo=v;CS=CS.map(function(c){if(c.id===SEL.id)c.memo=v;return c;});}
 
 function analyze(){
-  if(!sel||!sel.memo||!sel.memo.trim())return;
-  analyzing=true;render();
-  var c=sel;
-  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:'住宅営業コーチとして分析してください。\n顧客:'+c.name+'様\n予算:'+c.budget+'\nフェーズ:'+c.phase+'\n競合:'+c.competitor+'\nネック:'+Object.entries(c.necks).map(function(e){return e[0]+':'+e[1];}).join('、')+'\n\n商談メモ:'+c.memo+'\n\n【顧客の本音】\n・\n\n【次回アクション】\n1.\n2.\n3.\n\n【LINEメッセージ文面】\n\n【競合対策】\n・'}]})}).then(function(r){return r.json();}).then(function(d){var r=d.content?d.content.map(function(i){return i.text||'';}).join('\n'):'分析できませんでした';sel.aiResult=r;customers=customers.map(function(c2){if(c2.id===c.id)c2.aiResult=r;return c2;});analyzing=false;render();}).catch(function(){analyzing=false;alert('エラーが発生しました');render();});
+  if(!SEL||!SEL.memo||!SEL.memo.trim())return;
+  ANA=true;render();
+  var c=SEL;
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:800,messages:[{role:'user',content:'住宅営業コーチとして分析。顧客:'+c.name+'/予算:'+c.budget+'/フェーズ:'+c.phase+'/競合:'+c.comp+'\nネック:'+Object.entries(c.necks).map(function(e){return e[0]+':'+e[1];}).join(',')+'\n商談メモ:'+c.memo+'\n\n【顧客の本音】\n【次回アクション3つ】\n【LINE文面】\n【競合対策】'}]})
+  }).then(function(r){return r.json();}).then(function(d){
+    var r=d.content?d.content.map(function(i){return i.text||'';}).join('\n'):'分析できませんでした';
+    SEL.air=r;CS=CS.map(function(c2){if(c2.id===c.id)c2.air=r;return c2;});ANA=false;render();
+  }).catch(function(){ANA=false;alert('エラーが発生しました');render();});
 }
 
-function bdMsg(cn,fn,rel){alert('📋 LINE文面\n\n'+cn+'様\n\nいつもお世話になっております。\n'+fn+'様のお誕生日おめでとうございます🎂\n素敵な一日になりますように。\n\n引き続きよろしくお願いいたします。');}
+function bdMsg(cn,fn,rel){
+  var m=cn+'様\n\nいつもお世話になっております。\n'+fn+'様のお誕生日おめでとうございます\n素敵な一日になりますように。\n\n引き続きよろしくお願いいたします。';
+  alert('LINE文面:\n\n'+m);
+}
 
 function render(){
-  var urg=customers.filter(function(c){return c.urgent;});
-  var today=new Date().toISOString().split('T')[0];
-  var evts=[];customers.forEach(function(c){(c.events||[]).forEach(function(e){if(e.date>=today)evts.push({type:e.type,date:e.date,cn:c.name});});});
-  evts.sort(function(a,b){return a.date.localeCompare(b.date);});
-  var bds=[];customers.forEach(function(c){(c.family||[]).forEach(function(f){if(!f.birthday)return;var bd=new Date(f.birthday);var ty=new Date(new Date().getFullYear(),bd.getMonth(),bd.getDate());var diff=Math.floor((ty-new Date())/86400000);if(diff>=0&&diff<=7)bds.push({cn:c.name,fn:f.name,rel:f.relation,dl:diff});});});
+  var urg=CS.filter(function(c){return c.urg;});
+  var td=new Date().toISOString().split('T')[0];
+  var evts=[];CS.forEach(function(c){(c.events||[]).forEach(function(e){if(e.date>=td)evts.push({t:e.type,d:e.date,n:c.name});});});
+  evts.sort(function(a,b){return a.d.localeCompare(b.d);});
+  var bds=[];CS.forEach(function(c){(c.family||[]).forEach(function(f){if(!f.bd)return;var b=new Date(f.bd),ty=new Date(new Date().getFullYear(),b.getMonth(),b.getDate()),df=Math.floor((ty-new Date())/86400000);if(df>=0&&df<=7)bds.push({cn:c.name,fn:f.name,rel:f.rel,dl:df});});});
 
-  var content='';
-  if(tab==='dashboard'){
-    content='<div style="padding:16px">'+
-    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">'+
-    '<div class="stat-card" style="border-color:#3b82f6"><div style="font-size:20px">👥</div><div style="font-size:26px;font-weight:700;color:#3b82f6">'+customers.length+'</div><div style="font-size:11px;color:#64748b">総顧客数</div></div>'+
-    '<div class="stat-card" style="border-color:#ef4444"><div style="font-size:20px">⚡</div><div style="font-size:26px;font-weight:700;color:#ef4444">'+urg.length+'</div><div style="font-size:11px;color:#64748b">要対応</div></div>'+
-    '<div class="stat-card" style="border-color:#22c55e"><div style="font-size:20px">📅</div><div style="font-size:26px;font-weight:700;color:#22c55e">'+evts.length+'</div><div style="font-size:11px;color:#64748b">直近イベント</div></div>'+
-    '</div>';
-    if(bds.length>0){content+='<div style="font-size:12px;color:#64748b;font-weight:700;margin-bottom:8px">🎂 今週の誕生日</div>';bds.forEach(function(b){content+='<div class="card" style="border-left:3px solid #f59e0b;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:700;font-size:13px">'+b.cn+'様 / '+b.fn+'（'+b.rel+'）</div><div style="font-size:11px;color:#f59e0b">'+(b.dl===0?'🎉 今日！':'あと'+b.dl+'日')+'</div></div><button onclick="bdMsg(\''+b.cn+'\',\''+b.fn+'\',\''+b.rel+'\')" style="background:#1e3a5f;border:none;border-radius:8px;padding:6px 10px;color:#60a5fa;font-size:11px;font-weight:700;cursor:pointer">LINE生成</button></div>';});}
-    content+='<div style="font-size:12px;color:#64748b;font-weight:700;margin-bottom:8px;margin-top:16px">⚡ 要対応顧客</div>';
-    if(urg.length===0){content+='<div style="color:#475569;font-size:13px;text-align:center;padding:16px">要対応なし</div>';}
-    else{urg.forEach(function(c){content+='<div class="card" style="border-left:3px solid #ef4444;cursor:pointer;margin-bottom:8px" onclick="sel=customers.find(function(x){return x.id==='+c.id+'});showDet=true;render()"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div><span style="font-weight:700">'+c.name+'様</span> <span class="badge" style="background:'+rc(c.rank)+'">'+c.rank+'</span></div><div style="font-size:11px;color:#64748b">'+days(c.lastContact)+'</div></div><div style="font-size:12px;color:#94a3b8;margin-bottom:6px">→ '+c.nextAction+'</div><div style="display:flex;gap:6px">'+NECKS.map(function(n){return'<span>'+NI[c.necks[n]]+'</span>';}).join('')+'</div></div>';});}
-    content+='<div style="font-size:12px;color:#64748b;font-weight:700;margin-bottom:8px;margin-top:16px">📅 直近イベント</div>';
-    if(evts.length===0){content+='<div style="color:#475569;font-size:13px;text-align:center;padding:16px">予定なし</div>';}
-    else{evts.slice(0,5).forEach(function(e){content+='<div class="card" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div><span class="badge" style="background:#1e3a5f;color:#60a5fa;margin-right:6px">'+e.type+'</span><span style="font-size:13px">'+e.cn+'様</span></div><div style="font-size:12px;color:#64748b">'+e.date+'</div></div>';});}
-    content+='</div>';
-  } else if(tab==='customers'){
-    var filt=customers.filter(function(c){return c.phase===phase;});
-    content='<div style="padding:16px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-size:12px;color:#64748b;font-weight:700">顧客一覧</div><button onclick="showAdd=true;render()" style="background:linear-gradient(135deg,#3b82f6,#06b6d4);border:none;border-radius:8px;padding:6px 12px;color:white;font-size:12px;font-weight:700;cursor:pointer">＋ 追加</button></div><div class="phase-tabs">';
-    PHASES.forEach(function(p){var cnt=customers.filter(function(c){return c.phase===p;}).length;content+='<button class="phase-tab'+(phase===p?' active':'')+'" onclick="phase=\''+p+'\';render()">'+p+'（'+cnt+'）</button>';});
-    content+='</div>';
-    if(filt.length===0){content+='<div style="color:#475569;font-size:13px;text-align:center;padding:32px">顧客なし</div>';}
-    else{filt.forEach(function(c){content+='<div class="card" style="cursor:pointer;border-left:3px solid '+(c.urgent?'#ef4444':'#334155')+';margin-bottom:10px" onclick="sel=customers.find(function(x){return x.id==='+c.id+'});showDet=true;render()"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div><span style="font-weight:700;font-size:15px">'+c.name+'様</span> <span class="badge" style="background:'+rc(c.rank)+'">'+c.rank+'</span>'+(c.urgent?' <span class="badge" style="background:#ef4444">要対応</span>':'')+'</div><div style="font-size:11px;color:#64748b">'+days(c.lastContact)+'</div></div><div style="font-size:12px;color:#94a3b8;margin-bottom:8px">→ '+c.nextAction+'</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+NECKS.map(function(n){return'<div style="display:flex;align-items:center;gap:2px"><span style="font-size:10px;color:#64748b">'+n+'</span><span>'+NI[c.necks[n]]+'</span></div>';}).join('')+'</div></div>';});}
-    content+='</div>';
+  var html='<div style="max-width:500px;margin:0 auto;min-height:100vh">';
+
+  // Header
+  html+='<div class="header"><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;background:linear-gradient(135deg,#3b82f6,#06b6d4);border-radius:8px;text-align:center;line-height:32px;font-size:16px">🏠</div><div><div style="font-weight:700;font-size:15px">IEZUKURI PRO</div><div style="font-size:10px;color:#64748b">住宅営業自動化システム</div></div></div>'+(urg.length>0?'<div style="background:#ef4444;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700">要対応 '+urg.length+'件</div>':'')+'</div>';
+
+  // Tabs
+  html+='<div class="tab-bar"><button class="tab-btn'+(TAB==='dashboard'?' active':'')+'" onclick="TAB=\'dashboard\';render()">📊 ダッシュ</button><button class="tab-btn'+(TAB==='customers'?' active':'')+'" onclick="TAB=\'customers\';render()">👥 顧客管理</button><button class="tab-btn'+(TAB==='analyze'?' active':'')+'" onclick="TAB=\'analyze\';render()">🎙️ 商談分析</button></div>';
+
+  // Content
+  if(TAB==='dashboard'){
+    html+='<div style="padding:16px">';
+    html+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">';
+    html+='<div class="stat-card" style="border-color:#3b82f6"><div>👥</div><div style="font-size:26px;font-weight:700;color:#3b82f6">'+CS.length+'</div><div style="font-size:11px;color:#64748b">総顧客数</div></div>';
+    html+='<div class="stat-card" style="border-color:#ef4444"><div>⚡</div><div style="font-size:26px;font-weight:700;color:#ef4444">'+urg.length+'</div><div style="font-size:11px;color:#64748b">要対応</div></div>';
+    html+='<div class="stat-card" style="border-color:#22c55e"><div>📅</div><div style="font-size:26px;font-weight:700;color:#22c55e">'+evts.length+'</div><div style="font-size:11px;color:#64748b">イベント</div></div>';
+    html+='</div>';
+
+    if(bds.length>0){
+      html+='<div style="font-size:12px;color:#64748b;font-weight:700;margin-bottom:8px">🎂 今週の誕生日</div>';
+      bds.forEach(function(b){html+='<div class="card" style="border-left:3px solid #f59e0b;display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:700;font-size:13px">'+b.cn+'様/'+b.fn+'('+b.rel+')</div><div style="font-size:11px;color:#f59e0b">'+(b.dl===0?'今日！':'あと'+b.dl+'日')+'</div></div><button onclick="bdMsg(\''+b.cn+'\',\''+b.fn+'\',\''+b.rel+'\')" style="background:#1e3a5f;border:none;border-radius:8px;padding:6px 10px;color:#60a5fa;font-size:11px;cursor:pointer">LINE</button></div>';});
+    }
+
+    html+='<div style="font-size:12px;color:#64748b;font-weight:700;margin:16px 0 8px">⚡ 要対応顧客</div>';
+    if(urg.length===0){html+='<div style="color:#475569;text-align:center;padding:16px;font-size:13px">要対応なし</div>';}
+    else{urg.forEach(function(c){html+='<div class="card" style="border-left:3px solid #ef4444;cursor:pointer" onclick="SEL=CS.find(function(x){return x.id==='+c.id+'});DET=true;render()"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><div><b>'+c.name+'様</b> <span class="badge" style="background:'+rc(c.rank)+'">'+c.rank+'</span></div><span style="font-size:11px;color:#64748b">'+dago(c.lc)+'</span></div><div style="font-size:12px;color:#94a3b8;margin-bottom:6px">→ '+c.na+'</div><div style="display:flex;gap:4px">'+NK.map(function(n){return'<span>'+NI[c.necks[n]]+'</span>';}).join('')+'</div></div>';});}
+
+    html+='<div style="font-size:12px;color:#64748b;font-weight:700;margin:16px 0 8px">📅 直近イベント</div>';
+    if(evts.length===0){html+='<div style="color:#475569;text-align:center;padding:16px;font-size:13px">予定なし</div>';}
+    else{evts.slice(0,5).forEach(function(e){html+='<div class="card" style="display:flex;justify-content:space-between;align-items:center"><div><span class="badge" style="background:#1e3a5f;color:#60a5fa">'+e.t+'</span> '+e.n+'様</div><div style="font-size:12px;color:#64748b">'+e.d+'</div></div>';});}
+    html+='</div>';
+
+  } else if(TAB==='customers'){
+    var fl=CS.filter(function(c){return c.phase===PHASE;});
+    html+='<div style="padding:16px">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><b style="font-size:13px">顧客一覧</b><button onclick="ADD=true;render()" style="background:linear-gradient(135deg,#3b82f6,#06b6d4);border:none;border-radius:8px;padding:6px 12px;color:white;font-size:12px;font-weight:700;cursor:pointer">+ 追加</button></div>';
+    html+='<div class="ptabs">';
+    PH.forEach(function(p){var n=CS.filter(function(c){return c.phase===p;}).length;html+='<button class="ptab'+(PHASE===p?' active':'')+'" onclick="PHASE=\''+p+'\';render()">'+p+'('+n+')</button>';});
+    html+='</div>';
+    if(fl.length===0){html+='<div style="color:#475569;text-align:center;padding:32px;font-size:13px">顧客なし</div>';}
+    else{fl.forEach(function(c){html+='<div class="card" style="cursor:pointer;border-left:3px solid '+(c.urg?'#ef4444':'#334155')+'" onclick="SEL=CS.find(function(x){return x.id==='+c.id+'});DET=true;render()"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><div><b>'+c.name+'様</b> <span class="badge" style="background:'+rc(c.rank)+'">'+c.rank+'</span>'+(c.urg?' <span class="badge" style="background:#ef4444">要対応</span>':'')+'</div><span style="font-size:11px;color:#64748b">'+dago(c.lc)+'</span></div><div style="font-size:12px;color:#94a3b8;margin-bottom:8px">→ '+c.na+'</div><div style="display:flex;gap:6px;flex-wrap:wrap">'+NK.map(function(n){return'<span style="font-size:10px;color:#64748b">'+n+NI[c.necks[n]]+'</span>';}).join('')+'</div></div>';});}
+    html+='</div>';
+
   } else {
-    if(!sel){
-      content='<div style="padding:32px;text-align:center"><div style="font-size:48px;margin-bottom:16px">🎙️</div><div style="color:#64748b;margin-bottom:20px">顧客を選んでください</div><div style="display:flex;flex-direction:column;gap:8px">';
-      customers.forEach(function(c){content+='<button onclick="sel=customers.find(function(x){return x.id==='+c.id+'});render()" style="background:#1e293b;border:none;border-radius:10px;padding:14px;color:#e2e8f0;font-size:14px;font-weight:600;text-align:left;cursor:pointer">'+c.name+'様 <span style="color:#64748b;font-size:12px">/ '+c.phase+'</span></button>';});
-      content+='</div></div>';
+    if(!SEL){
+      html+='<div style="padding:32px;text-align:center"><div style="font-size:48px;margin-bottom:16px">🎙️</div><div style="color:#64748b;margin-bottom:20px">顧客を選んでください</div><div style="display:flex;flex-direction:column;gap:8px">';
+      CS.forEach(function(c){html+='<button onclick="SEL=CS.find(function(x){return x.id==='+c.id+'});render()" style="background:#1e293b;border:none;border-radius:10px;padding:14px;color:#e2e8f0;font-size:14px;font-weight:600;text-align:left;cursor:pointer">'+c.name+'様 <span style="color:#64748b;font-size:12px">'+c.phase+'</span></button>';});
+      html+='</div></div>';
     } else {
-      var c=sel;
-      content='<div style="padding:16px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><button onclick="sel=null;render()" style="background:#334155;border:none;border-radius:8px;padding:6px 10px;color:#94a3b8;font-size:12px;cursor:pointer">← 戻る</button><div style="font-weight:700">'+c.name+'様の商談分析</div></div>'+
-      '<button onclick="'+(recording?'stopRec()':'startRec()')+'" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:'+(recording?'linear-gradient(135deg,#ef4444,#dc2626)':'linear-gradient(135deg,#22c55e,#16a34a)')+';border:none;border-radius:12px;padding:15px;color:white;font-weight:700;font-size:14px;margin-bottom:10px;cursor:pointer">'+(recording?'■ 録音停止 '+fmt(recTime):'🎙️ タップして録音開始')+'</button>'+
-      (recording?'<div style="background:#1a0000;border:1px solid #ef4444;border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px;color:#ef4444;font-weight:700">● 録音中 '+fmt(recTime)+'</div>':'')+
-      '<textarea placeholder="🎙️ 録音で自動テキスト化&#10;または直接入力も可" style="width:100%;height:140px;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:14px;color:#e2e8f0;font-size:13px;resize:none;outline:none;line-height:1.8;margin-bottom:10px;display:block" oninput="updateMemo(this.value)">'+(c.memo||'')+'</textarea>'+
-      '<button onclick="analyze()" '+(analyzing||!c.memo||!c.memo.trim()?'disabled':'')+' style="width:100%;background:'+(analyzing||!c.memo||!c.memo.trim()?'#334155':'linear-gradient(135deg,#3b82f6,#06b6d4)')+';border:none;border-radius:10px;padding:14px;color:white;font-weight:700;font-size:14px;margin-bottom:16px;cursor:pointer">'+(analyzing?'⏳ AI分析中...':'✨ AIが次のアクションを提案する')+'</button>'+
-      (c.aiResult?'<div style="background:#1e293b;border-radius:12px;padding:20px;border-left:3px solid #3b82f6"><div style="font-size:12px;color:#3b82f6;font-weight:700;margin-bottom:12px">✨ AI分析結果</div><pre style="font-size:13px;color:#e2e8f0;white-space:pre-wrap;line-height:1.8;margin:0;font-family:inherit">'+c.aiResult+'</pre></div>':'')+
-      '</div>';
+      var sc=SEL;
+      html+='<div style="padding:16px">';
+      html+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><button onclick="SEL=null;render()" style="background:#334155;border:none;border-radius:8px;padding:6px 10px;color:#94a3b8;font-size:12px;cursor:pointer">← 戻る</button><b>'+sc.name+'様の商談分析</b></div>';
+      html+='<button onclick="'+(REC?'stopR()':'startR()')+'" style="width:100%;background:'+(REC?'linear-gradient(135deg,#ef4444,#dc2626)':'linear-gradient(135deg,#22c55e,#16a34a)')+';border:none;border-radius:12px;padding:15px;color:white;font-weight:700;font-size:14px;margin-bottom:10px;cursor:pointer">'+(REC?'■ 録音停止 '+ft2(RT):'🎙️ タップして録音開始')+'</button>';
+      if(REC)html+='<div style="background:#1a0000;border:1px solid #ef4444;border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px;color:#ef4444">● 録音中 '+ft2(RT)+'</div>';
+      html+='<textarea oninput="um(this.value)" placeholder="録音または直接入力" style="width:100%;height:140px;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:14px;color:#e2e8f0;font-size:13px;resize:none;outline:none;line-height:1.8;margin-bottom:10px;display:block">'+( sc.memo||'')+'</textarea>';
+      html+='<button onclick="analyze()" '+(ANA||!sc.memo?'disabled':'')+' style="width:100%;background:'+(ANA||!sc.memo?'#334155':'linear-gradient(135deg,#3b82f6,#06b6d4)')+';border:none;border-radius:10px;padding:14px;color:white;font-weight:700;font-size:14px;margin-bottom:16px;cursor:pointer">'+(ANA?'分析中...':'AIが次のアクションを提案する')+'</button>';
+      if(sc.air)html+='<div style="background:#1e293b;border-radius:12px;padding:20px;border-left:3px solid #3b82f6"><div style="font-size:12px;color:#3b82f6;font-weight:700;margin-bottom:12px">AI分析結果</div><pre style="font-size:13px;color:#e2e8f0;white-space:pre-wrap;line-height:1.8;font-family:inherit">'+sc.air+'</pre></div>';
+      html+='</div>';
     }
   }
 
-  var det='';
-  if(showDet&&sel){
-    var sc=sel;
-    det='<div class="modal-overlay" onclick="if(event.target===this){showDet=false;render()}"><div class="modal">'+
-    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div><div style="font-size:18px;font-weight:700">'+sc.name+'様</div><div style="font-size:12px;color:#64748b">'+sc.phase+' / ランク'+sc.rank+'</div></div><button onclick="showDet=false;render()" style="background:none;border:none;color:#64748b;font-size:20px;cursor:pointer">✕</button></div>'+
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">'+
-    [['💰 予算',sc.budget],['🏡 土地',sc.land],['🏢 競合',sc.competitor],['📞 最終連絡',days(sc.lastContact)],['🏠 初回来場',sc.firstVisit||'未登録'],['⚡ 次のアクション',sc.nextAction]].map(function(kv){return'<div style="background:#0f172a;border-radius:8px;padding:10px"><div class="label">'+kv[0]+'</div><div style="font-size:12px;font-weight:500">'+kv[1]+'</div></div>';}).join('')+
-    '</div>'+
-    '<div style="font-size:12px;color:#64748b;font-weight:700;margin-bottom:8px">🚦 ネック（タップで更新）</div>'+
-    '<div class="neck-grid">'+NECKS.map(function(n){return'<div class="neck-item '+NC[sc.necks[n]]+'" onclick="cycleNeck(\''+n+'\')"><div style="font-size:20px">'+NI[sc.necks[n]]+'</div><div style="font-size:12px;font-weight:700;margin-top:4px">'+n+'</div><div style="font-size:10px;color:#64748b;margin-top:2px">'+sc.necks[n]+'</div></div>';}).join('')+'</div>'+
-    (sc.family&&sc.family.length>0?'<div style="font-size:12px;color:#64748b;font-weight:700;margin-bottom:8px">👨‍👩‍👧 家族</div>'+sc.family.map(function(f){return'<div style="background:#0f172a;border-radius:8px;padding:10px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:600">'+f.name+'（'+f.relation+'）</div>'+(f.birthday?'<div style="font-size:11px;color:#64748b">'+f.birthday+'</div>':'')+'</div>'+(f.birthday?'<button onclick="bdMsg(\''+sc.name+'\',\''+f.name+'\',\''+f.relation+'\')" style="background:#1e3a5f;border:none;border-radius:6px;padding:4px 8px;color:#60a5fa;font-size:11px;cursor:pointer">LINE生成</button>':'')+'</div>';}).join(''):'')+'</div></div>';
+  // Detail modal
+  if(DET&&SEL){
+    var s=SEL;
+    html+='<div class="overlay" onclick="if(event.target===this){DET=false;render()}"><div class="modal">';
+    html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div><div style="font-size:18px;font-weight:700">'+s.name+'様</div><div style="font-size:12px;color:#64748b">'+s.phase+' / ランク'+s.rank+'</div></div><button onclick="DET=false;render()" style="background:none;border:none;color:#64748b;font-size:22px;cursor:pointer">x</button></div>';
+    html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">';
+    [['予算',s.budget],['土地',s.land],['競合',s.comp],['最終連絡',dago(s.lc)],['初回来場',s.fv||'未登録'],['次のアクション',s.na]].forEach(function(kv){html+='<div style="background:#0f172a;border-radius:8px;padding:10px"><div class="lbl">'+kv[0]+'</div><div style="font-size:12px">'+kv[1]+'</div></div>';});
+    html+='</div>';
+    html+='<div style="font-size:12px;color:#64748b;font-weight:700;margin-bottom:8px">ネック（タップで更新）</div>';
+    html+='<div class="ng">';
+    NK.forEach(function(n){html+='<div class="ni '+(NC[s.necks[n]]||'')+'" onclick="cn(\''+n+'\')"><div style="font-size:20px">'+NI[s.necks[n]]+'</div><div style="font-size:12px;font-weight:700;margin-top:4px">'+n+'</div><div style="font-size:10px;color:#64748b">'+s.necks[n]+'</div></div>';});
+    html+='</div>';
+    if(s.family&&s.family.length){
+      html+='<div style="font-size:12px;color:#64748b;font-weight:700;margin-bottom:8px">家族</div>';
+      s.family.forEach(function(f){html+='<div style="background:#0f172a;border-radius:8px;padding:10px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center"><div><b>'+f.name+'('+f.rel+')</b>'+(f.bd?'<div style="font-size:11px;color:#64748b">'+f.bd+'</div>':'')+'</div>'+(f.bd?'<button onclick="bdMsg(\''+s.name+'\',\''+f.name+'\',\''+f.rel+'\')" style="background:#1e3a5f;border:none;border-radius:6px;padding:4px 8px;color:#60a5fa;font-size:11px;cursor:pointer">LINE</button>':'')+'</div>';});
+    }
+    html+='<button onclick="DET=false;TAB=\'analyze\';render()" class="btn-p" style="margin-top:8px">商談分析へ</button>';
+    html+='</div></div>';
   }
 
-  var addHtml='';
-  if(showAdd){
-    addHtml='<div class="modal-overlay"><div class="modal"><div style="font-size:16px;font-weight:700;margin-bottom:20px">👤 顧客を追加</div>'+
-    '<div class="label">お客様名 *</div><input class="input" style="margin-bottom:12px" placeholder="田中 雄一" oninput="nc.name=this.value">'+
-    '<div class="label">電話番号</div><input class="input" style="margin-bottom:12px" placeholder="090-1234-5678" oninput="nc.phone=this.value">'+
-    '<div class="label">フェーズ</div><select class="input" style="margin-bottom:12px" onchange="nc.phase=this.value">'+PHASES.map(function(p){return'<option'+(nc.phase===p?' selected':'')+'>'+p+'</option>';}).join('')+'</select>'+
-    '<div class="label">熱量ランク</div><div style="display:flex;gap:8px;margin-bottom:12px">'+['S','A','B','C'].map(function(r){return'<button onclick="nc.rank=\''+r+'\';render()" style="flex:1;padding:8px;border:none;border-radius:8px;font-weight:700;cursor:pointer;background:'+(nc.rank===r?rc(r):'#0f172a')+';color:'+(nc.rank===r?'white':'#64748b')+'">'+r+'</button>';}).join('')+'</div>'+
-    '<div class="label">予算</div><input class="input" style="margin-bottom:12px" placeholder="4000万円" oninput="nc.budget=this.value">'+
-    '<div class="label">競合他社</div><input class="input" style="margin-bottom:12px" placeholder="積水ハウス" oninput="nc.competitor=this.value">'+
-    '<div class="label">初回来場日</div><input class="input" type="date" style="margin-bottom:20px" oninput="nc.firstVisit=this.value">'+
-    '<div style="display:flex;gap:8px"><button onclick="showAdd=false;render()" style="flex:1;background:#334155;border:none;border-radius:8px;padding:12px;color:#94a3b8;font-weight:700;cursor:pointer">キャンセル</button><button onclick="addC()" class="btn-primary" style="flex:1">登録する</button></div>'+
-    '</div></div>';
+  // Add modal
+  if(ADD){
+    html+='<div class="overlay"><div class="modal">';
+    html+='<div style="font-size:16px;font-weight:700;margin-bottom:20px">顧客を追加</div>';
+    html+='<div class="lbl">お客様名 *</div><input class="inp" style="margin-bottom:12px" placeholder="田中 雄一" oninput="NC2.name=this.value">';
+    html+='<div class="lbl">電話番号</div><input class="inp" style="margin-bottom:12px" placeholder="090-1234-5678" oninput="NC2.phone=this.value">';
+    html+='<div class="lbl">フェーズ</div><select class="inp" style="margin-bottom:12px" onchange="NC2.phase=this.value">'+PH.map(function(p){return'<option>'+p+'</option>';}).join('')+'</select>';
+    html+='<div class="lbl">熱量ランク</div><div style="display:flex;gap:8px;margin-bottom:12px">'+['S','A','B','C'].map(function(r){return'<button onclick="NC2.rank=\''+r+'\';render()" style="flex:1;padding:8px;border:none;border-radius:8px;font-weight:700;cursor:pointer;background:'+(NC2.rank===r?rc(r):'#0f172a')+';color:'+(NC2.rank===r?'white':'#64748b')+'">'+r+'</button>';}).join('')+'</div>';
+    html+='<div class="lbl">予算</div><input class="inp" style="margin-bottom:12px" placeholder="4000万円" oninput="NC2.budget=this.value">';
+    html+='<div class="lbl">競合他社</div><input class="inp" style="margin-bottom:12px" placeholder="積水ハウス" oninput="NC2.comp=this.value">';
+    html+='<div class="lbl">初回来場日</div><input class="inp" type="date" style="margin-bottom:20px" oninput="NC2.fv=this.value">';
+    html+='<div style="display:flex;gap:8px"><button onclick="ADD=false;render()" style="flex:1;background:#334155;border:none;border-radius:8px;padding:12px;color:#94a3b8;font-weight:700;cursor:pointer">キャンセル</button><button onclick="addC()" class="btn-p" style="flex:1">登録する</button></div>';
+    html+='</div></div>';
   }
 
-  document.getElementById('app').innerHTML=
-  '<div style="max-width:500px;margin:0 auto;min-height:100vh">'+
-  '<div class="header"><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;background:linear-gradient(135deg,#3b82f6,#06b6d4);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">🏠</div><div><div style="font-weight:700;font-size:15px">IEZUKURI PRO</div><div style="font-size:10px;color:#64748b">住宅営業自動化システム</div></div></div>'+(urg.length>0?'<div style="background:#ef4444;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700">🔔 要対応 '+urg.length+'件</div>':'')+'</div>'+
-  '<div class="tab-bar"><button class="tab-btn'+(tab==='dashboard'?' active':'')+'" onclick="tab=\'dashboard\';render()">📊<br>ダッシュボード</button><button class="tab-btn'+(tab==='customers'?' active':'')+'" onclick="tab=\'customers\';render()">👥<br>顧客管理</button><button class="tab-btn'+(tab==='analyze'?' active':'')+'" onclick="tab=\'analyze\';render()">🎙️<br>商談分析</button></div>'+
-  content+det+addHtml+
-  (toast?'<div class="toast">'+toast+'</div>':'')+
-  '</div>';
+  if(TOAST)html+='<div class="toast">'+TOAST+'</div>';
+  html+='</div>';
+  document.getElementById('app').innerHTML=html;
 }
 render();
 </script>
