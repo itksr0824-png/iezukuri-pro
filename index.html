@@ -1,615 +1,180 @@
 <!DOCTYPE html>
-
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>IEZUKURI PRO</title>
 <style>
-* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body { font-family: -apple-system, 'Noto Sans JP', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
-button { cursor: pointer; font-family: inherit; }
-input, textarea, select { font-family: inherit; }
-.tab-bar { display: flex; background: #1e293b; border-bottom: 1px solid #334155; position: sticky; top: 0; z-index: 50; }
-.tab-btn { flex: 1; padding: 12px 4px; background: none; border: none; color: #64748b; font-size: 11px; border-bottom: 2px solid transparent; transition: all 0.2s; }
-.tab-btn.active { color: #3b82f6; border-bottom-color: #3b82f6; font-weight: 700; }
-.card { background: #1e293b; border-radius: 12px; padding: 16px; margin-bottom: 10px; }
-.badge { display: inline-block; border-radius: 6px; padding: 2px 8px; font-size: 11px; font-weight: 700; }
-.btn-primary { background: linear-gradient(135deg, #3b82f6, #06b6d4); border: none; border-radius: 10px; padding: 14px; color: white; font-weight: 700; font-size: 14px; width: 100%; }
-.btn-secondary { background: #334155; border: none; border-radius: 8px; padding: 10px 16px; color: #94a3b8; font-weight: 600; font-size: 13px; }
-.input { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 12px; color: #e2e8f0; font-size: 13px; width: 100%; outline: none; }
-.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 100; display: flex; align-items: flex-end; justify-content: center; }
-.modal { background: #1e293b; border-radius: 20px 20px 0 0; padding: 24px; width: 100%; max-width: 500px; max-height: 85vh; overflow-y: auto; }
-.modal-title { font-size: 16px; font-weight: 700; margin-bottom: 20px; }
-.label { font-size: 11px; color: #64748b; margin-bottom: 4px; font-weight: 600; }
-.section-title { font-size: 12px; color: #64748b; font-weight: 700; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
-.neck-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 16px; }
-.neck-item { background: #0f172a; border-radius: 8px; padding: 10px; text-align: center; border: 2px solid transparent; cursor: pointer; }
-.neck-item.green { border-color: #22c55e; background: #052e16; }
-.neck-item.yellow { border-color: #f59e0b; background: #1c1300; }
-.neck-item.red { border-color: #ef4444; background: #1a0000; }
-.neck-label { font-size: 12px; font-weight: 700; margin-top: 4px; }
-.phase-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; margin-bottom: 16px; }
-.phase-tab { white-space: nowrap; padding: 6px 14px; border-radius: 20px; border: none; font-size: 12px; font-weight: 600; cursor: pointer; }
-.rank-s { background: #ff4444; color: white; }
-.rank-a { background: #f97316; color: white; }
-.rank-b { background: #3b82f6; color: white; }
-.rank-c { background: #64748b; color: white; }
-.stat-card { background: #1e293b; border-radius: 12px; padding: 14px; text-align: center; border-left: 3px solid; }
-.toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #22c55e; color: white; padding: 12px 20px; border-radius: 10px; font-weight: 700; font-size: 13px; z-index: 200; white-space: nowrap; }
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,sans-serif;background:#0f172a;color:#e2e8f0;min-height:100vh}
+.header{background:#1e293b;border-bottom:1px solid #334155;padding:14px 16px;display:flex;align-items:center;justify-content:space-between}
+.tab-bar{display:flex;background:#1e293b;border-bottom:1px solid #334155}
+.tab-btn{flex:1;padding:12px 4px;background:none;border:none;color:#64748b;font-size:11px;border-bottom:2px solid transparent;cursor:pointer}
+.tab-btn.active{color:#3b82f6;border-bottom-color:#3b82f6;font-weight:700}
+.card{background:#1e293b;border-radius:12px;padding:14px;margin-bottom:10px}
+.badge{display:inline-block;border-radius:6px;padding:2px 8px;font-size:11px;font-weight:700}
+.stat-card{background:#1e293b;border-radius:12px;padding:14px;text-align:center;border-left:3px solid}
+.input{background:#0f172a;border:1px solid #334155;border-radius:8px;padding:10px 12px;color:#e2e8f0;font-size:13px;width:100%;outline:none}
+.label{font-size:11px;color:#64748b;margin-bottom:4px;font-weight:600}
+.btn-primary{background:linear-gradient(135deg,#3b82f6,#06b6d4);border:none;border-radius:10px;padding:14px;color:white;font-weight:700;font-size:14px;width:100%;cursor:pointer}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:100;display:flex;align-items:flex-end;justify-content:center}
+.modal{background:#1e293b;border-radius:20px 20px 0 0;padding:24px;width:100%;max-height:85vh;overflow-y:auto}
+.neck-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+.neck-item{background:#0f172a;border-radius:8px;padding:10px;text-align:center;border:2px solid #334155;cursor:pointer}
+.neck-green{border-color:#22c55e!important;background:#052e16!important}
+.neck-red{border-color:#ef4444!important;background:#1a0000!important}
+.phase-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px}
+.phase-tab{white-space:nowrap;padding:6px 14px;border-radius:20px;border:none;font-size:12px;font-weight:600;cursor:pointer;background:#1e293b;color:#64748b}
+.phase-tab.active{background:linear-gradient(135deg,#3b82f6,#06b6d4);color:white}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:#22c55e;color:white;padding:12px 20px;border-radius:10px;font-weight:700;z-index:200}
 </style>
 </head>
 <body>
 <div id="app"></div>
 <script>
-const PHASES = ['契約済み・打ち合わせ中', '仮契約済み', '追客中', '失注・長期フォロー'];
-const NECKS = ['土地', '建物', 'メーカー', '親族', '時期', 'お金'];
-const NECK_STATUS = ['未確認', '要対応', '解決済み'];
-const RANKS = ['S', 'A', 'B', 'C'];
+var PHASES=['契約済み・打ち合わせ中','仮契約済み','追客中','失注・長期フォロー'];
+var NECKS=['土地','建物','メーカー','親族','時期','お金'];
+var NS=['未確認','要対応','解決済み'];
+var NI={'未確認':'⬜','要対応':'🔴','解決済み':'🟢'};
+var NC={'未確認':'','要対応':'neck-red','解決済み':'neck-green'};
+var customers=[
+{id:1,name:'田中 雄一',phase:'追客中',rank:'S',budget:'4000万円',land:'土地あり',firstVisit:'2024-03-05',lastContact:'2026-03-03',nextAction:'間取り提案書を送付',competitor:'積水ハウス',urgent:true,memo:'',aiResult:'',family:[{name:'田中 花子',relation:'奥様',birthday:'1985-05-03'}],events:[{type:'工場見学',date:'2026-03-15'}],necks:{土地:'解決済み',建物:'要対応',メーカー:'要対応',親族:'解決済み',時期:'未確認',お金:'要対応'}},
+{id:2,name:'佐藤 美咲',phase:'仮契約済み',rank:'A',budget:'3500万円',land:'土地なし',firstVisit:'2024-06-10',lastContact:'2026-02-28',nextAction:'土地情報を共有する',competitor:'タマホーム',urgent:false,memo:'',aiResult:'',family:[{name:'佐藤 健',relation:'ご主人',birthday:'1990-11-20'}],events:[],necks:{土地:'要対応',建物:'解決済み',メーカー:'解決済み',親族:'解決済み',時期:'要対応',お金:'解決済み'}},
+{id:3,name:'山本 健太',phase:'失注・長期フォロー',rank:'C',budget:'3000万円',land:'土地なし',firstVisit:'2023-11-15',lastContact:'2026-01-10',nextAction:'ライフプランニングへ案内',competitor:'未確認',urgent:true,memo:'',aiResult:'',family:[],events:[{type:'ライフプランニング',date:'2026-03-20'}],necks:{土地:'要対応',建物:'未確認',メーカー:'要対応',親族:'要対応',時期:'要対応',お金:'要対応'}}
+];
+var tab='dashboard',phase='追客中',sel=null,showDet=false,showAdd=false,toast=null,analyzing=false,recording=false,recTime=0,recog=null,recTimer=null,finalTxt='';
+var nc={name:'',phone:'',phase:'追客中',rank:'A',budget:'',land:'土地なし',competitor:'',firstVisit:''};
 
-const NECK_COLORS = {
-‘未確認’: { cls: ‘’, icon: ‘⬜’, color: ‘#64748b’ },
-‘要対応’: { cls: ‘red’, icon: ‘🔴’, color: ‘#ef4444’ },
-‘解決済み’: { cls: ‘green’, icon: ‘🟢’, color: ‘#22c55e’ }
-};
+function days(d){if(!d)return'-';var x=Math.floor((new Date()-new Date(d))/86400000);return x===0?'今日':x===1?'昨日':x+'日前';}
+function rc(r){return r==='S'?'#ef4444':r==='A'?'#f97316':r==='B'?'#3b82f6':'#64748b';}
+function fmt(s){return('0'+Math.floor(s/60)).slice(-2)+':'+('0'+(s%60)).slice(-2);}
+function showT(m){toast=m;render();setTimeout(function(){toast=null;render();},3000);}
 
-let state = {
-tab: ‘dashboard’,
-customers: [
-{
-id: 1, name: ‘田中 雄一’, family: [
-{ name: ‘田中 花子’, relation: ‘奥様’, birthday: ‘1985-05-03’ },
-{ name: ‘田中 太郎’, relation: ‘長男’, birthday: ‘2015-08-15’ }
-],
-phone: ‘090-1234-5678’, phase: ‘追客中’, rank: ‘S’,
-budget: ‘4000万円’, land: ‘土地あり’, firstVisit: ‘2024-03-05’,
-lastContact: ‘2026-03-03’, nextAction: ‘間取り提案書を送付’,
-competitor: ‘積水ハウス’, urgent: true,
-necks: { 土地: ‘解決済み’, 建物: ‘要対応’, メーカー: ‘要対応’, 親族: ‘解決済み’, 時期: ‘未確認’, お金: ‘要対応’ },
-memo: ‘’, aiResult: ‘’, events: [{ type: ‘工場見学’, date: ‘2026-03-15’ }]
-},
-{
-id: 2, name: ‘佐藤 美咲’, family: [{ name: ‘佐藤 健’, relation: ‘ご主人’, birthday: ‘1990-11-20’ }],
-phone: ‘090-2345-6789’, phase: ‘仮契約済み’, rank: ‘A’,
-budget: ‘3500万円’, land: ‘土地なし’, firstVisit: ‘2024-06-10’,
-lastContact: ‘2026-02-28’, nextAction: ‘土地情報を共有する’,
-competitor: ‘タマホーム’, urgent: false,
-necks: { 土地: ‘要対応’, 建物: ‘解決済み’, メーカー: ‘解決済み’, 親族: ‘解決済み’, 時期: ‘要対応’, お金: ‘解決済み’ },
-memo: ‘’, aiResult: ‘’, events: []
-},
-{
-id: 3, name: ‘山本 健太’, family: [],
-phone: ‘090-3456-7890’, phase: ‘失注・長期フォロー’, rank: ‘C’,
-budget: ‘3000万円’, land: ‘土地なし’, firstVisit: ‘2023-11-15’,
-lastContact: ‘2026-01-10’, nextAction: ‘ライフプランニングへ案内’,
-competitor: ‘未確認’, urgent: true,
-necks: { 土地: ‘要対応’, 建物: ‘未確認’, メーカー: ‘要対応’, 親族: ‘要対応’, 時期: ‘要対応’, お金: ‘要対応’ },
-memo: ‘’, aiResult: ‘’, events: [{ type: ‘ライフプランニング’, date: ‘2026-03-20’ }]
-}
-],
-selectedCustomer: null,
-showCustomerDetail: false,
-showAddCustomer: false,
-showAnalyze: false,
-toast: null,
-phaseFilter: ‘追客中’,
-isAnalyzing: false,
-isRecording: false,
-recordingTime: 0,
-newCustomer: { name: ‘’, phone: ‘’, phase: ‘追客中’, rank: ‘A’, budget: ‘’, land: ‘土地なし’, competitor: ‘’, firstVisit: ‘’, necks: { 土地: ‘未確認’, 建物: ‘未確認’, メーカー: ‘未確認’, 親族: ‘未確認’, 時期: ‘未確認’, お金: ‘未確認’ } }
-};
-
-let recognition = null;
-let timer = null;
-let finalTranscript = ‘’;
-
-function setState(updates) {
-Object.assign(state, updates);
-render();
+function cycleNeck(n){
+  if(!sel)return;
+  var i=NS.indexOf(sel.necks[n]);
+  var nx=NS[(i+1)%NS.length];
+  sel.necks[n]=nx;
+  customers=customers.map(function(c){if(c.id===sel.id)c.necks[n]=nx;return c;});
+  render();
 }
 
-function showToast(msg) {
-setState({ toast: msg });
-setTimeout(() => setState({ toast: null }), 3000);
+function addC(){
+  if(!nc.name.trim()){alert('名前を入力してください');return;}
+  customers.push({id:Date.now(),name:nc.name,phone:nc.phone,phase:nc.phase,rank:nc.rank,budget:nc.budget,land:nc.land,competitor:nc.competitor,firstVisit:nc.firstVisit,lastContact:new Date().toISOString().split('T')[0],nextAction:'初回フォロー',urgent:false,memo:'',aiResult:'',family:[],events:[],necks:{土地:'未確認',建物:'未確認',メーカー:'未確認',親族:'未確認',時期:'未確認',お金:'未確認'}});
+  showAdd=false;
+  nc={name:'',phone:'',phase:'追客中',rank:'A',budget:'',land:'土地なし',competitor:'',firstVisit:''};
+  showT('✅ 顧客を登録しました');
 }
 
-function daysSince(dateStr) {
-if (!dateStr) return ‘-’;
-const diff = Math.floor((new Date() - new Date(dateStr)) / 86400000);
-if (diff === 0) return ‘今日’;
-if (diff === 1) return ‘昨日’;
-return diff + ‘日前’;
+function startRec(){
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert('ChromeまたはSafariをお使いください');return;}
+  recog=new SR();recog.lang='ja-JP';recog.continuous=true;recog.interimResults=true;
+  finalTxt=sel?(sel.memo||')':'';
+  recog.onresult=function(e){var it='',nf='';for(var i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)nf+=e.results[i][0].transcript;else it+=e.results[i][0].transcript;}if(nf)finalTxt+=nf;if(sel){sel.memo=finalTxt+it;customers=customers.map(function(c){if(c.id===sel.id)c.memo=finalTxt+it;return c;});render();}};
+  recog.onerror=function(e){if(e.error==='not-allowed')alert('マイクを許可してください');stopRec();};
+  recog.start();recording=true;recTime=0;
+  recTimer=setInterval(function(){recTime++;render();},1000);render();
 }
 
-function getNeckSummary(necks) {
-const counts = { ‘解決済み’: 0, ‘要対応’: 0, ‘未確認’: 0 };
-Object.values(necks).forEach(v => counts[v]++);
-return counts;
+function stopRec(){if(recog){recog.stop();recog=null;}clearInterval(recTimer);recording=false;render();}
+
+function updateMemo(v){if(!sel)return;sel.memo=v;customers=customers.map(function(c){if(c.id===sel.id)c.memo=v;return c;});}
+
+function analyze(){
+  if(!sel||!sel.memo||!sel.memo.trim())return;
+  analyzing=true;render();
+  var c=sel;
+  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:'住宅営業コーチとして分析してください。\n顧客:'+c.name+'様\n予算:'+c.budget+'\nフェーズ:'+c.phase+'\n競合:'+c.competitor+'\nネック:'+Object.entries(c.necks).map(function(e){return e[0]+':'+e[1];}).join('、')+'\n\n商談メモ:'+c.memo+'\n\n【顧客の本音】\n・\n\n【次回アクション】\n1.\n2.\n3.\n\n【LINEメッセージ文面】\n\n【競合対策】\n・'}]})}).then(function(r){return r.json();}).then(function(d){var r=d.content?d.content.map(function(i){return i.text||'';}).join('\n'):'分析できませんでした';sel.aiResult=r;customers=customers.map(function(c2){if(c2.id===c.id)c2.aiResult=r;return c2;});analyzing=false;render();}).catch(function(){analyzing=false;alert('エラーが発生しました');render();});
 }
 
-function startRecording() {
-const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-if (!SR) { alert(‘音声認識非対応のブラウザです。ChromeまたはSafariをお使いください。’); return; }
-recognition = new SR();
-recognition.lang = ‘ja-JP’;
-recognition.continuous = true;
-recognition.interimResults = true;
-finalTranscript = state.selectedCustomer?.memo || ‘’;
+function bdMsg(cn,fn,rel){alert('📋 LINE文面\n\n'+cn+'様\n\nいつもお世話になっております。\n'+fn+'様のお誕生日おめでとうございます🎂\n素敵な一日になりますように。\n\n引き続きよろしくお願いいたします。');}
 
-recognition.onresult = (e) => {
-let interim = ‘’;
-let newFinal = ‘’;
-for (let i = e.resultIndex; i < e.results.length; i++) {
-if (e.results[i].isFinal) newFinal += e.results[i][0].transcript;
-else interim += e.results[i][0].transcript;
+function render(){
+  var urg=customers.filter(function(c){return c.urgent;});
+  var today=new Date().toISOString().split('T')[0];
+  var evts=[];customers.forEach(function(c){(c.events||[]).forEach(function(e){if(e.date>=today)evts.push({type:e.type,date:e.date,cn:c.name});});});
+  evts.sort(function(a,b){return a.date.localeCompare(b.date);});
+  var bds=[];customers.forEach(function(c){(c.family||[]).forEach(function(f){if(!f.birthday)return;var bd=new Date(f.birthday);var ty=new Date(new Date().getFullYear(),bd.getMonth(),bd.getDate());var diff=Math.floor((ty-new Date())/86400000);if(diff>=0&&diff<=7)bds.push({cn:c.name,fn:f.name,rel:f.relation,dl:diff});});});
+
+  var content='';
+  if(tab==='dashboard'){
+    content='<div style="padding:16px">'+
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">'+
+    '<div class="stat-card" style="border-color:#3b82f6"><div style="font-size:20px">👥</div><div style="font-size:26px;font-weight:700;color:#3b82f6">'+customers.length+'</div><div style="font-size:11px;color:#64748b">総顧客数</div></div>'+
+    '<div class="stat-card" style="border-color:#ef4444"><div style="font-size:20px">⚡</div><div style="font-size:26px;font-weight:700;color:#ef4444">'+urg.length+'</div><div style="font-size:11px;color:#64748b">要対応</div></div>'+
+    '<div class="stat-card" style="border-color:#22c55e"><div style="font-size:20px">📅</div><div style="font-size:26px;font-weight:700;color:#22c55e">'+evts.length+'</div><div style="font-size:11px;color:#64748b">直近イベント</div></div>'+
+    '</div>';
+    if(bds.length>0){content+='<div style="font-size:12px;color:#64748b;font-weight:700;margin-bottom:8px">🎂 今週の誕生日</div>';bds.forEach(function(b){content+='<div class="card" style="border-left:3px solid #f59e0b;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center"><div><div style="font-weight:700;font-size:13px">'+b.cn+'様 / '+b.fn+'（'+b.rel+'）</div><div style="font-size:11px;color:#f59e0b">'+(b.dl===0?'🎉 今日！':'あと'+b.dl+'日')+'</div></div><button onclick="bdMsg(\''+b.cn+'\',\''+b.fn+'\',\''+b.rel+'\')" style="background:#1e3a5f;border:none;border-radius:8px;padding:6px 10px;color:#60a5fa;font-size:11px;font-weight:700;cursor:pointer">LINE生成</button></div>';});}
+    content+='<div style="font-size:12px;color:#64748b;font-weight:700;margin-bottom:8px;margin-top:16px">⚡ 要対応顧客</div>';
+    if(urg.length===0){content+='<div style="color:#475569;font-size:13px;text-align:center;padding:16px">要対応なし</div>';}
+    else{urg.forEach(function(c){content+='<div class="card" style="border-left:3px solid #ef4444;cursor:pointer;margin-bottom:8px" onclick="sel=customers.find(function(x){return x.id==='+c.id+'});showDet=true;render()"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div><span style="font-weight:700">'+c.name+'様</span> <span class="badge" style="background:'+rc(c.rank)+'">'+c.rank+'</span></div><div style="font-size:11px;color:#64748b">'+days(c.lastContact)+'</div></div><div style="font-size:12px;color:#94a3b8;margin-bottom:6px">→ '+c.nextAction+'</div><div style="display:flex;gap:6px">'+NECKS.map(function(n){return'<span>'+NI[c.necks[n]]+'</span>';}).join('')+'</div></div>';});}
+    content+='<div style="font-size:12px;color:#64748b;font-weight:700;margin-bottom:8px;margin-top:16px">📅 直近イベント</div>';
+    if(evts.length===0){content+='<div style="color:#475569;font-size:13px;text-align:center;padding:16px">予定なし</div>';}
+    else{evts.slice(0,5).forEach(function(e){content+='<div class="card" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div><span class="badge" style="background:#1e3a5f;color:#60a5fa;margin-right:6px">'+e.type+'</span><span style="font-size:13px">'+e.cn+'様</span></div><div style="font-size:12px;color:#64748b">'+e.date+'</div></div>';});}
+    content+='</div>';
+  } else if(tab==='customers'){
+    var filt=customers.filter(function(c){return c.phase===phase;});
+    content='<div style="padding:16px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-size:12px;color:#64748b;font-weight:700">顧客一覧</div><button onclick="showAdd=true;render()" style="background:linear-gradient(135deg,#3b82f6,#06b6d4);border:none;border-radius:8px;padding:6px 12px;color:white;font-size:12px;font-weight:700;cursor:pointer">＋ 追加</button></div><div class="phase-tabs">';
+    PHASES.forEach(function(p){var cnt=customers.filter(function(c){return c.phase===p;}).length;content+='<button class="phase-tab'+(phase===p?' active':'')+'" onclick="phase=\''+p+'\';render()">'+p+'（'+cnt+'）</button>';});
+    content+='</div>';
+    if(filt.length===0){content+='<div style="color:#475569;font-size:13px;text-align:center;padding:32px">顧客なし</div>';}
+    else{filt.forEach(function(c){content+='<div class="card" style="cursor:pointer;border-left:3px solid '+(c.urgent?'#ef4444':'#334155')+';margin-bottom:10px" onclick="sel=customers.find(function(x){return x.id==='+c.id+'});showDet=true;render()"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div><span style="font-weight:700;font-size:15px">'+c.name+'様</span> <span class="badge" style="background:'+rc(c.rank)+'">'+c.rank+'</span>'+(c.urgent?' <span class="badge" style="background:#ef4444">要対応</span>':'')+'</div><div style="font-size:11px;color:#64748b">'+days(c.lastContact)+'</div></div><div style="font-size:12px;color:#94a3b8;margin-bottom:8px">→ '+c.nextAction+'</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+NECKS.map(function(n){return'<div style="display:flex;align-items:center;gap:2px"><span style="font-size:10px;color:#64748b">'+n+'</span><span>'+NI[c.necks[n]]+'</span></div>';}).join('')+'</div></div>';});}
+    content+='</div>';
+  } else {
+    if(!sel){
+      content='<div style="padding:32px;text-align:center"><div style="font-size:48px;margin-bottom:16px">🎙️</div><div style="color:#64748b;margin-bottom:20px">顧客を選んでください</div><div style="display:flex;flex-direction:column;gap:8px">';
+      customers.forEach(function(c){content+='<button onclick="sel=customers.find(function(x){return x.id==='+c.id+'});render()" style="background:#1e293b;border:none;border-radius:10px;padding:14px;color:#e2e8f0;font-size:14px;font-weight:600;text-align:left;cursor:pointer">'+c.name+'様 <span style="color:#64748b;font-size:12px">/ '+c.phase+'</span></button>';});
+      content+='</div></div>';
+    } else {
+      var c=sel;
+      content='<div style="padding:16px"><div style="display:flex;align-items:center;gap:10px;margin-bottom:16px"><button onclick="sel=null;render()" style="background:#334155;border:none;border-radius:8px;padding:6px 10px;color:#94a3b8;font-size:12px;cursor:pointer">← 戻る</button><div style="font-weight:700">'+c.name+'様の商談分析</div></div>'+
+      '<button onclick="'+(recording?'stopRec()':'startRec()')+'" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:'+(recording?'linear-gradient(135deg,#ef4444,#dc2626)':'linear-gradient(135deg,#22c55e,#16a34a)')+';border:none;border-radius:12px;padding:15px;color:white;font-weight:700;font-size:14px;margin-bottom:10px;cursor:pointer">'+(recording?'■ 録音停止 '+fmt(recTime):'🎙️ タップして録音開始')+'</button>'+
+      (recording?'<div style="background:#1a0000;border:1px solid #ef4444;border-radius:10px;padding:10px;margin-bottom:10px;font-size:12px;color:#ef4444;font-weight:700">● 録音中 '+fmt(recTime)+'</div>':'')+
+      '<textarea placeholder="🎙️ 録音で自動テキスト化&#10;または直接入力も可" style="width:100%;height:140px;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:14px;color:#e2e8f0;font-size:13px;resize:none;outline:none;line-height:1.8;margin-bottom:10px;display:block" oninput="updateMemo(this.value)">'+(c.memo||'')+'</textarea>'+
+      '<button onclick="analyze()" '+(analyzing||!c.memo||!c.memo.trim()?'disabled':'')+' style="width:100%;background:'+(analyzing||!c.memo||!c.memo.trim()?'#334155':'linear-gradient(135deg,#3b82f6,#06b6d4)')+';border:none;border-radius:10px;padding:14px;color:white;font-weight:700;font-size:14px;margin-bottom:16px;cursor:pointer">'+(analyzing?'⏳ AI分析中...':'✨ AIが次のアクションを提案する')+'</button>'+
+      (c.aiResult?'<div style="background:#1e293b;border-radius:12px;padding:20px;border-left:3px solid #3b82f6"><div style="font-size:12px;color:#3b82f6;font-weight:700;margin-bottom:12px">✨ AI分析結果</div><pre style="font-size:13px;color:#e2e8f0;white-space:pre-wrap;line-height:1.8;margin:0;font-family:inherit">'+c.aiResult+'</pre></div>':'')+
+      '</div>';
+    }
+  }
+
+  var det='';
+  if(showDet&&sel){
+    var sc=sel;
+    det='<div class="modal-overlay" onclick="if(event.target===this){showDet=false;render()}"><div class="modal">'+
+    '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div><div style="font-size:18px;font-weight:700">'+sc.name+'様</div><div style="font-size:12px;color:#64748b">'+sc.phase+' / ランク'+sc.rank+'</div></div><button onclick="showDet=false;render()" style="background:none;border:none;color:#64748b;font-size:20px;cursor:pointer">✕</button></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">'+
+    [['💰 予算',sc.budget],['🏡 土地',sc.land],['🏢 競合',sc.competitor],['📞 最終連絡',days(sc.lastContact)],['🏠 初回来場',sc.firstVisit||'未登録'],['⚡ 次のアクション',sc.nextAction]].map(function(kv){return'<div style="background:#0f172a;border-radius:8px;padding:10px"><div class="label">'+kv[0]+'</div><div style="font-size:12px;font-weight:500">'+kv[1]+'</div></div>';}).join('')+
+    '</div>'+
+    '<div style="font-size:12px;color:#64748b;font-weight:700;margin-bottom:8px">🚦 ネック（タップで更新）</div>'+
+    '<div class="neck-grid">'+NECKS.map(function(n){return'<div class="neck-item '+NC[sc.necks[n]]+'" onclick="cycleNeck(\''+n+'\')"><div style="font-size:20px">'+NI[sc.necks[n]]+'</div><div style="font-size:12px;font-weight:700;margin-top:4px">'+n+'</div><div style="font-size:10px;color:#64748b;margin-top:2px">'+sc.necks[n]+'</div></div>';}).join('')+'</div>'+
+    (sc.family&&sc.family.length>0?'<div style="font-size:12px;color:#64748b;font-weight:700;margin-bottom:8px">👨‍👩‍👧 家族</div>'+sc.family.map(function(f){return'<div style="background:#0f172a;border-radius:8px;padding:10px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center"><div><div style="font-size:13px;font-weight:600">'+f.name+'（'+f.relation+'）</div>'+(f.birthday?'<div style="font-size:11px;color:#64748b">'+f.birthday+'</div>':'')+'</div>'+(f.birthday?'<button onclick="bdMsg(\''+sc.name+'\',\''+f.name+'\',\''+f.relation+'\')" style="background:#1e3a5f;border:none;border-radius:6px;padding:4px 8px;color:#60a5fa;font-size:11px;cursor:pointer">LINE生成</button>':'')+'</div>';}).join(''):'')+'</div></div>';
+  }
+
+  var addHtml='';
+  if(showAdd){
+    addHtml='<div class="modal-overlay"><div class="modal"><div style="font-size:16px;font-weight:700;margin-bottom:20px">👤 顧客を追加</div>'+
+    '<div class="label">お客様名 *</div><input class="input" style="margin-bottom:12px" placeholder="田中 雄一" oninput="nc.name=this.value">'+
+    '<div class="label">電話番号</div><input class="input" style="margin-bottom:12px" placeholder="090-1234-5678" oninput="nc.phone=this.value">'+
+    '<div class="label">フェーズ</div><select class="input" style="margin-bottom:12px" onchange="nc.phase=this.value">'+PHASES.map(function(p){return'<option'+(nc.phase===p?' selected':'')+'>'+p+'</option>';}).join('')+'</select>'+
+    '<div class="label">熱量ランク</div><div style="display:flex;gap:8px;margin-bottom:12px">'+['S','A','B','C'].map(function(r){return'<button onclick="nc.rank=\''+r+'\';render()" style="flex:1;padding:8px;border:none;border-radius:8px;font-weight:700;cursor:pointer;background:'+(nc.rank===r?rc(r):'#0f172a')+';color:'+(nc.rank===r?'white':'#64748b')+'">'+r+'</button>';}).join('')+'</div>'+
+    '<div class="label">予算</div><input class="input" style="margin-bottom:12px" placeholder="4000万円" oninput="nc.budget=this.value">'+
+    '<div class="label">競合他社</div><input class="input" style="margin-bottom:12px" placeholder="積水ハウス" oninput="nc.competitor=this.value">'+
+    '<div class="label">初回来場日</div><input class="input" type="date" style="margin-bottom:20px" oninput="nc.firstVisit=this.value">'+
+    '<div style="display:flex;gap:8px"><button onclick="showAdd=false;render()" style="flex:1;background:#334155;border:none;border-radius:8px;padding:12px;color:#94a3b8;font-weight:700;cursor:pointer">キャンセル</button><button onclick="addC()" class="btn-primary" style="flex:1">登録する</button></div>'+
+    '</div></div>';
+  }
+
+  document.getElementById('app').innerHTML=
+  '<div style="max-width:500px;margin:0 auto;min-height:100vh">'+
+  '<div class="header"><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;background:linear-gradient(135deg,#3b82f6,#06b6d4);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">🏠</div><div><div style="font-weight:700;font-size:15px">IEZUKURI PRO</div><div style="font-size:10px;color:#64748b">住宅営業自動化システム</div></div></div>'+(urg.length>0?'<div style="background:#ef4444;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700">🔔 要対応 '+urg.length+'件</div>':'')+'</div>'+
+  '<div class="tab-bar"><button class="tab-btn'+(tab==='dashboard'?' active':'')+'" onclick="tab=\'dashboard\';render()">📊<br>ダッシュボード</button><button class="tab-btn'+(tab==='customers'?' active':'')+'" onclick="tab=\'customers\';render()">👥<br>顧客管理</button><button class="tab-btn'+(tab==='analyze'?' active':'')+'" onclick="tab=\'analyze\';render()">🎙️<br>商談分析</button></div>'+
+  content+det+addHtml+
+  (toast?'<div class="toast">'+toast+'</div>':'')+
+  '</div>';
 }
-if (newFinal) finalTranscript += newFinal;
-if (state.selectedCustomer) {
-const updated = state.customers.map(c => c.id === state.selectedCustomer.id ? { …c, memo: finalTranscript + interim } : c);
-setState({ customers: updated, selectedCustomer: { …state.selectedCustomer, memo: finalTranscript + interim } });
-}
-};
-
-recognition.onerror = (e) => { if (e.error === ‘not-allowed’) alert(‘マイクの使用を許可してください。’); stopRecording(); };
-recognition.start();
-setState({ isRecording: true, recordingTime: 0 });
-timer = setInterval(() => setState({ recordingTime: state.recordingTime + 1 }), 1000);
-}
-
-function stopRecording() {
-recognition?.stop();
-recognition = null;
-clearInterval(timer);
-setState({ isRecording: false });
-}
-
-function formatTime(sec) {
-return `${Math.floor(sec / 60).toString().padStart(2, '0')}:${(sec % 60).toString().padStart(2, '0')}`;
-}
-
-async function analyzeVoiceMemo() {
-if (!state.selectedCustomer?.memo?.trim()) return;
-setState({ isAnalyzing: true });
-const c = state.selectedCustomer;
-try {
-const res = await fetch(‘https://api.anthropic.com/v1/messages’, {
-method: ‘POST’,
-headers: { ‘Content-Type’: ‘application/json’ },
-body: JSON.stringify({
-model: ‘claude-sonnet-4-20250514’,
-max_tokens: 1000,
-messages: [{
-role: ‘user’,
-content: `あなたは住宅営業のコーチです。以下の商談メモを分析して日本語で回答してください。
-
-顧客情報：
-
-- 名前：${c.name}様
-- 予算：${c.budget}
-- 土地：${c.land}
-- フェーズ：${c.phase}
-- 競合：${c.competitor}
-- ネック状況：${Object.entries(c.necks).map(([k,v]) => k + ‘:’ + v).join(’、’)}
-
-商談メモ：${c.memo}
-
-以下の形式で出力してください：
-【顧客の本音・潜在ニーズ】
-・
-
-【次回アクション（優先順位順）】
-1.
-2.
-3.
-
-【今すぐ送るべきLINE文面】
-（自然でプッシュしすぎない文章）
-
-【競合対策】
-・`
-}]
-})
-});
-const data = await res.json();
-const result = data.content?.map(i => i.text || ‘’).join(’\n’) || ‘分析できませんでした’;
-const updated = state.customers.map(c2 => c2.id === c.id ? { …c2, aiResult: result } : c2);
-setState({ customers: updated, selectedCustomer: { …c, aiResult: result }, isAnalyzing: false });
-} catch {
-setState({ isAnalyzing: false });
-alert(‘エラーが発生しました。もう一度お試しください。’);
-}
-}
-
-function updateNeck(neckName) {
-const c = state.selectedCustomer;
-if (!c) return;
-const current = c.necks[neckName];
-const idx = NECK_STATUS.indexOf(current);
-const next = NECK_STATUS[(idx + 1) % NECK_STATUS.length];
-const newNecks = { …c.necks, [neckName]: next };
-const updated = state.customers.map(cu => cu.id === c.id ? { …cu, necks: newNecks } : cu);
-setState({ customers: updated, selectedCustomer: { …c, necks: newNecks } });
-}
-
-function addCustomer() {
-const nc = state.newCustomer;
-if (!nc.name.trim()) { alert(‘名前を入力してください’); return; }
-const newC = { …nc, id: Date.now(), family: [], memo: ‘’, aiResult: ‘’, events: [], urgent: false, lastContact: new Date().toISOString().split(‘T’)[0] };
-setState({ customers: […state.customers, newC], showAddCustomer: false, newCustomer: { name: ‘’, phone: ‘’, phase: ‘追客中’, rank: ‘A’, budget: ‘’, land: ‘土地なし’, competitor: ‘’, firstVisit: ‘’, necks: { 土地: ‘未確認’, 建物: ‘未確認’, メーカー: ‘未確認’, 親族: ‘未確認’, 時期: ‘未確認’, お金: ‘未確認’ } } });
-showToast(‘✅ 顧客を登録しました’);
-}
-
-// ========== RENDER ==========
-
-function renderDashboard() {
-const urgent = state.customers.filter(c => c.urgent);
-const today = new Date().toISOString().split(‘T’)[0];
-const upcomingEvents = state.customers.flatMap(c => (c.events || []).map(e => ({ …e, customerName: c.name }))).filter(e => e.date >= today).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 5);
-const birthdays = [];
-state.customers.forEach(c => {
-(c.family || []).forEach(f => {
-if (!f.birthday) return;
-const bd = new Date(f.birthday);
-const thisYear = new Date(new Date().getFullYear(), bd.getMonth(), bd.getDate());
-const diff = Math.floor((thisYear - new Date()) / 86400000);
-if (diff >= 0 && diff <= 7) birthdays.push({ customerName: c.name, familyName: f.name, relation: f.relation, daysLeft: diff });
-});
-});
-
-return `
-<div style="padding:16px">
-<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px">
-<div class="stat-card" style="border-color:#3b82f6">
-<div style="font-size:22px">👥</div>
-<div style="font-size:26px;font-weight:700;color:#3b82f6">${state.customers.length}</div>
-<div style="font-size:11px;color:#64748b">総顧客数</div>
-</div>
-<div class="stat-card" style="border-color:#ef4444">
-<div style="font-size:22px">⚡</div>
-<div style="font-size:26px;font-weight:700;color:#ef4444">${urgent.length}</div>
-<div style="font-size:11px;color:#64748b">要対応</div>
-</div>
-<div class="stat-card" style="border-color:#22c55e">
-<div style="font-size:22px">📅</div>
-<div style="font-size:26px;font-weight:700;color:#22c55e">${upcomingEvents.length}</div>
-<div style="font-size:11px;color:#64748b">直近イベント</div>
-</div>
-</div>
-
-```
-  ${birthdays.length > 0 ? `
-  <div class="section-title">🎂 今週の誕生日</div>
-  ${birthdays.map(b => `
-    <div class="card" style="border-left:3px solid #f59e0b;margin-bottom:8px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div style="font-weight:700;font-size:13px">${b.customerName}様 / ${b.familyName}（${b.relation}）</div>
-          <div style="font-size:11px;color:#f59e0b;margin-top:2px">${b.daysLeft === 0 ? '🎉 今日が誕生日！' : `あと${b.daysLeft}日`}</div>
-        </div>
-        <button onclick="generateBirthdayMessage('${b.customerName}', '${b.familyName}', '${b.relation}')" style="background:#1e3a5f;border:none;border-radius:8px;padding:6px 10px;color:#60a5fa;font-size:11px;font-weight:700">LINE生成</button>
-      </div>
-    </div>
-  `).join('')}
-  ` : ''}
-
-  <div class="section-title" style="margin-top:16px">⚡ 要対応顧客</div>
-  ${urgent.length === 0 ? '<div style="color:#475569;font-size:13px;text-align:center;padding:16px">要対応なし</div>' :
-    urgent.map(c => `
-    <div class="card" style="border-left:3px solid #ef4444;cursor:pointer" onclick="openCustomer(${c.id})">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <div style="font-weight:700;margin-bottom:4px">${c.name}様 <span class="badge rank-${c.rank.toLowerCase()}">${c.rank}</span></div>
-          <div style="font-size:12px;color:#94a3b8">→ ${c.nextAction}</div>
-        </div>
-        <div style="font-size:11px;color:#64748b">${daysSince(c.lastContact)}</div>
-      </div>
-      <div style="display:flex;gap:4px;margin-top:8px;flex-wrap:wrap">
-        ${NECKS.map(n => `<span style="font-size:16px" title="${n}:${c.necks[n]}">${NECK_COLORS[c.necks[n]].icon}</span>`).join('')}
-      </div>
-    </div>
-  `).join('')}
-
-  <div class="section-title" style="margin-top:16px">📅 直近イベント</div>
-  ${upcomingEvents.length === 0 ? '<div style="color:#475569;font-size:13px;text-align:center;padding:16px">予定なし</div>' :
-    upcomingEvents.map(e => `
-    <div class="card" style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
-      <div>
-        <span class="badge" style="background:#1e3a5f;color:#60a5fa;margin-right:6px">${e.type}</span>
-        <span style="font-size:13px">${e.customerName}様</span>
-      </div>
-      <div style="font-size:12px;color:#64748b">${e.date}</div>
-    </div>
-  `).join('')}
-</div>
-```
-
-`;
-}
-
-function renderCustomers() {
-const filtered = state.customers.filter(c => c.phase === state.phaseFilter);
-
-return `
-<div style="padding:16px">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-<div class="section-title" style="margin:0">顧客一覧</div>
-<button onclick="setState({showAddCustomer:true})" style="background:linear-gradient(135deg,#3b82f6,#06b6d4);border:none;border-radius:8px;padding:6px 12px;color:white;font-size:12px;font-weight:700">＋ 追加</button>
-</div>
-
-```
-  <div class="phase-tabs">
-    ${PHASES.map(p => `
-      <button class="phase-tab" onclick="setState({phaseFilter:'${p}'})"
-        style="background:${state.phaseFilter === p ? 'linear-gradient(135deg,#3b82f6,#06b6d4)' : '#1e293b'};color:${state.phaseFilter === p ? 'white' : '#64748b'};border:none">
-        ${p}（${state.customers.filter(c => c.phase === p).length}）
-      </button>
-    `).join('')}
-  </div>
-
-  ${filtered.length === 0 ? '<div style="color:#475569;font-size:13px;text-align:center;padding:32px">顧客なし</div>' :
-    filtered.map(c => {
-      const neckSummary = getNeckSummary(c.necks);
-      return `
-      <div class="card" style="cursor:pointer;border-left:3px solid ${c.urgent ? '#ef4444' : '#1e293b'}" onclick="openCustomer(${c.id})">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">
-          <div>
-            <span style="font-weight:700;font-size:15px">${c.name}様</span>
-            <span class="badge rank-${c.rank.toLowerCase()}" style="margin-left:6px">${c.rank}</span>
-            ${c.urgent ? '<span class="badge" style="background:#ef4444;margin-left:4px">要対応</span>' : ''}
-          </div>
-          <div style="font-size:11px;color:#64748b">${daysSince(c.lastContact)}</div>
-        </div>
-        <div style="font-size:12px;color:#94a3b8;margin-bottom:8px">→ ${c.nextAction}</div>
-        <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">
-          ${NECKS.map(n => `
-            <div style="display:flex;align-items:center;gap:2px">
-              <span style="font-size:10px;color:#64748b">${n}</span>
-              <span style="font-size:14px">${NECK_COLORS[c.necks[n]].icon}</span>
-            </div>
-          `).join('')}
-        </div>
-        <div style="font-size:11px;color:#64748b">
-          🔴${neckSummary['要対応']} 🟢${neckSummary['解決済み']} ⬜${neckSummary['未確認']}
-          　競合：${c.competitor}
-        </div>
-      </div>
-    `;
-    }).join('')}
-</div>
-```
-
-`;
-}
-
-function renderAnalyze() {
-const c = state.selectedCustomer;
-if (!c) return `<div style="padding:32px;text-align:center"> <div style="font-size:40px;margin-bottom:16px">🎙️</div> <div style="color:#64748b;margin-bottom:20px">顧客を選んで商談メモを分析します</div> <div style="display:flex;flex-direction:column;gap:8px"> ${state.customers.map(cu =>`
-<button onclick=“setState({selectedCustomer:${JSON.stringify(cu).replace(/”/g, ‘"’)}});setState({tab:‘analyze’})”
-style=“background:#1e293b;border:none;border-radius:10px;padding:14px;color:#e2e8f0;font-size:14px;font-weight:600;text-align:left”>
-${cu.name}様 <span style="color:#64748b;font-size:12px">/ ${cu.phase}</span>
-</button>
-`).join('')} </div> </div> `;
-
-return `
-<div style="padding:16px">
-<div style="display:flex;align-items:center;gap:10px;margin-bottom:16px">
-<button onclick="setState({selectedCustomer:null})" style="background:#334155;border:none;border-radius:8px;padding:6px 10px;color:#94a3b8;font-size:12px">← 戻る</button>
-<div style="font-weight:700">${c.name}様の商談分析</div>
-</div>
-
-```
-  <button onclick="${state.isRecording ? 'stopRecording()' : 'startRecording()'}"
-    style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
-    background:${state.isRecording ? 'linear-gradient(135deg,#ef4444,#dc2626)' : 'linear-gradient(135deg,#22c55e,#16a34a)'};
-    border:none;border-radius:12px;padding:15px;color:white;font-weight:700;font-size:14px;margin-bottom:10px;
-    box-shadow:${state.isRecording ? '0 0 20px rgba(239,68,68,0.4)' : '0 0 16px rgba(34,197,94,0.3)'}">
-    ${state.isRecording
-      ? `<span style="width:12px;height:12px;background:white;border-radius:2px;display:inline-block"></span> 録音停止 ${formatTime(state.recordingTime)}`
-      : '🎙️ タップして録音開始（自動でテキスト化）'}
-  </button>
-
-  ${state.isRecording ? `
-    <div style="background:#1a0000;border:1px solid #ef4444;border-radius:10px;padding:10px 14px;margin-bottom:10px;display:flex;align-items:center;gap:8px">
-      <span style="width:8px;height:8px;background:#ef4444;border-radius:50%;display:inline-block"></span>
-      <span style="font-size:12px;color:#ef4444;font-weight:700">録音中 ${formatTime(state.recordingTime)}</span>
-    </div>
-  ` : ''}
-
-  <div style="position:relative;margin-bottom:10px">
-    <textarea
-      placeholder="🎙️ 録音ボタンを押して話すと自動でテキスト化されます&#10;または直接入力・貼り付けも可能です"
-      style="width:100%;height:150px;background:#1e293b;border:1px solid #334155;border-radius:12px;padding:14px;color:#e2e8f0;font-size:13px;resize:none;outline:none;line-height:1.8"
-      oninput="updateMemo(this.value)">${c.memo || ''}</textarea>
-  </div>
-
-  <button onclick="analyzeVoiceMemo()" ${state.isAnalyzing || !c.memo?.trim() ? 'disabled' : ''}
-    style="width:100%;background:${state.isAnalyzing || !c.memo?.trim() ? '#334155' : 'linear-gradient(135deg,#3b82f6,#06b6d4)'};border:none;border-radius:10px;padding:14px;color:white;font-weight:700;font-size:14px;margin-bottom:16px;cursor:${state.isAnalyzing || !c.memo?.trim() ? 'not-allowed' : 'pointer'}">
-    ${state.isAnalyzing ? '⏳ AI分析中...' : '✨ AIが次のアクションを提案する'}
-  </button>
-
-  ${c.aiResult ? `
-    <div style="background:#1e293b;border-radius:12px;padding:20px;border-left:3px solid #3b82f6">
-      <div style="font-size:12px;color:#3b82f6;font-weight:700;margin-bottom:12px">✨ AI分析結果</div>
-      <pre style="font-size:13px;color:#e2e8f0;white-space:pre-wrap;line-height:1.8;margin:0;font-family:inherit">${c.aiResult}</pre>
-    </div>
-  ` : ''}
-</div>
-```
-
-`;
-}
-
-function renderCustomerDetail() {
-const c = state.selectedCustomer;
-if (!c) return ‘’;
-
-return `
-<div class="modal-overlay" onclick="if(event.target===this)setState({showCustomerDetail:false,selectedCustomer:null})">
-<div class="modal">
-<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
-<div>
-<div style="font-size:18px;font-weight:700">${c.name}様</div>
-<div style="font-size:12px;color:#64748b">${c.phase} / ランク${c.rank}</div>
-</div>
-<button onclick="setState({showCustomerDetail:false})" style="background:none;border:none;color:#64748b;font-size:20px">✕</button>
-</div>
-
-```
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
-      ${[['💰 予算', c.budget], ['🏡 土地', c.land], ['🏢 競合', c.competitor], ['📞 最終連絡', daysSince(c.lastContact)], ['🏠 初回来場', c.firstVisit || '未登録'], ['📋 フェーズ', c.phase]].map(([k,v]) => `
-        <div style="background:#0f172a;border-radius:8px;padding:10px">
-          <div class="label">${k}</div>
-          <div style="font-size:13px;font-weight:500">${v}</div>
-        </div>
-      `).join('')}
-    </div>
-
-    <div style="background:#0f172a;border-radius:8px;padding:12px;margin-bottom:16px">
-      <div class="label">⚡ 次のアクション</div>
-      <div style="font-size:13px;color:#f59e0b;font-weight:600">${c.nextAction}</div>
-    </div>
-
-    <div class="section-title">🚦 ネック状況（タップで更新）</div>
-    <div class="neck-grid">
-      ${NECKS.map(n => `
-        <div class="neck-item ${NECK_COLORS[c.necks[n]].cls}" onclick="updateNeck('${n}')">
-          <div style="font-size:20px">${NECK_COLORS[c.necks[n]].icon}</div>
-          <div class="neck-label" style="color:${NECK_COLORS[c.necks[n]].color}">${n}</div>
-          <div style="font-size:10px;color:#64748b;margin-top:2px">${c.necks[n]}</div>
-        </div>
-      `).join('')}
-    </div>
-
-    ${c.family && c.family.length > 0 ? `
-      <div class="section-title">👨‍👩‍👧 家族情報</div>
-      ${c.family.map(f => `
-        <div style="background:#0f172a;border-radius:8px;padding:10px;margin-bottom:6px;display:flex;justify-content:space-between">
-          <div>
-            <div style="font-size:13px;font-weight:600">${f.name}（${f.relation}）</div>
-            ${f.birthday ? `<div style="font-size:11px;color:#64748b">${f.birthday}</div>` : ''}
-          </div>
-          ${f.birthday ? `<button onclick="generateBirthdayMessage('${c.name}', '${f.name}', '${f.relation}')" style="background:#1e3a5f;border:none;border-radius:6px;padding:4px 8px;color:#60a5fa;font-size:11px;font-weight:700">LINE生成</button>` : ''}
-        </div>
-      `).join('')}
-    ` : ''}
-
-    <div style="display:flex;gap:8px;margin-top:8px">
-      <button onclick="setState({showCustomerDetail:false,tab:'analyze'})" class="btn-primary" style="flex:1">
-        🎙️ 商談分析
-      </button>
-    </div>
-  </div>
-</div>
-```
-
-`;
-}
-
-function renderAddCustomer() {
-const nc = state.newCustomer;
-return `
-<div class="modal-overlay">
-<div class="modal">
-<div class="modal-title">👤 顧客を追加</div>
-
-```
-    <div class="label">お客様名 *</div>
-    <input class="input" style="margin-bottom:12px" placeholder="田中 雄一" value="${nc.name}" oninput="state.newCustomer.name=this.value">
-
-    <div class="label">電話番号</div>
-    <input class="input" style="margin-bottom:12px" placeholder="090-1234-5678" value="${nc.phone}" oninput="state.newCustomer.phone=this.value">
-
-    <div class="label">フェーズ</div>
-    <select class="input" style="margin-bottom:12px" onchange="state.newCustomer.phase=this.value">
-      ${PHASES.map(p => `<option ${nc.phase === p ? 'selected' : ''}>${p}</option>`).join('')}
-    </select>
-
-    <div class="label">熱量ランク</div>
-    <div style="display:flex;gap:8px;margin-bottom:12px">
-      ${RANKS.map(r => `
-        <button onclick="state.newCustomer.rank='${r}';render()" 
-          style="flex:1;padding:8px;border:none;border-radius:8px;font-weight:700;
-          background:${nc.rank === r ? (r==='S'?'#ef4444':r==='A'?'#f97316':r==='B'?'#3b82f6':'#64748b') : '#0f172a'};
-          color:${nc.rank === r ? 'white' : '#64748b'}">${r}</button>
-      `).join('')}
-    </div>
-
-    <div class="label">予算</div>
-    <input class="input" style="margin-bottom:12px" placeholder="4000万円" value="${nc.budget}" oninput="state.newCustomer.budget=this.value">
-
-    <div class="label">土地</div>
-    <select class="input" style="margin-bottom:12px" onchange="state.newCustomer.land=this.value">
-      <option ${nc.land==='土地あり'?'selected':''}>土地あり</option>
-      <option ${nc.land==='土地なし'?'selected':''}>土地なし</option>
-      <option ${nc.land==='土地検討中'?'selected':''}>土地検討中</option>
-    </select>
-
-    <div class="label">競合他社</div>
-    <input class="input" style="margin-bottom:12px" placeholder="積水ハウス" value="${nc.competitor}" oninput="state.newCustomer.competitor=this.value">
-
-    <div class="label">初回来場日</div>
-    <input class="input" type="date" style="margin-bottom:20px" value="${nc.firstVisit}" oninput="state.newCustomer.firstVisit=this.value">
-
-    <div style="display:flex;gap:8px">
-      <button onclick="setState({showAddCustomer:false})" class="btn-secondary" style="flex:1">キャンセル</button>
-      <button onclick="addCustomer()" class="btn-primary" style="flex:1">登録する</button>
-    </div>
-  </div>
-</div>
-```
-
-`;
-}
-
-function generateBirthdayMessage(customerName, familyName, relation) {
-const msg = `${customerName}様\n\nいつもお世話になっております。\n${familyName}様のお誕生日おめでとうございます🎂\n素敵な一日になりますように。\n\n引き続きよろしくお願いいたします。`;
-alert(‘📋 LINE文面（コピーして使ってください）\n\n’ + msg);
-}
-
-function openCustomer(id) {
-const c = state.customers.find(cu => cu.id === id);
-if (c) setState({ selectedCustomer: c, showCustomerDetail: true });
-}
-
-function updateMemo(val) {
-if (!state.selectedCustomer) return;
-const updated = state.customers.map(c => c.id === state.selectedCustomer.id ? { …c, memo: val } : c);
-state.customers = updated;
-state.selectedCustomer = { …state.selectedCustomer, memo: val };
-}
-
-function render() {
-const app = document.getElementById(‘app’);
-const tabContent = state.tab === ‘dashboard’ ? renderDashboard() : state.tab === ‘customers’ ? renderCustomers() : renderAnalyze();
-
-app.innerHTML = `<div style="max-width:500px;margin:0 auto;min-height:100vh;position:relative"> <!-- Header --> <div style="background:linear-gradient(135deg,#1e293b,#0f172a);border-bottom:1px solid #1e3a5f;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:40"> <div style="display:flex;align-items:center;gap:10px"> <div style="width:32px;height:32px;background:linear-gradient(135deg,#3b82f6,#06b6d4);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px">🏠</div> <div> <div style="font-weight:700;font-size:15px">IEZUKURI PRO</div> <div style="font-size:10px;color:#64748b">住宅営業自動化システム</div> </div> </div> ${state.customers.filter(c => c.urgent).length > 0 ?`<div style="background:#ef4444;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:700">🔔 要対応 ${state.customers.filter(c => c.urgent).length}件</div>` : ‘’}
-</div>
-
-```
-  <!-- Tab Bar -->
-  <div class="tab-bar">
-    <button class="tab-btn ${state.tab==='dashboard'?'active':''}" onclick="setState({tab:'dashboard'})">📊<br>ダッシュボード</button>
-    <button class="tab-btn ${state.tab==='customers'?'active':''}" onclick="setState({tab:'customers'})">👥<br>顧客管理</button>
-    <button class="tab-btn ${state.tab==='analyze'?'active':''}" onclick="setState({tab:'analyze'})">🎙️<br>商談分析</button>
-  </div>
-
-  <!-- Content -->
-  ${tabContent}
-
-  <!-- Modals -->
-  ${state.showCustomerDetail && state.selectedCustomer ? renderCustomerDetail() : ''}
-  ${state.showAddCustomer ? renderAddCustomer() : ''}
-
-  <!-- Toast -->
-  ${state.toast ? `<div class="toast">${state.toast}</div>` : ''}
-</div>
-```
-
-`;
-}
-
 render();
 </script>
-
 </body>
 </html>
