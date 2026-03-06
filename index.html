@@ -271,7 +271,7 @@ else c.family.forEach(function(f,fi){h+='<div class="family-card" style="flex-di
 h+='<div style="margin-bottom:18px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="section-title" style="margin-bottom:0"><span>📅</span> イベント</div><button class="btn-ghost" onclick="S.showEvt=true;render()">＋</button></div>';
 if(!c.events||!c.events.length)h+='<div style="color:var(--text3);font-size:12px;text-align:center;padding:12px">予定なし</div>';
 else c.events.forEach(function(e,ei){h+='<div style="background:var(--bg2);border-radius:8px;padding:11px 13px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border)"><span style="font-size:13px;font-weight:600"><span style="background:var(--green-dim);color:var(--green);border-radius:5px;padding:2px 7px;font-size:10px;margin-right:8px;font-weight:700">'+esc(e.type)+'</span>'+e.date+'</span><button onclick="delEvt(sel(),'+ei+')" style="background:none;border:none;color:var(--text3);font-size:14px;padding:4px">✕</button></div>';});h+='</div>';
-
+h+='<div class="divider"></div><button class="btn btn-danger" onclick="delC('+c.id+')">この顧客を削除</button></div></div>';return h;}
 function rAdd(){var nc=S.nc;var scanned=nc.name||nc.phone||nc.budget;var h='<div class="modal-overlay"><div class="modal"><div class="modal-handle"></div><div style="font-size:16px;font-weight:800;margin-bottom:4px">'+(scanned?'📷 読取結果を確認':'顧客を追加')+'</div>';
 if(scanned)h+='<div style="font-size:11px;color:var(--accent);margin-bottom:16px">内容を確認・修正して登録してください</div>';
 else h+='<div style="margin-bottom:16px"></div>';
