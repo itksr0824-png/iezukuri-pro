@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>キッズランド 🎮</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Hiragino Sans','Hiragino Kaku Gothic ProN','Noto Sans JP',sans-serif;background:#1a1a2e;color:#fff}
+
+/* ===== メニュー画面 ===== */
+.screen{display:none;width:100%;height:100%;position:absolute;top:0;left:0;flex-direction:column}
+.screen.active{display:flex}
+
+/* ホーム */
+#home{background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);align-items:center;justify-content:center;gap:20px;padding:20px}
+#home h1{font-size:clamp(32px,8vw,52px);text-shadow:3px 3px 0 rgba(0,0,0,.2);letter-spacing:2px}
+#home .subtitle{font-size:clamp(14px,3.5vw,18px);opacity:.85;margin-bottom:10px}
+.menu-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;width:100%;max-width:400px;padding:0 10px}
+.menu-card{background:rgba(255,255,255,.15);backdrop-filter:blur(10px);border-radius:20px;padding:20px 12px;text-align:center;border:2px solid rgba(255,255,255,.2);cursor:pointer;transition:transform .15s,box-shadow .15s;display:flex;flex-direction:column;align-items:center;gap:8px}
+.menu-card:active{transform:scale(.93)}
+.menu-card .icon{font-size:clamp(36px,9vw,52px)}
+.menu-card .label{font-size:clamp(13px,3.2vw,16px);font-weight:700;letter-spacing:1px}
+
+/* 共通ヘッダー */
+.game-header{display:flex;align-items:center;padding:12px 16px;background:rgba(0,0,0,.2);gap:12px;flex-shrink:0}
+.back-btn{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.back-btn:active{transform:scale(.9)}
+.game-header h2{font-size:clamp(16px,4vw,22px);flex:1}
+.score-display{font-size:clamp(16px,4vw,20px);font-weight:700;background:rgba(255,255,255,.15);padding:4px 14px;border-radius:20px}
+
+/* ===== 1. いろあてゲーム ===== */
+#color-game{background:linear-gradient(135deg,#f093fb 0%,#f5576c 100%)}
+#color-game .game-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:20px}
+.color-target{width:clamp(100px,30vw,160px);height:clamp(100px,30vw,160px);border-radius:50%;border:5px solid rgba(255,255,255,.4);box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.color-name{font-size:clamp(24px,6vw,36px);font-weight:900;text-shadow:2px 2px 0 rgba(0,0,0,.2)}
+.color-options{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;width:100%;max-width:360px;padding:0 10px}
+.color-opt{height:clamp(60px,15vw,80px);border-radius:16px;border:3px solid rgba(255,255,255,.3);cursor:pointer;transition:transform .12s}
+.color-opt:active{transform:scale(.92)}
+.color-opt.correct{animation:correctPop .5s ease}
+.color-opt.wrong{animation:wrongShake .4s ease}
+@keyframes correctPop{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(1)}}
+@keyframes wrongShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+
+/* ===== 2. もぐらたたき ===== */
+#mole-game{background:linear-gradient(135deg,#43e97b 0%,#38f9d7 100%)}
+#mole-game .game-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;gap:12px}
+.mole-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;width:100%;max-width:340px}
+.mole-hole{aspect-ratio:1;border-radius:50%;background:rgba(0,0,0,.2);border:3px solid rgba(0,0,0,.15);display:flex;align-items:center;justify-content:center;font-size:clamp(32px,10vw,56px);cursor:pointer;transition:transform .1s;position:relative;overflow:hidden}
+.mole-hole::after{content:'';position:absolute;bottom:0;left:10%;right:10%;height:35%;background:radial-ellipse(closest-side,#5d4037 80%,transparent);border-radius:50% 50% 0 0;pointer-events:none}
+.mole-hole:active{transform:scale(.9)}
+.mole-hole .mole{transition:transform .15s;transform:translateY(100%);position:relative;z-index:1}
+.mole-hole.up .mole{transform:translateY(0)}
+.mole-timer{font-size:clamp(20px,5vw,28px);font-weight:900;background:rgba(0,0,0,.15);padding:6px 20px;border-radius:30px}
+.mole-start-btn{padding:16px 48px;border-radius:30px;background:#fff;color:#38f9d7;font-size:clamp(18px,4.5vw,24px);font-weight:900;border:none;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,.2)}
+.mole-start-btn:active{transform:scale(.95)}
+
+/* ===== 3. おえかき ===== */
+#draw-game{background:linear-gradient(135deg,#a18cd1 0%,#fbc2eb 100%)}
+#draw-game .game-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.canvas-wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:10px}
+#drawCanvas{background:#fff;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.2);touch-action:none;max-width:100%;max-height:100%}
+.draw-tools{display:flex;gap:8px;padding:10px 16px;overflow-x:auto;flex-shrink:0;align-items:center;justify-content:center;flex-wrap:wrap}
+.color-btn{width:clamp(32px,8vw,42px);height:clamp(32px,8vw,42px);border-radius:50%;border:3px solid rgba(255,255,255,.4);cursor:pointer;transition:transform .12s}
+.color-btn:active,.color-btn.active{transform:scale(1.2);border-color:#fff}
+.tool-btn{height:clamp(32px,8vw,42px);padding:0 14px;border-radius:20px;background:rgba(255,255,255,.25);border:2px solid rgba(255,255,255,.3);color:#fff;font-size:clamp(12px,3vw,15px);font-weight:700;cursor:pointer}
+.tool-btn:active{transform:scale(.93)}
+.size-range{width:80px;accent-color:#fff}
+
+/* ===== 4. すうじゲーム ===== */
+#math-game{background:linear-gradient(135deg,#fa709a 0%,#fee140 100%)}
+#math-game .game-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:20px}
+.math-question{font-size:clamp(36px,10vw,60px);font-weight:900;text-shadow:3px 3px 0 rgba(0,0,0,.15);background:rgba(255,255,255,.15);padding:16px 32px;border-radius:24px;min-width:200px;text-align:center}
+.math-answers{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;width:100%;max-width:320px}
+.math-ans{padding:clamp(14px,4vw,20px);border-radius:16px;background:rgba(255,255,255,.2);border:3px solid rgba(255,255,255,.3);color:#fff;font-size:clamp(24px,6vw,36px);font-weight:900;cursor:pointer;transition:transform .12s;text-shadow:2px 2px 0 rgba(0,0,0,.1)}
+.math-ans:active{transform:scale(.92)}
+.math-ans.correct{animation:correctPop .5s ease;background:rgba(76,175,80,.5)}
+.math-ans.wrong{animation:wrongShake .4s ease;background:rgba(244,67,54,.4)}
+.math-streak{font-size:clamp(14px,3.5vw,18px);opacity:.85}
+
+/* ===== 結果オーバーレイ ===== */
+.result-overlay{position:absolute;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:100;backdrop-filter:blur(6px)}
+.result-overlay.show{display:flex}
+.result-box{background:#fff;border-radius:28px;padding:32px;text-align:center;color:#333;max-width:300px;width:85%;box-shadow:0 10px 40px rgba(0,0,0,.3)}
+.result-box .emoji{font-size:60px;margin-bottom:12px}
+.result-box h3{font-size:24px;margin-bottom:8px}
+.result-box p{font-size:16px;color:#666;margin-bottom:20px}
+.result-btn{padding:12px 32px;border-radius:30px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;font-size:16px;font-weight:700;cursor:pointer}
+.result-btn:active{transform:scale(.95)}
+
+/* 正解・不正解エフェクト */
+.feedback{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:80px;pointer-events:none;z-index:200;animation:feedbackAnim .7s ease forwards}
+@keyframes feedbackAnim{0%{opacity:1;transform:translate(-50%,-50%) scale(.5)}50%{transform:translate(-50%,-50%) scale(1.3)}100%{opacity:0;transform:translate(-50%,-50%) scale(1.5) translateY(-30px)}}
+</style>
+</head>
+<body>
+
+<!-- ===== ホーム画面 ===== -->
+<div id="home" class="screen active">
+  <h1>キッズランド</h1>
+  <p class="subtitle">すきなゲームをえらんでね！</p>
+  <div class="menu-grid">
+    <div class="menu-card" onclick="showScreen('color-game')">
+      <span class="icon">🎨</span>
+      <span class="label">いろあて</span>
+    </div>
+    <div class="menu-card" onclick="showScreen('mole-game')">
+      <span class="icon">🐹</span>
+      <span class="label">もぐらたたき</span>
+    </div>
+    <div class="menu-card" onclick="showScreen('draw-game')">
+      <span class="icon">🖍️</span>
+      <span class="label">おえかき</span>
+    </div>
+    <div class="menu-card" onclick="showScreen('math-game')">
+      <span class="icon">🔢</span>
+      <span class="label">すうじ</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 1. いろあてゲーム ===== -->
+<div id="color-game" class="screen">
+  <div class="game-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <h2>🎨 いろあてゲーム</h2>
+    <div class="score-display" id="color-score">0てん</div>
+  </div>
+  <div class="game-area">
+    <div class="color-target" id="colorTarget"></div>
+    <div class="color-name" id="colorName"></div>
+    <div class="color-options" id="colorOptions"></div>
+  </div>
+</div>
+
+<!-- ===== 2. もぐらたたき ===== -->
+<div id="mole-game" class="screen">
+  <div class="game-header">
+    <button class="back-btn" onclick="goHome();moleStop()">←</button>
+    <h2>🐹 もぐらたたき</h2>
+    <div class="score-display" id="mole-score">0てん</div>
+  </div>
+  <div class="game-area">
+    <div class="mole-timer" id="moleTimer">20びょう</div>
+    <div class="mole-grid" id="moleGrid"></div>
+    <button class="mole-start-btn" id="moleStartBtn" onclick="moleStart()">スタート！</button>
+  </div>
+  <div class="result-overlay" id="moleResult">
+    <div class="result-box">
+      <div class="emoji">🎉</div>
+      <h3 id="moleResultTitle">すごい！</h3>
+      <p id="moleResultText"></p>
+      <button class="result-btn" onclick="moleReset()">もういちど</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 3. おえかき ===== -->
+<div id="draw-game" class="screen">
+  <div class="game-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <h2>🖍️ おえかき</h2>
+  </div>
+  <div class="game-area">
+    <div class="canvas-wrap">
+      <canvas id="drawCanvas"></canvas>
+    </div>
+    <div class="draw-tools" id="drawTools"></div>
+  </div>
+</div>
+
+<!-- ===== 4. すうじゲーム ===== -->
+<div id="math-game" class="screen">
+  <div class="game-header">
+    <button class="back-btn" onclick="goHome()">←</button>
+    <h2>🔢 すうじゲーム</h2>
+    <div class="score-display" id="math-score">0てん</div>
+  </div>
+  <div class="game-area">
+    <div class="math-streak" id="mathStreak">れんぞく: 0</div>
+    <div class="math-question" id="mathQuestion"></div>
+    <div class="math-answers" id="mathAnswers"></div>
+  </div>
+</div>
+
+<script>
+/* ===== 画面切り替え ===== */
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  if(id==='color-game')colorInit();
+  if(id==='draw-game')drawInit();
+  if(id==='math-game')mathInit();
+  if(id==='mole-game')moleInit();
+}
+function goHome(){showScreen('home')}
+
+function showFeedback(emoji){
+  const el=document.createElement('div');
+  el.className='feedback';
+  el.textContent=emoji;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(),700);
+}
+
+/* ===== 1. いろあてゲーム ===== */
+const COLORS=[
+  {name:'あか',color:'#e74c3c'},{name:'あお',color:'#3498db'},
+  {name:'きいろ',color:'#f1c40f'},{name:'みどり',color:'#2ecc71'},
+  {name:'オレンジ',color:'#e67e22'},{name:'むらさき',color:'#9b59b6'},
+  {name:'ピンク',color:'#e91e90'},{name:'みずいろ',color:'#00bcd4'},
+  {name:'ちゃいろ',color:'#8d6e63'},{name:'はいいろ',color:'#95a5a6'}
+];
+let colorScore=0,colorLocked=false;
+
+function colorInit(){
+  colorScore=0;
+  document.getElementById('color-score').textContent='0てん';
+  colorNext();
+}
+function colorNext(){
+  colorLocked=false;
+  const correct=COLORS[Math.floor(Math.random()*COLORS.length)];
+  document.getElementById('colorTarget').style.background=correct.color;
+  document.getElementById('colorName').textContent='これは なにいろ？';
+  const opts=[correct];
+  while(opts.length<4){
+    const c=COLORS[Math.floor(Math.random()*COLORS.length)];
+    if(!opts.find(o=>o.name===c.name))opts.push(c);
+  }
+  opts.sort(()=>Math.random()-.5);
+  const container=document.getElementById('colorOptions');
+  container.innerHTML='';
+  opts.forEach(o=>{
+    const btn=document.createElement('div');
+    btn.className='color-opt';
+    btn.style.background=o.color;
+    btn.onclick=()=>{
+      if(colorLocked)return;
+      colorLocked=true;
+      if(o.name===correct.name){
+        btn.classList.add('correct');
+        colorScore++;
+        document.getElementById('color-score').textContent=colorScore+'てん';
+        showFeedback('⭐');
+        setTimeout(colorNext,600);
+      }else{
+        btn.classList.add('wrong');
+        showFeedback('💦');
+        setTimeout(()=>{colorLocked=false},500);
+      }
+    };
+    container.appendChild(btn);
+  });
+}
+
+/* ===== 2. もぐらたたき ===== */
+let moleScore=0,moleTimerId=null,molePopId=null,moleTime=0;
+function moleInit(){
+  const grid=document.getElementById('moleGrid');
+  grid.innerHTML='';
+  for(let i=0;i<9;i++){
+    const hole=document.createElement('div');
+    hole.className='mole-hole';
+    hole.dataset.idx=i;
+    hole.innerHTML='<span class="mole">🐹</span>';
+    hole.onclick=()=>moleWhack(hole);
+    grid.appendChild(hole);
+  }
+  moleScore=0;
+  document.getElementById('mole-score').textContent='0てん';
+  document.getElementById('moleTimer').textContent='20びょう';
+  document.getElementById('moleStartBtn').style.display='';
+  document.getElementById('moleResult').classList.remove('show');
+}
+function moleStart(){
+  document.getElementById('moleStartBtn').style.display='none';
+  moleScore=0;moleTime=20;
+  document.getElementById('mole-score').textContent='0てん';
+  moleTimerId=setInterval(()=>{
+    moleTime--;
+    document.getElementById('moleTimer').textContent=moleTime+'びょう';
+    if(moleTime<=0)moleEnd();
+  },1000);
+  molePop();
+}
+function molePop(){
+  const holes=document.querySelectorAll('.mole-hole');
+  holes.forEach(h=>h.classList.remove('up'));
+  const count=Math.random()>.6?2:1;
+  const indices=[];
+  while(indices.length<count){
+    const i=Math.floor(Math.random()*9);
+    if(!indices.includes(i))indices.push(i);
+  }
+  indices.forEach(i=>holes[i].classList.add('up'));
+  const speed=Math.max(500,1200-moleScore*30);
+  molePopId=setTimeout(molePop,speed);
+}
+function moleWhack(hole){
+  if(!hole.classList.contains('up'))return;
+  hole.classList.remove('up');
+  moleScore++;
+  document.getElementById('mole-score').textContent=moleScore+'てん';
+  showFeedback('💥');
+}
+function moleEnd(){
+  clearInterval(moleTimerId);clearTimeout(molePopId);
+  document.querySelectorAll('.mole-hole').forEach(h=>h.classList.remove('up'));
+  const r=document.getElementById('moleResult');
+  document.getElementById('moleResultTitle').textContent=moleScore>=15?'すごい！🏆':moleScore>=8?'がんばったね！😊':'つぎはもっとできるよ！💪';
+  document.getElementById('moleResultText').textContent=moleScore+'ひき つかまえたよ！';
+  r.classList.add('show');
+}
+function moleStop(){clearInterval(moleTimerId);clearTimeout(molePopId)}
+function moleReset(){document.getElementById('moleResult').classList.remove('show');moleInit()}
+
+/* ===== 3. おえかき ===== */
+let drawCtx,drawing=false,drawColor='#e74c3c',drawSize=6;
+const drawColors=['#e74c3c','#e67e22','#f1c40f','#2ecc71','#3498db','#9b59b6','#e91e90','#000000','#ffffff'];
+
+function drawInit(){
+  const canvas=document.getElementById('drawCanvas');
+  const wrap=canvas.parentElement;
+  const w=Math.min(wrap.clientWidth-20,500);
+  const h=Math.min(wrap.clientHeight-20,500);
+  canvas.width=w;canvas.height=h;
+  canvas.style.width=w+'px';canvas.style.height=h+'px';
+  drawCtx=canvas.getContext('2d');
+  drawCtx.fillStyle='#ffffff';
+  drawCtx.fillRect(0,0,w,h);
+  drawCtx.lineCap='round';drawCtx.lineJoin='round';
+
+  canvas.onpointerdown=e=>{drawing=true;drawCtx.beginPath();const r=canvas.getBoundingClientRect();drawCtx.moveTo(e.clientX-r.left,e.clientY-r.top)};
+  canvas.onpointermove=e=>{if(!drawing)return;const r=canvas.getBoundingClientRect();drawCtx.strokeStyle=drawColor;drawCtx.lineWidth=drawSize;drawCtx.lineTo(e.clientX-r.left,e.clientY-r.top);drawCtx.stroke()};
+  canvas.onpointerup=()=>drawing=false;
+  canvas.onpointerleave=()=>drawing=false;
+
+  const tools=document.getElementById('drawTools');
+  tools.innerHTML='';
+  drawColors.forEach(c=>{
+    const btn=document.createElement('div');
+    btn.className='color-btn'+(c===drawColor?' active':'');
+    btn.style.background=c;
+    if(c==='#ffffff')btn.style.border='3px solid #ccc';
+    btn.onclick=()=>{drawColor=c;tools.querySelectorAll('.color-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active')};
+    tools.appendChild(btn);
+  });
+  const range=document.createElement('input');
+  range.type='range';range.min=2;range.max=24;range.value=drawSize;range.className='size-range';
+  range.oninput=()=>drawSize=+range.value;
+  tools.appendChild(range);
+  const clearBtn=document.createElement('button');
+  clearBtn.className='tool-btn';clearBtn.textContent='ぜんぶけす';
+  clearBtn.onclick=()=>{drawCtx.fillStyle='#fff';drawCtx.fillRect(0,0,canvas.width,canvas.height)};
+  tools.appendChild(clearBtn);
+}
+
+/* ===== 4. すうじゲーム ===== */
+let mathScore=0,mathStreak=0,mathLocked=false;
+function mathInit(){
+  mathScore=0;mathStreak=0;
+  document.getElementById('math-score').textContent='0てん';
+  document.getElementById('mathStreak').textContent='れんぞく: 0';
+  mathNext();
+}
+function mathNext(){
+  mathLocked=false;
+  const ops=['+','-'];
+  const op=ops[Math.floor(Math.random()*ops.length)];
+  let a,b,answer;
+  if(op==='+'){
+    a=Math.floor(Math.random()*10)+1;
+    b=Math.floor(Math.random()*10)+1;
+    answer=a+b;
+  }else{
+    a=Math.floor(Math.random()*10)+2;
+    b=Math.floor(Math.random()*a);
+    answer=a-b;
+  }
+  document.getElementById('mathQuestion').textContent=a+' '+op+' '+b+' = ?';
+  const choices=[answer];
+  while(choices.length<4){
+    const wrong=answer+Math.floor(Math.random()*7)-3;
+    if(wrong!==answer&&wrong>=0&&!choices.includes(wrong))choices.push(wrong);
+  }
+  choices.sort(()=>Math.random()-.5);
+  const container=document.getElementById('mathAnswers');
+  container.innerHTML='';
+  choices.forEach(c=>{
+    const btn=document.createElement('button');
+    btn.className='math-ans';
+    btn.textContent=c;
+    btn.onclick=()=>{
+      if(mathLocked)return;
+      mathLocked=true;
+      if(c===answer){
+        btn.classList.add('correct');
+        mathScore++;mathStreak++;
+        document.getElementById('math-score').textContent=mathScore+'てん';
+        document.getElementById('mathStreak').textContent='れんぞく: '+mathStreak+(mathStreak>=3?' 🔥':'');
+        showFeedback('🎉');
+        setTimeout(mathNext,600);
+      }else{
+        btn.classList.add('wrong');
+        mathStreak=0;
+        document.getElementById('mathStreak').textContent='れんぞく: 0';
+        showFeedback('😢');
+        setTimeout(()=>{mathLocked=false},500);
+      }
+    };
+    container.appendChild(btn);
+  });
+}
+</script>
+</body>
+</html>
