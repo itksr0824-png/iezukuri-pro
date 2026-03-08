@@ -223,15 +223,15 @@ select.input { -webkit-appearance: none; }
 .ai-result { background: var(--surface); border-radius: var(--radius); padding: 18px; border: 1px solid var(--border); position: relative; overflow: hidden; }
 .ai-result::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: linear-gradient(180deg, var(--accent), var(--green)); }
 
-.sync-badge { position: fixed; bottom: 20px; right: 20px; padding: 5px 12px; border-radius: 8px; font-size: 11px; font-weight: 700; z-index: 999; transition: background 0.3s, color 0.3s; pointer-events: none; }
-.sync-ok { background: var(--green-dim); color: var(--green); }
-.sync-fail { background: var(--red-dim); color: var(--red); }
-.sync-ing { background: var(--orange-dim); color: var(--orange); }
+.sync-badge { position: fixed; bottom: 20px; right: 20px; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; z-index: 9999; transition: background 0.3s, color 0.3s; pointer-events: none; }
+.sync-ok { background: rgba(0,0,0,0.75); color: #7a9e7e; }
+.sync-fail { background: rgba(0,0,0,0.75); color: #e06050; }
+.sync-ing { background: rgba(0,0,0,0.75); color: #d4a24e; }
 </style>
 </head>
 <body>
 <div class="app" id="app"></div>
-<div id="syncBadge" class="sync-badge sync-ing">...同期中</div>
+<div id="syncBadge" class="sync-badge sync-ing">…同期中</div>
 <script>
 /* ========== Supabase Config ========== */
 var SUPABASE_URL = 'https://cbnrcvoswwitimrqrugq.supabase.co';
@@ -327,7 +327,7 @@ function showSyncStatus(type) {
     el.textContent = '\u00d7 オフライン';
   } else if (type === 'ing') {
     el.className = 'sync-badge sync-ing';
-    el.textContent = '...同期中';
+    el.textContent = '\u2026同期中';
   }
 }
 
