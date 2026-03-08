@@ -2,303 +2,1288 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>IEZUKURI PRO</title>
 <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Cormorant+Garamond:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{--bg:#12110f;--bg2:#1a1815;--surface:#211f1b;--surface2:#2a2722;--surface3:#33302a;--border:#3d3830;--border2:#4a4438;--text:#f0ebe3;--text2:#b8ad9e;--text3:#7a7068;--accent:#c8956c;--accent2:#e8b48a;--accent-dim:#c8956c22;--green:#7a9e7e;--green-dim:#7a9e7e18;--red:#b5785a;--red-dim:#b5785a18;--orange:#d4a24e;--orange-dim:#d4a24e20;--blue:#6b8eb8;--radius:12px;--radius-lg:18px;--safe-bottom:env(safe-area-inset-bottom,0px)}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth}
-body{font-family:'Zen Kaku Gothic New',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;min-height:100dvh;overflow-x:hidden;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E")}
-input,textarea,select,button{font-family:inherit}button{cursor:pointer;border:none}::-webkit-scrollbar{width:0}
-.app{max-width:500px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;position:relative}
-.header{background:linear-gradient(180deg,var(--surface) 0%,var(--bg) 100%);padding:16px 20px 12px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;border-bottom:1px solid var(--border)}
-.header::after{content:'';position:absolute;bottom:0;left:20px;right:20px;height:1px;background:linear-gradient(90deg,transparent,var(--accent) 50%,transparent);opacity:0.3}
-.logo{display:flex;align-items:center;gap:12px}
-.logo-mark{width:38px;height:38px;position:relative;border:2px solid #7b8a65;border-radius:8px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#7b8a6518,transparent)}
-.logo-mark::before{content:'';position:absolute;inset:3px;border:1px solid #7b8a65;border-radius:4px;opacity:0.3}
-.logo-mark span{font-size:16px}
-.logo-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;letter-spacing:2px;color:var(--accent2)}
-.logo-sub{font-size:8px;color:var(--text3);letter-spacing:3px;font-weight:500;text-transform:uppercase;margin-top:-1px}
-.alert-badge{background:var(--red);border-radius:20px;padding:4px 12px;font-size:10px;font-weight:700;letter-spacing:0.5px;animation:breathe 3s ease-in-out infinite}
-@keyframes breathe{0%,100%{opacity:1}50%{opacity:0.65}}
-.tab-bar{display:flex;background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:67px;z-index:49;padding:0 8px}
-.tab-btn{flex:1;padding:11px 4px 9px;background:none;color:var(--text3);font-size:10px;font-weight:500;border-bottom:2px solid transparent;transition:all 0.25s ease;display:flex;flex-direction:column;align-items:center;gap:4px;letter-spacing:0.5px}
-.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:700}
-.tab-icon{font-size:17px}
-.content{flex:1;padding:20px;padding-bottom:calc(24px + var(--safe-bottom))}
-.card{background:var(--surface);border-radius:var(--radius);padding:16px;margin-bottom:12px;border:1px solid var(--border);transition:transform 0.15s,box-shadow 0.15s;position:relative;overflow:hidden}
-.card:active{transform:scale(0.985)}
-.card::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:transparent;border-radius:0 2px 2px 0}
-.card-urgent::before{background:var(--red)}.card-accent::before{background:var(--accent)}.card-green::before{background:var(--green)}
-.badge{display:inline-flex;align-items:center;justify-content:center;border-radius:5px;padding:2px 8px;font-size:10px;font-weight:700;letter-spacing:0.5px}
-.badge-s{background:var(--red-dim);color:var(--red)}.badge-a{background:var(--orange-dim);color:var(--orange)}.badge-b{background:#6b8eb822;color:var(--blue)}.badge-c{background:#7a706820;color:var(--text3)}
-.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:24px}
-.stat{background:var(--surface);border-radius:var(--radius);padding:14px 6px;text-align:center;border:1px solid var(--border);position:relative;overflow:hidden}
-.stat::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px}
-.stat:active{transform:scale(0.96);transition:transform 0.1s}
-.stat-a::after{background:var(--accent)}.stat-r::after{background:var(--red)}.stat-g::after{background:var(--green)}
-.stat-num{font-family:'Cormorant Garamond',serif;font-size:28px;font-weight:700;line-height:1}
-.stat-label{font-size:9px;color:var(--text3);font-weight:500;margin-top:4px;letter-spacing:0.5px}
-.phase-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:8px;margin-bottom:16px;-webkit-overflow-scrolling:touch}.phase-tabs::-webkit-scrollbar{display:none}
-.phase-tab{white-space:nowrap;padding:8px 16px;border-radius:8px;font-size:11px;font-weight:700;background:var(--surface2);color:var(--text3);border:1px solid var(--border);transition:all 0.2s;letter-spacing:0.3px}
-.phase-tab.active{background:var(--accent);color:var(--bg);border-color:var(--accent)}
-.neck-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.neck-item{background:var(--bg2);border-radius:10px;padding:12px 8px;text-align:center;border:1.5px solid var(--border);transition:all 0.2s}
-.neck-item.resolved{border-color:var(--green);background:var(--green-dim)}.neck-item.issue{border-color:var(--red);background:var(--red-dim)}
-.neck-icon{font-size:20px}.neck-label{font-size:11px;font-weight:700;margin-top:5px;letter-spacing:0.5px}.neck-status{font-size:9px;color:var(--text3);margin-top:2px}
-.input{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;width:100%;outline:none;transition:border-color 0.2s}
-.input:focus{border-color:var(--accent)}.input::placeholder{color:var(--text3)}textarea.input{resize:none;line-height:1.7}select.input{-webkit-appearance:none}
-.label{font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:700;display:block;letter-spacing:0.5px}
-.btn{border-radius:10px;padding:14px 18px;font-weight:700;font-size:14px;width:100%;transition:all 0.2s;letter-spacing:0.5px}.btn:active{transform:scale(0.97)}
-.btn-primary{background:linear-gradient(135deg,var(--accent),#a07850);color:var(--bg)}.btn-secondary{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}.btn-danger{background:var(--red-dim);color:var(--red);border:1px solid #b5785a30}
-.btn-ghost{background:none;color:var(--accent);padding:8px 14px;font-size:12px;width:auto}.btn-small{padding:7px 13px;font-size:11px;width:auto;border-radius:8px;font-weight:700}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:100;display:flex;align-items:flex-end;justify-content:center;animation:fadeIn 0.15s;backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
-@keyframes fadeIn{from{opacity:0}}
-.modal{background:var(--surface);border-radius:22px 22px 0 0;padding:20px 20px calc(24px + var(--safe-bottom));width:100%;max-width:500px;max-height:88vh;overflow-y:auto;animation:slideUp 0.3s cubic-bezier(0.16,1,0.3,1);border-top:1px solid var(--border2)}
-@keyframes slideUp{from{transform:translateY(60px);opacity:0}}
-.modal-handle{width:40px;height:4px;background:var(--text3);border-radius:2px;margin:0 auto 16px;opacity:0.6}
-.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--surface2);color:var(--accent2);padding:12px 24px;border-radius:12px;font-weight:700;font-size:13px;z-index:200;animation:toastIn 0.3s cubic-bezier(0.16,1,0.3,1);border:1px solid var(--border2);box-shadow:0 8px 32px rgba(0,0,0,0.4)}
-@keyframes toastIn{from{transform:translateX(-50%) translateY(16px);opacity:0}}
-.section-title{font-size:11px;color:var(--text3);font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px;letter-spacing:1px;text-transform:uppercase}
-.section-title span{font-size:14px;letter-spacing:0;text-transform:none}
-.section-line{height:1px;flex:1;background:linear-gradient(90deg,var(--border),transparent);margin-left:8px}
-.check-item{display:flex;align-items:center;gap:12px;padding:12px 14px;background:var(--bg2);border-radius:10px;margin-bottom:6px;border:1px solid var(--border)}
-.check-box{width:22px;height:22px;border-radius:6px;border:2px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;transition:all 0.2s;color:transparent}
-.check-box.checked{background:var(--green);border-color:var(--green);color:white}
-.check-text{font-size:13px;font-weight:500}.check-text.done{color:var(--text3);text-decoration:line-through}
-.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.detail-cell{background:var(--bg2);border-radius:10px;padding:11px 13px;border:1px solid var(--border)}
-.detail-cell-label{font-size:9px;color:var(--text3);font-weight:600;margin-bottom:3px;letter-spacing:0.5px}
-.detail-cell-value{font-size:13px;font-weight:600}
-.family-card{background:var(--bg2);border-radius:10px;padding:12px 14px;margin-bottom:8px;border:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
-.empty{text-align:center;padding:40px 20px}.empty-icon{font-size:44px;margin-bottom:12px;opacity:0.5}.empty-text{font-size:12px;color:var(--text3)}
-.progress-track{background:var(--bg);border-radius:4px;height:6px;overflow:hidden}
-.progress-fill{background:linear-gradient(90deg,var(--accent),var(--green));height:100%;border-radius:4px;transition:width 0.4s ease}
-.rec-btn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border-radius:var(--radius);padding:16px;font-weight:700;font-size:15px;margin-bottom:14px;letter-spacing:0.5px}
-.rec-start{background:linear-gradient(135deg,var(--green),#5a8060);color:white}
-.rec-stop{background:linear-gradient(135deg,var(--red),#a0503a);color:white;animation:recPulse 1.5s infinite}
-@keyframes recPulse{0%,100%{box-shadow:0 0 0 0 #b5785a44}50%{box-shadow:0 0 0 14px #b5785a00}}
-.rank-btns{display:flex;gap:8px}
-.rank-btn{flex:1;padding:11px;border-radius:10px;font-weight:800;font-size:15px;text-align:center;border:2px solid var(--border);background:var(--bg2);color:var(--text3);transition:all 0.2s}
-.rank-btn.sel-s{background:var(--red-dim);border-color:var(--red);color:var(--red)}.rank-btn.sel-a{background:var(--orange-dim);border-color:var(--orange);color:var(--orange)}.rank-btn.sel-b{background:#6b8eb822;border-color:var(--blue);color:var(--blue)}.rank-btn.sel-c{background:#7a706820;border-color:var(--text3);color:var(--text3)}
-.setting-item{background:var(--surface);border-radius:var(--radius);padding:18px;margin-bottom:12px;border:1px solid var(--border)}
-.setting-label{font-size:14px;font-weight:700;margin-bottom:3px}.setting-desc{font-size:11px;color:var(--text3);margin-bottom:12px;line-height:1.6}
-.neck-memo-row{background:var(--bg2);border-radius:10px;padding:10px 12px;margin-bottom:6px;border:1px solid var(--border)}
-.neck-memo-label{font-size:10px;font-weight:700;margin-bottom:4px;display:flex;align-items:center;gap:4px}
-.neck-memo-label.is-red{color:var(--red)}.neck-memo-label.is-green{color:var(--green)}.neck-memo-label.is-gray{color:var(--text3)}
-.divider{height:1px;background:var(--border);margin:18px 0}
-.toggle-wrap{display:flex;align-items:center;gap:10px}
-.toggle{width:46px;height:26px;border-radius:13px;padding:2px;transition:background 0.25s;position:relative;flex-shrink:0}
-.toggle-off{background:var(--surface3)}
-.toggle-on{background:var(--red)}
-.toggle-dot{width:22px;height:22px;border-radius:50%;background:white;transition:transform 0.25s;box-shadow:0 1px 4px rgba(0,0,0,0.3)}
-.toggle-on .toggle-dot{transform:translateX(20px)}
-.toggle-label{font-size:12px;font-weight:600}
-.drag-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:15px 16px;margin-bottom:8px;transition:margin 0.25s ease,box-shadow 0.15s,opacity 0.15s,transform 0.25s ease;position:relative}
-.drag-item.dragging{opacity:0.85;box-shadow:0 12px 32px rgba(0,0,0,0.5);z-index:10;border-color:var(--accent);transition:none}
-.drag-item.drag-gap{margin-top:54px}
-.ai-result{background:var(--surface);border-radius:var(--radius);padding:18px;border:1px solid var(--border);position:relative;overflow:hidden}
-.ai-result::before{content:'';position:absolute;top:0;left:0;width:3px;height:100%;background:linear-gradient(180deg,var(--accent),var(--green))}
+:root {
+  --bg: #12110f; --bg2: #1a1815; --surface: #211f1b; --surface2: #2a2722; --surface3: #33302a;
+  --border: #3d3830; --border2: #4a4438;
+  --text: #f0ebe3; --text2: #b8ad9e; --text3: #7a7068;
+  --accent: #c8956c; --accent2: #e8b48a; --accent-dim: #c8956c22;
+  --green: #7a9e7e; --green-dim: #7a9e7e18;
+  --red: #b5785a; --red-dim: #b5785a18;
+  --orange: #d4a24e; --orange-dim: #d4a24e20;
+  --blue: #6b8eb8;
+  --radius: 12px; --radius-lg: 18px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Zen Kaku Gothic New', sans-serif; background: var(--bg); color: var(--text);
+  min-height: 100vh; min-height: 100dvh; overflow-x: hidden;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+}
+input, textarea, select, button { font-family: inherit; }
+button { cursor: pointer; border: none; }
+::-webkit-scrollbar { width: 0; }
+
+.app { max-width: 500px; margin: 0 auto; min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; position: relative; }
+.header {
+  background: linear-gradient(180deg, var(--surface) 0%, var(--bg) 100%);
+  padding: 16px 20px 12px; display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 50; border-bottom: 1px solid var(--border);
+}
+.header::after {
+  content: ''; position: absolute; bottom: 0; left: 20px; right: 20px; height: 1px;
+  background: linear-gradient(90deg, transparent, var(--accent) 50%, transparent); opacity: 0.3;
+}
+.logo { display: flex; align-items: center; gap: 12px; }
+.logo-mark {
+  width: 38px; height: 38px; position: relative; border: 2px solid #7b8a65; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #7b8a6518, transparent);
+}
+.logo-mark::before { content: ''; position: absolute; inset: 3px; border: 1px solid #7b8a65; border-radius: 4px; opacity: 0.3; }
+.logo-mark span { font-size: 16px; }
+.logo-title { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-weight: 700; letter-spacing: 2px; color: var(--accent2); }
+.logo-sub { font-size: 8px; color: var(--text3); letter-spacing: 3px; font-weight: 500; text-transform: uppercase; margin-top: -1px; }
+.alert-badge { background: var(--red); border-radius: 20px; padding: 4px 12px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; animation: breathe 3s ease-in-out infinite; }
+@keyframes breathe { 0%, 100% { opacity: 1; } 50% { opacity: 0.65; } }
+
+.tab-bar { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); position: sticky; top: 67px; z-index: 49; padding: 0 8px; }
+.tab-btn {
+  flex: 1; padding: 11px 4px 9px; background: none; color: var(--text3); font-size: 10px; font-weight: 500;
+  border-bottom: 2px solid transparent; transition: all 0.25s ease; display: flex; flex-direction: column;
+  align-items: center; gap: 4px; letter-spacing: 0.5px;
+}
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 700; }
+.tab-icon { font-size: 17px; }
+.content { flex: 1; padding: 20px; padding-bottom: calc(24px + var(--safe-bottom)); }
+
+.card {
+  background: var(--surface); border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+  border: 1px solid var(--border); transition: transform 0.15s, box-shadow 0.15s; position: relative; overflow: hidden;
+}
+.card:active { transform: scale(0.985); }
+.card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: transparent; border-radius: 0 2px 2px 0; }
+.card-urgent::before { background: var(--red); }
+.card-accent::before { background: var(--accent); }
+.card-green::before { background: var(--green); }
+
+.badge { display: inline-flex; align-items: center; justify-content: center; border-radius: 5px; padding: 2px 8px; font-size: 10px; font-weight: 700; letter-spacing: 0.5px; }
+.badge-s { background: var(--red-dim); color: var(--red); }
+.badge-a { background: var(--orange-dim); color: var(--orange); }
+.badge-b { background: #6b8eb822; color: var(--blue); }
+.badge-c { background: #7a706820; color: var(--text3); }
+
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 24px; }
+.stat {
+  background: var(--surface); border-radius: var(--radius); padding: 14px 6px; text-align: center;
+  border: 1px solid var(--border); position: relative; overflow: hidden; cursor: pointer;
+}
+.stat::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; }
+.stat:active { transform: scale(0.96); transition: transform 0.1s; }
+.stat-a::after { background: var(--accent); }
+.stat-r::after { background: var(--red); }
+.stat-g::after { background: var(--green); }
+.stat-o::after { background: var(--orange); }
+.stat-num { font-family: 'Cormorant Garamond', serif; font-size: 28px; font-weight: 700; line-height: 1; }
+.stat-label { font-size: 9px; color: var(--text3); font-weight: 500; margin-top: 4px; letter-spacing: 0.5px; }
+
+.phase-tabs { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 16px; -webkit-overflow-scrolling: touch; }
+.phase-tabs::-webkit-scrollbar { display: none; }
+.phase-tab {
+  white-space: nowrap; padding: 8px 16px; border-radius: 8px; font-size: 11px; font-weight: 700;
+  background: var(--surface2); color: var(--text3); border: 1px solid var(--border); transition: all 0.2s; letter-spacing: 0.3px;
+}
+.phase-tab.active { background: var(--accent); color: var(--bg); border-color: var(--accent); }
+
+.neck-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.neck-item { background: var(--bg2); border-radius: 10px; padding: 12px 8px; text-align: center; border: 1.5px solid var(--border); transition: all 0.2s; }
+.neck-item.resolved { border-color: var(--green); background: var(--green-dim); }
+.neck-item.issue { border-color: var(--red); background: var(--red-dim); }
+.neck-icon { font-size: 20px; }
+.neck-label { font-size: 11px; font-weight: 700; margin-top: 5px; letter-spacing: 0.5px; }
+.neck-status { font-size: 9px; color: var(--text3); margin-top: 2px; }
+
+.input {
+  background: var(--bg2); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px;
+  color: var(--text); font-size: 14px; width: 100%; outline: none; transition: border-color 0.2s;
+}
+.input:focus { border-color: var(--accent); }
+.input::placeholder { color: var(--text3); }
+textarea.input { resize: none; line-height: 1.7; }
+select.input { -webkit-appearance: none; }
+
+.label { font-size: 11px; color: var(--text2); margin-bottom: 6px; font-weight: 700; display: block; letter-spacing: 0.5px; }
+.btn { border-radius: 10px; padding: 14px 18px; font-weight: 700; font-size: 14px; width: 100%; transition: all 0.2s; letter-spacing: 0.5px; }
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: linear-gradient(135deg, var(--accent), #a07850); color: var(--bg); }
+.btn-secondary { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+.btn-danger { background: var(--red-dim); color: var(--red); border: 1px solid #b5785a30; }
+.btn-ghost { background: none; color: var(--accent); padding: 8px 14px; font-size: 12px; width: auto; }
+.btn-small { padding: 7px 13px; font-size: 11px; width: auto; border-radius: 8px; font-weight: 700; }
+
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 100; display: flex;
+  align-items: flex-end; justify-content: center; animation: fadeIn 0.15s;
+  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+}
+@keyframes fadeIn { from { opacity: 0; } }
+.modal {
+  background: var(--surface); border-radius: 22px 22px 0 0; padding: 20px 20px calc(24px + var(--safe-bottom));
+  width: 100%; max-width: 500px; max-height: 88vh; overflow-y: auto;
+  animation: slideUp 0.3s cubic-bezier(0.16,1,0.3,1); border-top: 1px solid var(--border2);
+}
+@keyframes slideUp { from { transform: translateY(60px); opacity: 0; } }
+.modal-handle { width: 40px; height: 4px; background: var(--text3); border-radius: 2px; margin: 0 auto 16px; opacity: 0.6; }
+
+.toast {
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--surface2);
+  color: var(--accent2); padding: 12px 24px; border-radius: 12px; font-weight: 700; font-size: 13px;
+  z-index: 200; animation: toastIn 0.3s cubic-bezier(0.16,1,0.3,1); border: 1px solid var(--border2);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+}
+@keyframes toastIn { from { transform: translateX(-50%) translateY(16px); opacity: 0; } }
+
+.section-title {
+  font-size: 11px; color: var(--text3); font-weight: 700; margin-bottom: 12px; display: flex;
+  align-items: center; gap: 6px; letter-spacing: 1px; text-transform: uppercase;
+}
+.section-title span { font-size: 14px; letter-spacing: 0; text-transform: none; }
+.section-line { height: 1px; flex: 1; background: linear-gradient(90deg, var(--border), transparent); margin-left: 8px; }
+
+.check-item { display: flex; align-items: center; gap: 12px; padding: 12px 14px; background: var(--bg2); border-radius: 10px; margin-bottom: 6px; border: 1px solid var(--border); }
+.check-box {
+  width: 22px; height: 22px; border-radius: 6px; border: 2px solid var(--border2); display: flex;
+  align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; transition: all 0.2s; color: transparent;
+}
+.check-box.checked { background: var(--green); border-color: var(--green); color: white; }
+.check-text { font-size: 13px; font-weight: 500; }
+.check-text.done { color: var(--text3); text-decoration: line-through; }
+
+.detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.detail-cell { background: var(--bg2); border-radius: 10px; padding: 11px 13px; border: 1px solid var(--border); }
+.detail-cell-label { font-size: 9px; color: var(--text3); font-weight: 600; margin-bottom: 3px; letter-spacing: 0.5px; }
+.detail-cell-value { font-size: 13px; font-weight: 600; }
+
+.family-card { background: var(--bg2); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px; border: 1px solid var(--border); }
+.empty { text-align: center; padding: 40px 20px; }
+.empty-icon { font-size: 44px; margin-bottom: 12px; opacity: 0.5; }
+.empty-text { font-size: 12px; color: var(--text3); }
+
+.progress-track { background: var(--bg); border-radius: 4px; height: 6px; overflow: hidden; }
+.progress-fill { background: linear-gradient(90deg, var(--accent), var(--green)); height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+
+.rec-btn {
+  width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px;
+  border-radius: var(--radius); padding: 16px; font-weight: 700; font-size: 15px; margin-bottom: 14px; letter-spacing: 0.5px;
+}
+.rank-btns { display: flex; gap: 8px; }
+.rank-btn {
+  flex: 1; padding: 11px; border-radius: 10px; font-weight: 800; font-size: 15px; text-align: center;
+  border: 2px solid var(--border); background: var(--bg2); color: var(--text3); transition: all 0.2s;
+}
+.rank-btn.sel-s { background: var(--red-dim); border-color: var(--red); color: var(--red); }
+.rank-btn.sel-a { background: var(--orange-dim); border-color: var(--orange); color: var(--orange); }
+.rank-btn.sel-b { background: #6b8eb822; border-color: var(--blue); color: var(--blue); }
+.rank-btn.sel-c { background: #7a706820; border-color: var(--text3); color: var(--text3); }
+
+.setting-item { background: var(--surface); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; border: 1px solid var(--border); }
+.setting-label { font-size: 14px; font-weight: 700; margin-bottom: 3px; }
+.setting-desc { font-size: 11px; color: var(--text3); margin-bottom: 12px; line-height: 1.6; }
+
+.neck-memo-row { background: var(--bg2); border-radius: 10px; padding: 10px 12px; margin-bottom: 6px; border: 1px solid var(--border); }
+.neck-memo-label { font-size: 10px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 4px; }
+.neck-memo-label.is-red { color: var(--red); }
+.neck-memo-label.is-green { color: var(--green); }
+.neck-memo-label.is-gray { color: var(--text3); }
+
+.divider { height: 1px; background: var(--border); margin: 18px 0; }
+.toggle-wrap { display: flex; align-items: center; gap: 10px; }
+.toggle { width: 46px; height: 26px; border-radius: 13px; padding: 2px; transition: background 0.25s; position: relative; flex-shrink: 0; }
+.toggle-off { background: var(--surface3); }
+.toggle-on { background: var(--red); }
+.toggle-dot { width: 22px; height: 22px; border-radius: 50%; background: white; transition: transform 0.25s; box-shadow: 0 1px 4px rgba(0,0,0,0.3); }
+.toggle-on .toggle-dot { transform: translateX(20px); }
+.toggle-label { font-size: 12px; font-weight: 600; }
+
+.drag-item {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 15px 16px; margin-bottom: 8px; transition: margin 0.25s ease, box-shadow 0.15s, opacity 0.15s, transform 0.25s ease; position: relative;
+}
+.drag-item.dragging { opacity: 0.85; box-shadow: 0 12px 32px rgba(0,0,0,0.5); z-index: 10; border-color: var(--accent); transition: none; }
+.drag-item.drag-gap { margin-top: 54px; }
+
+.ai-result { background: var(--surface); border-radius: var(--radius); padding: 18px; border: 1px solid var(--border); position: relative; overflow: hidden; }
+.ai-result::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: linear-gradient(180deg, var(--accent), var(--green)); }
+
+.sync-badge { position: fixed; bottom: 20px; right: 20px; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; z-index: 9999; transition: background 0.3s, color 0.3s; pointer-events: none; }
+.sync-ok { background: rgba(0,0,0,0.75); color: #7a9e7e; }
+.sync-fail { background: rgba(0,0,0,0.75); color: #e06050; }
+.sync-ing { background: rgba(0,0,0,0.75); color: #d4a24e; }
 </style>
 </head>
 <body>
 <div class="app" id="app"></div>
+<div id="syncBadge" class="sync-badge sync-ing">…同期中</div>
 <script>
-var DB_KEY='iezukuri_pro_data',PHASES=['契約済み','仮契約済み','追客中','失注・長期'],NECKS=['土地','建物','メーカー','親族','時期','お金'],NECK_S=['未確認','要対応','解決済み'],NECK_I={'未確認':'<span style="display:inline-block;width:10px;height:10px;border-radius:50%;border:1.5px solid #8a7e72;vertical-align:middle"></span>','要対応':'<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#b5785a;vertical-align:middle"></span>','解決済み':'<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#7a9e7e;vertical-align:middle"></span>'},DEF_STEPS=['間取り','仕様','電気','外壁・屋根','インテリア','最終確認'],RANKS=['S','A','B','C'];
-function defaultData(){return{customers:[{id:1,name:'サンプル 太郎',phone:'090-1234-5678',phase:'追客中',rank:'S',budget:'4,000万円',land:'土地あり（飯塚市）',area:'飯塚市',firstVisit:'2024-03-05',lastContact:'2026-03-03',actions:[{t:'間取り提案書を送付',done:false},{t:'競合比較資料を作成',done:false}],competitor:'積水ハウス',urgent:true,memo:'',aiResult:'',family:[{name:'サンプル 花子',relation:'奥様',birthday:'1985-05-03'},{name:'サンプル 一郎',relation:'長男',birthday:'2018-08-15'}],events:[{type:'工場見学',date:'2026-03-15'}],necks:{土地:{s:'解決済み',m:'飯塚市内80坪所有'},建物:{s:'要対応',m:'35坪以上希望。予算との折り合い'},メーカー:{s:'要対応',m:'積水と比較中'},親族:{s:'解決済み',m:'ご両親了承済み'},時期:{s:'未確認',m:''},お金:{s:'要対応',m:'頭金500万。親援助未確認'}},steps:[]},{id:2,name:'サンプル 美咲',phone:'080-2345-6789',phase:'仮契約済み',rank:'A',budget:'3,500万円',land:'土地なし',area:'福岡市東区',firstVisit:'2024-06-10',lastContact:'2026-02-28',actions:[{t:'土地情報を3件共有する',done:false}],competitor:'タマホーム',urgent:false,memo:'',aiResult:'',family:[{name:'サンプル 健',relation:'ご主人',birthday:'1990-11-20'}],events:[{type:'お家見学',date:'2026-03-22'}],necks:{土地:{s:'要対応',m:'福岡東区60坪以上・1200万以内'},建物:{s:'解決済み',m:'i-smartで決定'},メーカー:{s:'解決済み',m:'一条内定'},親族:{s:'解決済み',m:''},時期:{s:'要対応',m:'来年4月入学合わせ'},お金:{s:'解決済み',m:'世帯800万・仮審査OK'}},steps:[]},{id:3,name:'サンプル 健太',phone:'070-3456-7890',phase:'失注・長期',rank:'C',budget:'3,000万円',land:'土地なし',area:'北九州市',firstVisit:'2023-11-15',lastContact:'2026-01-10',actions:[{t:'ライフプランニングへ案内',done:false},{t:'再来場の案内LINE送信',done:false}],competitor:'未確認',urgent:true,memo:'',aiResult:'',family:[],events:[{type:'ライフプランニング',date:'2026-03-20'}],necks:{土地:{s:'要対応',m:'北九州で探し中・予算厳しい'},建物:{s:'未確認',m:''},メーカー:{s:'要対応',m:'未定'},親族:{s:'要対応',m:'奥様慎重派'},時期:{s:'要対応',m:'2年以内希望'},お金:{s:'要対応',m:'年収400万・頭金なし'}},steps:[]},{id:4,name:'サンプル 大輔',phone:'090-5678-1234',phase:'契約済み',rank:'S',budget:'4,500万円',land:'土地あり',area:'飯塚市',firstVisit:'2024-01-20',lastContact:'2026-03-05',actions:[{t:'仕様打ち合わせ 2回目',done:false},{t:'キッチン仕様の確認',done:false}],competitor:'',urgent:false,memo:'',aiResult:'',family:[{name:'サンプル 優子',relation:'奥様',birthday:'1988-07-22'},{name:'サンプル 陽菜',relation:'長女',birthday:'2020-03-10'}],events:[],necks:{土地:{s:'解決済み',m:''},建物:{s:'解決済み',m:'i-smart 36坪'},メーカー:{s:'解決済み',m:''},親族:{s:'解決済み',m:''},時期:{s:'解決済み',m:''},お金:{s:'解決済み',m:''}},steps:[{name:'間取り',done:true},{name:'仕様',done:false},{name:'電気',done:false},{name:'外壁・屋根',done:false},{name:'インテリア',done:false},{name:'最終確認',done:false}]},{id:5,name:'サンプル 次郎',phone:'080-8765-4321',phase:'契約済み',rank:'A',budget:'5,000万円',land:'土地あり',area:'福岡市中央区',firstVisit:'2023-09-01',lastContact:'2026-03-04',actions:[{t:'電気打ち合わせ',done:false},{t:'コンセント位置の確認依頼',done:false}],competitor:'',urgent:false,memo:'',aiResult:'',family:[{name:'サンプル 麻衣',relation:'奥様',birthday:'1986-12-05'},{name:'サンプル 蓮',relation:'長男',birthday:'2016-04-18'},{name:'サンプル 結衣',relation:'長女',birthday:'2019-09-30'}],events:[],necks:{土地:{s:'解決済み',m:''},建物:{s:'解決済み',m:'グラン・セゾン 42坪'},メーカー:{s:'解決済み',m:''},親族:{s:'解決済み',m:''},時期:{s:'解決済み',m:''},お金:{s:'解決済み',m:''}},steps:[{name:'間取り',done:true},{name:'仕様',done:true},{name:'電気',done:false},{name:'外壁・屋根',done:false},{name:'インテリア',done:false},{name:'最終確認',done:false}]}],staff:[],apiKey:'',whisperKey:'',eventTypes:['現場見学','資金計画','間取り提案','土地案内','ショールーム'],settings:{bdNotify:'both'}};}
-function load(){try{var d=localStorage.getItem(DB_KEY);if(d){var p=JSON.parse(d);p.customers.forEach(function(c){NECKS.forEach(function(n){if(c.necks&&typeof c.necks[n]==='string')c.necks[n]={s:c.necks[n],m:''};if(!c.necks)c.necks={};if(!c.necks[n])c.necks[n]={s:'未確認',m:''};});if(!c.steps)c.steps=[];if(!c.family)c.family=[];if(!c.events)c.events=[];
-if(typeof c.nextAction==='string'){c.actions=c.nextAction?[{t:c.nextAction,done:false}]:[];delete c.nextAction;}
-if(!c.actions)c.actions=[];});if(!p.staff)p.staff=[];if(!p.apiKey)p.apiKey='';if(!p.whisperKey)p.whisperKey='';if(!p.settings)p.settings={bdNotify:'both'};if(!p.eventTypes)p.eventTypes=['現場見学','資金計画','間取り提案','土地案内','ショールーム'];return p;}}catch(e){}return defaultData();}
-function save(){try{localStorage.setItem(DB_KEY,JSON.stringify(data));}catch(e){}}
-var data=load();
-var S={tab:'dashboard',phase:'追客中',selId:null,showDet:false,showAdd:false,showFam:false,showEvt:false,showStep:false,toast:null,analyzing:false,transcribing:false,rec:false,recT:0,recog:null,recTmr:null,nc:freshC(),nf:{name:'',relation:'',birthday:''},ne:{type:'',date:''},ns:''};
-function freshC(){var n={};NECKS.forEach(function(k){n[k]={s:'未確認',m:''};});return{name:'',phone:'',phase:'追客中',rank:'A',budget:'',land:'',area:'',competitor:'',firstVisit:'',necks:n};}
-function sel(){return data.customers.find(function(c){return c.id===S.selId;});}
-function daysAgo(d){if(!d)return'-';var x=Math.floor((new Date()-new Date(d))/864e5);return x===0?'今日':x===1?'昨日':x+'日前';}
-function rc(r){return'badge-'+r.toLowerCase();}
-function fmtT(s){return('0'+Math.floor(s/60)).slice(-2)+':'+('0'+(s%60)).slice(-2);}
-function age(b){if(!b)return'';var d=new Date(b),t=new Date(),a=t.getFullYear()-d.getFullYear();if(t.getMonth()<d.getMonth()||(t.getMonth()===d.getMonth()&&t.getDate()<d.getDate()))a--;return a+'歳';}
-function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
-function toast(m){S.toast=m;render();setTimeout(function(){S.toast=null;render();},2500);}
-function uc(){return data.customers.filter(function(c){return c.urgent;}).length;}
-function ni(c){var n=0;NECKS.forEach(function(k){if(c.necks[k].s==='要対応')n++;});return n;}
-function switchTab(t){S.tab=t;S.selId=null;S.showDet=false;render();}
-function smoothTo(id){var el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
-function switchPhase(p){S.phase=p;render();}
-function selectC(id){S.selId=id;S.showDet=true;render();}
-function closeDet(){S.showDet=false;S.selId=null;render();}
-function cycleN(c,n){var i=NECK_S.indexOf(c.necks[n].s);c.necks[n].s=NECK_S[(i+1)%NECK_S.length];save();render();}
-function togStep(c,i){c.steps[i].done=!c.steps[i].done;save();render();}
-function togUrg(c){c.urgent=!c.urgent;c.lastContact=new Date().toISOString().split('T')[0];save();render();toast(c.urgent?'⚡ 要対応にしました':'✓ 対応済みにしました');}
-function sortByDate(){if(!confirm('最終連絡が古い順に並び替えますか？')){return;}var ph=S.phase;var others=data.customers.filter(function(c){return c.phase!==ph;});var targets=data.customers.filter(function(c){return c.phase===ph;});targets.sort(function(a,b){return(a.lastContact||'').localeCompare(b.lastContact||'');});data.customers=[];PHASES.forEach(function(p){if(p===ph){data.customers=data.customers.concat(targets);}else{var g=others.filter(function(c){return c.phase===p;});data.customers=data.customers.concat(g);}});save();render();toast('📅 対応日付順に並び替えました');}
-function sortByRank(){if(!confirm('熱量ランク順（S→A→B→C）に並び替えますか？')){return;}var ph=S.phase;var others=data.customers.filter(function(c){return c.phase!==ph;});var targets=data.customers.filter(function(c){return c.phase===ph;});targets.sort(function(a,b){return RANKS.indexOf(a.rank)-RANKS.indexOf(b.rank);});data.customers=[];PHASES.forEach(function(p){if(p===ph){data.customers=data.customers.concat(targets);}else{var g=others.filter(function(c){return c.phase===p;});data.customers=data.customers.concat(g);}});save();render();toast('🔥 ランク順に並び替えました');}
-function scanAnketo(inp){var f=inp.files[0];if(!f)return;if(!data.apiKey){alert('設定からAnthropicのAPIキーを登録してください。\nAPIキーがないとアンケート読取は使えません。');inp.value='';return;}
-toast('📷 アンケートを読み取り中...');
-var reader=new FileReader();reader.onload=function(e){
-var img=new Image();img.onload=function(){
-var canvas=document.createElement('canvas');var max=1200;var w=img.width,h=img.height;if(w>h){if(w>max){h=h*max/w;w=max;}}else{if(h>max){w=w*max/h;h=max;}}canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);
-var b64=canvas.toDataURL('image/jpeg',0.8).split(',')[1];
-fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:'image/jpeg',data:b64}},{type:'text',text:'この来場アンケート用紙から顧客情報を読み取ってJSONで返してください。読み取れない項目は空文字にしてください。必ず以下のJSON形式のみで返してください（説明文不要）：\n{"name":"姓 名","phone":"電話番号","budget":"予算（万円付き）","area":"希望エリア","land":"土地あり or 土地なし","competitor":"検討中の他社","family":[{"name":"名前","relation":"続柄","birthday":"YYYY-MM-DD or 空"}],"memo":"その他気になる記載"}'}]}]})}).then(function(r){return r.json();}).then(function(d){
-var txt=d.content?d.content.map(function(i){return i.text||'';}).join(''):'';
-try{var clean=txt.replace(/```json|```/g,'').trim();var p=JSON.parse(clean);
-S.nc=freshC();
-if(p.name)S.nc.name=p.name;if(p.phone)S.nc.phone=p.phone;if(p.budget)S.nc.budget=p.budget;if(p.area)S.nc.area=p.area;if(p.land)S.nc.land=p.land;if(p.competitor)S.nc.competitor=p.competitor;
-S.nc._family=p.family||[];S.nc._memo=p.memo||'';
-S.showAdd=true;render();toast('✅ 読み取り完了！内容を確認してください');
-}catch(e){alert('読み取り結果を解析できませんでした。\n手動で登録してください。\n\n読み取り内容：\n'+txt);S.showAdd=true;render();}
-}).catch(function(e){alert('読み取りエラー：'+e.message);});
-};img.src=e.target.result;};reader.readAsDataURL(f);inp.value='';}
-function moveC(id,dir){var cs=data.customers;var ph=cs.find(function(c){return c.id===id;}).phase;var inPh=cs.filter(function(c){return c.phase===ph;});var idx=inPh.findIndex(function(c){return c.id===id;});if(dir===-1&&idx===0)return;if(dir===1&&idx===inPh.length-1)return;var swapId=inPh[idx+dir].id;var ai=cs.findIndex(function(c){return c.id===id;});var bi=cs.findIndex(function(c){return c.id===swapId;});var tmp=cs[ai];cs[ai]=cs[bi];cs[bi]=tmp;save();render();}
-function moveCAll(id,dir){var cs=data.customers;var idx=cs.findIndex(function(c){return c.id===id;});if(dir===-1&&idx===0)return;if(dir===1&&idx===cs.length-1)return;var tmp=cs[idx];cs[idx]=cs[idx+dir];cs[idx+dir]=tmp;save();render();}
-S.dragged=false;S.dragIdx=null;S.dragTimer=null;S.dragEl=null;S.dragStartY=0;S.dragStartX=0;S.dragMode=null;
-function dragStart(e,idx,mode){var touch=e.touches[0];S.dragStartY=touch.clientY;S.dragStartX=touch.clientX;S.dragMode=mode||'all';S.dragTimer=setTimeout(function(){S.dragged=true;S.dragIdx=idx;var items=document.querySelectorAll('.drag-item');var el=items[idx];if(!el)return;S.dragEl=el;el.classList.add('dragging');if(navigator.vibrate)navigator.vibrate(30);var list=document.getElementById('dragList');if(list){list.addEventListener('touchmove',dragMove,{passive:false});list.addEventListener('touchend',dragEnd);}},400);}
-function dragMove(e){if(!S.dragged)return;e.preventDefault();var touch=e.touches[0];var items=document.querySelectorAll('.drag-item');items.forEach(function(it){it.classList.remove('drag-gap');});items.forEach(function(it,i){if(i===S.dragIdx)return;var r=it.getBoundingClientRect();var mid=r.top+r.height/2;if(touch.clientY>r.top-10&&touch.clientY<r.bottom+10){if(touch.clientY<mid){it.classList.add('drag-gap');}else{var next=items[i+1];if(next&&next!==S.dragEl)next.classList.add('drag-gap');}}});if(S.dragEl){var dy=touch.clientY-S.dragStartY;var dx=touch.clientX-S.dragStartX;dx=Math.max(-30,Math.min(30,dx));S.dragEl.style.transform='translate('+dx+'px,'+dy+'px) rotate('+(dx*0.15)+'deg)';S.dragEl.style.zIndex='10';}}
-function dragEnd(e){clearTimeout(S.dragTimer);if(!S.dragged){S.dragIdx=null;return;}var touch=e.changedTouches[0];var items=document.querySelectorAll('.drag-item');var overIdx=null;items.forEach(function(it,i){var r=it.getBoundingClientRect();if(touch.clientY>r.top-10&&touch.clientY<r.bottom+10&&i!==S.dragIdx)overIdx=i;});if(overIdx!==null&&S.dragIdx!==null&&overIdx!==S.dragIdx){if(S.dragMode==='phase'){var filt=data.customers.filter(function(c){return c.phase===S.phase;});var fromId=filt[S.dragIdx]?filt[S.dragIdx].id:null;var toId=filt[overIdx]?filt[overIdx].id:null;if(fromId&&toId){var cs=data.customers;var ai=cs.findIndex(function(c){return c.id===fromId;});var moved=cs.splice(ai,1)[0];var bi=cs.findIndex(function(c){return c.id===toId;});if(overIdx>S.dragIdx)bi++;cs.splice(bi,0,moved);save();}}else{var cs2=data.customers;var moved2=cs2.splice(S.dragIdx,1)[0];cs2.splice(overIdx,0,moved2);save();}}S.dragged=false;S.dragIdx=null;S.dragEl=null;S.dragMode=null;var list=document.getElementById('dragList');if(list){list.removeEventListener('touchmove',dragMove);list.removeEventListener('touchend',dragEnd);}setTimeout(function(){S.dragged=false;render();},50);}
-function updField(c,f,v){c[f]=v;save();}
-function nextAct(c){if(!c.actions)return'-';var a=c.actions.find(function(x){return!x.done;});return a?a.t:'すべて完了';}
-function togAct(c,i){c.actions[i].done=!c.actions[i].done;save();render();}
-function addAct(c,t){if(!t.trim())return;c.actions.unshift({t:t,done:false});save();render();}
-function delAct(c,i){c.actions.splice(i,1);save();render();}
-function addC(){var nc=S.nc;if(!nc.name.trim()){alert('名前を入力してください');return;}var fam=nc._family||[];var memo=nc._memo||'';data.customers.push({id:Date.now(),name:nc.name,phone:nc.phone,phase:nc.phase,rank:nc.rank,budget:nc.budget,land:nc.land,area:nc.area,competitor:nc.competitor,firstVisit:nc.firstVisit||new Date().toISOString().split('T')[0],lastContact:new Date().toISOString().split('T')[0],actions:[{t:'初回フォロー',done:false}],urgent:false,memo:memo,aiResult:'',family:fam,events:[],necks:nc.necks,steps:nc.phase==='契約済み'?DEF_STEPS.map(function(s){return{name:s,done:false};}):[]});save();S.showAdd=false;S.nc=freshC();toast('✅ 顧客を登録しました');}
-function delC(id){if(!confirm('削除しますか？'))return;data.customers=data.customers.filter(function(c){return c.id!==id;});save();closeDet();toast('削除しました');}
-function addFam(){var c=sel();if(!c)return;var f=S.nf;if(!f.name.trim())return;c.family.push({name:f.name,relation:f.relation,birthday:f.birthday});save();S.showFam=false;S.nf={name:'',relation:'',birthday:''};toast('✅ 家族を追加');}
-function updFam(c,i,field,val){c.family[i][field]=val;save();}
-function delFam(c,i){if(confirm(c.family[i].name+'を削除しますか？')){c.family.splice(i,1);save();render();}}
-function delEvt(c,i){if(confirm('このイベントを削除しますか？')){c.events.splice(i,1);save();render();}}
-function addEvtType(t){if(!t.trim())return;if(data.eventTypes.indexOf(t)===-1){data.eventTypes.push(t);save();}S.ne.type=t;render();}
-function delEvtType(i){data.eventTypes.splice(i,1);save();render();}
-function addEvt(){var c=sel();if(!c)return;var e=S.ne;if(!e.type.trim()||!e.date)return;c.events.push({type:e.type,date:e.date});save();S.showEvt=false;S.ne={type:'',date:''};toast('✅ イベント追加');}
-function addStp(){var c=sel();if(!c||!S.ns.trim())return;c.steps.push({name:S.ns,done:false});save();S.showStep=false;S.ns='';render();}
-function delStep(c,i){c.steps.splice(i,1);save();render();}
-function addDefSteps(id){var c=data.customers.find(function(x){return x.id===id;});if(!c)return;c.steps=DEF_STEPS.map(function(s){return{name:s,done:false};});save();render();}
-function handleAudio(inp){var f=inp.files[0];if(!f)return;var c=sel();if(!c)return;toast('📎 '+f.name+' を追加しました');var note='【音声ファイル】'+f.name+'\n※ ボイスメモアプリで文字起こし後、下のテキスト欄に貼り付けてください\n\n';if(!c.memo)c.memo=note;else c.memo=note+c.memo;save();render();inp.value='';}
-function transcribeAudio(inp){var f=inp.files[0];if(!f)return;if(!data.whisperKey){alert('設定画面でWhisper APIキーを登録してください');inp.value='';return;}var c=sel();if(!c)return;S.transcribing=true;render();var fd=new FormData();fd.append('file',f);fd.append('model','whisper-1');fd.append('language','ja');fetch('https://api.openai.com/v1/audio/transcriptions',{method:'POST',headers:{'Authorization':'Bearer '+data.whisperKey},body:fd}).then(function(r){return r.json();}).then(function(d){if(d.text){c.memo=(c.memo?c.memo+'\n':'')+d.text;save();toast('✅ 文字起こし完了');}else{alert('文字起こしに失敗しました：'+(d.error?d.error.message:'不明なエラー'));}S.transcribing=false;inp.value='';render();}).catch(function(e){S.transcribing=false;inp.value='';alert('エラー: '+e.message);render();});}
-function buildPrompt(c){var acts=(c.actions||[]).filter(function(a){return!a.done;}).map(function(a){return a.t;}).join('、');return'住宅営業コーチとして分析。簡潔に箇条書き。\n\n【顧客】'+c.name+'様\n【予算】'+c.budget+'\n【フェーズ】'+c.phase+'\n【競合】'+(c.competitor||'なし')+'\n【現在のアクション】'+(acts||'なし')+'\n【ネック】\n'+NECKS.map(function(n){return n+'：'+c.necks[n].s+(c.necks[n].m?'（'+c.necks[n].m+'）':'');}).join('\n')+'\n\n【商談メモ】\n'+c.memo+'\n\n■顧客の本音\n■次回アクション（優先順）\n■LINEメッセージ案\n■競合対策';}
-function analyze(){var c=sel();if(!c||!c.memo||!c.memo.trim())return;if(!data.apiKey){var p=buildPrompt(c);if(navigator.clipboard){navigator.clipboard.writeText(p).then(function(){toast('📋 プロンプトをコピーしました');});}return;}S.analyzing=true;render();fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:buildPrompt(c)}]})}).then(function(r){return r.json();}).then(function(d){var t=d.content?d.content.map(function(i){return i.text||'';}).join('\n'):'分析失敗';c.aiResult=t;save();S.analyzing=false;render();}).catch(function(){S.analyzing=false;render();});}
-function copyAi(){var c=sel();if(c&&c.aiResult&&navigator.clipboard){navigator.clipboard.writeText(c.aiResult);toast('📋 コピーしました');}}
-function genBd(cn,fn,rel,bd){var a=bd?age(bd):'';var m=cn+'様\n\nいつもお世話になっております。\n'+fn+'様'+(a?'（'+a+'）':'')+' のお誕生日おめでとうございます🎂\n素敵な一日をお過ごしください。\n\n今後ともよろしくお願いいたします。';if(navigator.clipboard){navigator.clipboard.writeText(m);toast('📋 LINE文面をコピー');}else alert(m);}
-function exportD(){var b=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});var u=URL.createObjectURL(b);var a=document.createElement('a');a.href=u;a.download='iezukuri_backup_'+new Date().toISOString().split('T')[0]+'.json';a.click();URL.revokeObjectURL(u);toast('💾 エクスポート完了');}
-function importD(inp){var f=inp.files[0];if(!f)return;var r=new FileReader();r.onload=function(e){try{var d=JSON.parse(e.target.result);if(d.customers&&confirm('上書きしますか？')){data=d;save();render();toast('✅ インポート完了');}}catch(e){alert('形式エラー');}};r.readAsText(f);}
-function resetD(){if(confirm('全データを削除しますか？')&&confirm('最終確認です')){data=defaultData();save();render();toast('リセット完了');}}
+/* ========== Supabase Config ========== */
+var SUPABASE_URL = 'https://cbnrcvoswwitimrqrugq.supabase.co';
+var SUPABASE_KEY = 'sb_publishable_Lgf5RgDRez-tPYddFXDdSw_1jW3uum8';
+var sbClient = null;
+var SB_ROW_ID = 1;
 
-function render(){var h=rH();if(S.tab!=='settings')h+=rT();h+='<div class="content">';if(S.tab==='dashboard')h+=rD();else if(S.tab==='customers')h+=rC();else if(S.tab==='analyze')h+=rA();else h+=rS();h+='</div>';if(S.showDet)h+=rDet();if(S.showAdd)h+=rAdd();if(S.showFam)h+=rFam();if(S.showEvt)h+=rEvt();if(S.showStep)h+=rStp();if(S.toast)h+='<div class="toast">'+S.toast+'</div>';document.getElementById('app').innerHTML=h;initSwipe();}
-var swipeY=0,swipeEl=null,swipeDist=0;
-var hSwipeX=0,hSwiping=false;
-function initSwipe(){var modals=document.querySelectorAll('.modal');modals.forEach(function(m){m.addEventListener('touchstart',function(e){if(m.scrollTop<=0){swipeY=e.touches[0].clientY;swipeEl=m;swipeDist=0;}else{swipeEl=null;}},{passive:true});m.addEventListener('touchmove',function(e){if(!swipeEl)return;swipeDist=e.touches[0].clientY-swipeY;if(swipeDist>0){swipeEl.style.transform='translateY('+swipeDist+'px)';swipeEl.style.transition='none';}},{passive:true});m.addEventListener('touchend',function(){if(!swipeEl)return;if(swipeDist>80){swipeEl.style.transform='translateY(100%)';swipeEl.style.transition='transform 0.2s';setTimeout(function(){closeDet();S.showAdd=false;S.showFam=false;S.showEvt=false;S.showStep=false;render();},200);}else{swipeEl.style.transform='';swipeEl.style.transition='transform 0.2s';}swipeEl=null;swipeDist=0;});});
-if(S.tab==='customers'&&!S.showDet&&!S.showAdd){var ct=document.querySelector('.content');if(ct){ct.addEventListener('touchstart',function(e){hSwipeX=e.touches[0].clientX;hSwiping=true;},{passive:true});ct.addEventListener('touchend',function(e){if(!hSwiping)return;hSwiping=false;var dx=e.changedTouches[0].clientX-hSwipeX;if(Math.abs(dx)<60)return;var idx=PHASES.indexOf(S.phase);if(dx<-60&&idx<PHASES.length-1){S.phase=PHASES[idx+1];render();}else if(dx>60&&idx>0){S.phase=PHASES[idx-1];render();}});}}}
+try {
+  if (window.supabase && typeof window.supabase.createClient === 'function') {
+    sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  }
+} catch (e) { console.error('[Supabase] Init error:', e); }
 
-function rH(){var u=uc();return'<div class="header"><div class="logo"><div class="logo-mark"><span>⌂</span></div><div><div class="logo-title">IEZUKURI PRO</div><div class="logo-sub">Housing Sales System</div></div></div><div style="display:flex;align-items:center;gap:10px">'+(u?'<div class="alert-badge">要対応 '+u+'</div>':'')+'<button onclick="switchTab(\'settings\')" style="background:none;color:var(--text3);font-size:18px;padding:4px">⚙</button></div></div>';}
-function rT(){var ts=[{id:'dashboard',ic:'◈',l:'ダッシュ'},{id:'customers',ic:'◉',l:'顧客管理'},{id:'analyze',ic:'◎',l:'商談分析'}];return'<div class="tab-bar">'+ts.map(function(t){return'<button class="tab-btn'+(S.tab===t.id?' active':'')+'" onclick="switchTab(\''+t.id+'\')"><span class="tab-icon">'+t.ic+'</span>'+t.l+'</button>';}).join('')+'</div>';}
+/* ========== Constants ========== */
+var DB_KEY = 'iezukuri_pro_data';
+var PHASES = ['契約済み', '仮契約済み', '追客中', '失注・長期', '引渡し済み'];
+var NECKS = ['土地', '建物', 'メーカー', '親族', '時期', 'お金'];
+var NECK_S = ['未確認', '要対応', '解決済み'];
+var NECK_I = {
+  '未確認': '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;border:1.5px solid #8a7e72;vertical-align:middle"></span>',
+  '要対応': '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#b5785a;vertical-align:middle"></span>',
+  '解決済み': '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#7a9e7e;vertical-align:middle"></span>'
+};
+var DEF_STEPS = ['間取り', '仕様', '電気', '外壁・屋根', 'インテリア', '最終確認'];
+var RANKS = ['S', 'A', 'B', 'C'];
 
-function rD(){var cs=data.customers,ur=cs.filter(function(c){return c.urgent;}),today=new Date(),ts=today.toISOString().split('T')[0];var bds=[];cs.forEach(function(c){(c.family||[]).forEach(function(f){if(!f.birthday)return;var bd=new Date(f.birthday),ty=new Date(today.getFullYear(),bd.getMonth(),bd.getDate()),df=Math.floor((ty-today)/864e5);if(df>=-1&&df<=7)bds.push({cn:c.name,fn:f.name,rel:f.relation,bd:f.birthday,df:df});});});var evs=[];cs.forEach(function(c){(c.events||[]).forEach(function(e){if(e.date>=ts)evs.push({type:e.type,date:e.date,cn:c.name});});});evs.sort(function(a,b){return a.date.localeCompare(b.date);});
-var h='<div class="stats" style="grid-template-columns:repeat(4,1fr)"><div class="stat stat-a" onclick="switchTab(\'analyze\')" style="cursor:pointer"><div style="font-size:16px;margin-bottom:2px">◈</div><div class="stat-num" style="color:var(--accent)">'+cs.length+'</div><div class="stat-label">顧客数</div></div><div class="stat stat-r" onclick="smoothTo(\'sec-urgent\')" style="cursor:pointer"><div style="font-size:16px;margin-bottom:2px">◆</div><div class="stat-num" style="color:var(--red)">'+ur.length+'</div><div class="stat-label">要対応</div></div><div class="stat stat-g" onclick="smoothTo(\'sec-events\')" style="cursor:pointer"><div style="font-size:16px;margin-bottom:2px">◇</div><div class="stat-num" style="color:var(--green)">'+evs.length+'</div><div class="stat-label">イベント</div></div><div class="stat" onclick="smoothTo(\'sec-birthday\')" style="cursor:pointer;border-bottom:2px solid var(--orange)"><div style="font-size:16px;margin-bottom:2px">🎂</div><div class="stat-num" style="color:var(--orange)">'+bds.length+'</div><div class="stat-label">誕生日</div></div></div>';
-h+='<div id="sec-urgent" class="section-title" style="margin-top:20px"><span>⚡</span> 要対応 <div class="section-line"></div></div>';
-if(!ur.length)h+='<div class="empty" style="padding:20px"><div class="empty-text" style="color:var(--green)">対応完了 ✓</div></div>';
-else ur.forEach(function(c){h+='<div class="card card-urgent" onclick="selectC('+c.id+')"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div><span style="font-weight:700;font-size:14px">'+esc(c.name)+'様</span> <span class="badge '+rc(c.rank)+'">'+c.rank+'</span></div><span style="font-size:11px;color:var(--text3)">'+daysAgo(c.lastContact)+'</span></div><div style="font-size:12px;color:var(--text2);margin-bottom:8px">→ '+esc(nextAct(c))+'</div><div style="display:flex;gap:7px">'+NECKS.map(function(n){return'<div style="display:flex;align-items:center;gap:2px"><span style="font-size:9px;color:var(--text3)">'+n+'</span><span style="font-size:11px">'+NECK_I[c.necks[n].s]+'</span></div>';}).join('')+'</div></div>';});
-h+='<div id="sec-events" class="section-title" style="margin-top:20px"><span>📅</span> イベント <div class="section-line"></div></div>';
-if(!evs.length)h+='<div class="empty" style="padding:20px"><div class="empty-text">予定なし</div></div>';
-else evs.slice(0,6).forEach(function(e){h+='<div class="card card-green" style="display:flex;justify-content:space-between;align-items:center"><div><span style="background:var(--green-dim);color:var(--green);border-radius:5px;padding:2px 8px;font-size:10px;font-weight:700;margin-right:8px">'+esc(e.type)+'</span><span style="font-size:13px;font-weight:600">'+esc(e.cn)+'様</span></div><span style="font-size:12px;color:var(--text3)">'+e.date+'</span></div>';});
-if(bds.length){h+='<div id="sec-birthday" class="section-title" style="margin-top:20px"><span>🎂</span> 直近の誕生日 <div class="section-line"></div></div>';
-bds.sort(function(a,b){return a.df-b.df;});
-bds.forEach(function(b){
-var col,bg,lbl;
-if(b.df<=0){col='#b5785a';bg='#b5785a18';lbl='🎉 今日！';}
-else if(b.df===1){col='#d4a24e';bg='#d4a24e18';lbl='明日';}
-else if(b.df===2){col='#7a9e7e';bg='#7a9e7e18';lbl='あと2日';}
-else{col='#8a9a9e';bg='#8a9a9e14';lbl='あと'+b.df+'日';}
-h+='<div class="card" style="display:flex;justify-content:space-between;align-items:center;border-left:3px solid '+col+'"><div><div style="font-weight:700;font-size:13px">'+esc(b.cn)+'様 / '+esc(b.fn)+' <span style="color:var(--text3);font-size:11px">'+age(b.bd)+'</span></div><div style="font-size:11px;color:'+col+';font-weight:700;margin-top:2px;display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:'+col+'"></span>'+lbl+'</div></div><button class="btn-small" style="background:'+bg+';color:'+col+'" onclick="genBd(\''+esc(b.cn)+'\',\''+esc(b.fn)+'\',\''+esc(b.rel)+'\',\''+b.bd+'\')">LINE生成</button></div>';});}
-return h;}
+/* ========== Default Data ========== */
+function defaultData() {
+  return {
+    customers: [
+      {id:1,name:'サンプル 太郎',phone:'090-1234-5678',phase:'追客中',rank:'S',budget:'4,000万円',land:'土地あり（飯塚市）',area:'飯塚市',firstVisit:'2024-03-05',lastContact:'2026-03-03',actions:[{t:'間取り提案書を送付',done:false},{t:'競合比較資料を作成',done:false}],competitor:'積水ハウス',urgent:true,memo:'',aiResult:'',family:[{name:'サンプル 花子',relation:'奥様',birthday:'1985-05-03'},{name:'サンプル 一郎',relation:'長男',birthday:'2018-08-15'}],events:[{type:'工場見学',date:'2026-03-15'}],necks:{土地:{s:'解決済み',m:'飯塚市内80坪所有'},建物:{s:'要対応',m:'35坪以上希望。予算との折り合い'},メーカー:{s:'要対応',m:'積水と比較中'},親族:{s:'解決済み',m:'ご両親了承済み'},時期:{s:'未確認',m:''},お金:{s:'要対応',m:'頭金500万。親援助未確認'}},steps:[]},
+      {id:2,name:'サンプル 美咲',phone:'080-2345-6789',phase:'仮契約済み',rank:'A',budget:'3,500万円',land:'土地なし',area:'福岡市東区',firstVisit:'2024-06-10',lastContact:'2026-02-28',actions:[{t:'土地情報を3件共有する',done:false}],competitor:'タマホーム',urgent:false,memo:'',aiResult:'',family:[{name:'サンプル 健',relation:'ご主人',birthday:'1990-11-20'}],events:[{type:'お家見学',date:'2026-03-22'}],necks:{土地:{s:'要対応',m:'福岡東区60坪以上・1200万以内'},建物:{s:'解決済み',m:'i-smartで決定'},メーカー:{s:'解決済み',m:'一条内定'},親族:{s:'解決済み',m:''},時期:{s:'要対応',m:'来年4月入学合わせ'},お金:{s:'解決済み',m:'世帯800万・仮審査OK'}},steps:[]},
+      {id:3,name:'サンプル 健太',phone:'070-3456-7890',phase:'失注・長期',rank:'C',budget:'3,000万円',land:'土地なし',area:'北九州市',firstVisit:'2023-11-15',lastContact:'2026-01-10',actions:[{t:'ライフプランニングへ案内',done:false},{t:'再来場の案内LINE送信',done:false}],competitor:'未確認',urgent:true,memo:'',aiResult:'',family:[],events:[{type:'ライフプランニング',date:'2026-03-20'}],necks:{土地:{s:'要対応',m:'北九州で探し中・予算厳しい'},建物:{s:'未確認',m:''},メーカー:{s:'要対応',m:'未定'},親族:{s:'要対応',m:'奥様慎重派'},時期:{s:'要対応',m:'2年以内希望'},お金:{s:'要対応',m:'年収400万・頭金なし'}},steps:[]},
+      {id:4,name:'サンプル 大輔',phone:'090-5678-1234',phase:'契約済み',rank:'S',budget:'4,500万円',land:'土地あり',area:'飯塚市',firstVisit:'2024-01-20',lastContact:'2026-03-05',actions:[{t:'仕様打ち合わせ 2回目',done:false},{t:'キッチン仕様の確認',done:false}],competitor:'',urgent:false,memo:'',aiResult:'',family:[{name:'サンプル 優子',relation:'奥様',birthday:'1988-07-22'},{name:'サンプル 陽菜',relation:'長女',birthday:'2020-03-10'}],events:[],necks:{土地:{s:'解決済み',m:''},建物:{s:'解決済み',m:'i-smart 36坪'},メーカー:{s:'解決済み',m:''},親族:{s:'解決済み',m:''},時期:{s:'解決済み',m:''},お金:{s:'解決済み',m:''}},steps:[{name:'間取り',done:true},{name:'仕様',done:false},{name:'電気',done:false},{name:'外壁・屋根',done:false},{name:'インテリア',done:false},{name:'最終確認',done:false}]},
+      {id:5,name:'サンプル 次郎',phone:'080-8765-4321',phase:'契約済み',rank:'A',budget:'5,000万円',land:'土地あり',area:'福岡市中央区',firstVisit:'2023-09-01',lastContact:'2026-03-04',actions:[{t:'電気打ち合わせ',done:false},{t:'コンセント位置の確認依頼',done:false}],competitor:'',urgent:false,memo:'',aiResult:'',family:[{name:'サンプル 麻衣',relation:'奥様',birthday:'1986-12-05'},{name:'サンプル 蓮',relation:'長男',birthday:'2016-04-18'},{name:'サンプル 結衣',relation:'長女',birthday:'2019-09-30'}],events:[],necks:{土地:{s:'解決済み',m:''},建物:{s:'解決済み',m:'グラン・セゾン 42坪'},メーカー:{s:'解決済み',m:''},親族:{s:'解決済み',m:''},時期:{s:'解決済み',m:''},お金:{s:'解決済み',m:''}},steps:[{name:'間取り',done:true},{name:'仕様',done:true},{name:'電気',done:false},{name:'外壁・屋根',done:false},{name:'インテリア',done:false},{name:'最終確認',done:false}]}
+    ],
+    staff: [], apiKey: '', whisperKey: '',
+    eventTypes: ['現場見学', '資金計画', '間取り提案', '土地案内', 'ショールーム'],
+    settings: { bdNotify: 'both' }
+  };
+}
 
-function rC(){var filt=data.customers.filter(function(c){return c.phase===S.phase;});var h='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><div style="font-size:15px;font-weight:700;letter-spacing:0.5px">顧客一覧</div><div style="display:flex;gap:6px"><button class="btn-small" style="background:var(--surface2);color:var(--accent);border:1px solid var(--border)" onclick="document.getElementById(\'scanInp\').click()">📷 読取</button><button class="btn-small btn-primary" onclick="S.showAdd=true;render()">＋ 新規</button></div></div><input type="file" id="scanInp" accept="image/*" capture="environment" style="display:none" onchange="scanAnketo(this)"><div class="phase-tabs">';PHASES.forEach(function(p){var n=data.customers.filter(function(c){return c.phase===p;}).length;h+='<button class="phase-tab'+(S.phase===p?' active':'')+'" onclick="switchPhase(\''+p+'\')">'+p+'（'+n+'）</button>';});h+='</div>';
-if(filt.length>1){h+='<div style="display:flex;gap:6px;margin-bottom:14px"><button onclick="sortByDate()" class="btn-small" style="background:var(--surface2);color:var(--text2);border:1px solid var(--border)">📅 日付順</button><button onclick="sortByRank()" class="btn-small" style="background:var(--surface2);color:var(--text2);border:1px solid var(--border)">🔥 ランク順</button></div>';}
-if(!filt.length)h+='<div class="empty"><div class="empty-icon">◻️</div><div class="empty-text">該当なし</div></div>';
-else{h+='<div id="dragList">';filt.forEach(function(c,ci){var iss=ni(c);
-h+='<div class="drag-item'+(c.urgent?' card-urgent':' card-accent')+'" data-idx="'+ci+'" ontouchstart="dragStart(event,'+ci+',\'phase\')" ontouchend="if(!S.dragged)clearTimeout(S.dragTimer)">';
-h+='<div onclick="if(!S.dragged)selectC('+c.id+')">';
-h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px"><div style="display:flex;align-items:center;gap:8px"><span style="color:var(--text3);font-size:12px;margin-right:2px">☰</span><span style="font-weight:700;font-size:15px">'+esc(c.name)+'様</span><span class="badge '+rc(c.rank)+'">'+c.rank+'</span>';if(c.urgent)h+='<span class="badge" style="background:var(--red-dim);color:var(--red)">要対応</span>';h+='</div><span style="font-size:11px;color:var(--text3)">'+daysAgo(c.lastContact)+'</span></div>';
-h+='<div style="font-size:12px;color:var(--text2);margin-bottom:8px">→ '+esc(nextAct(c))+'</div>';
-h+='<div style="display:flex;gap:7px;flex-wrap:wrap">';NECKS.forEach(function(n){h+='<div style="display:flex;align-items:center;gap:2px"><span style="font-size:9px;color:var(--text3)">'+n+'</span><span style="font-size:11px">'+NECK_I[c.necks[n].s]+'</span></div>';});if(iss)h+='<span style="font-size:10px;color:var(--red);font-weight:700;margin-left:auto">ネック'+iss+'</span>';h+='</div>';
-if(c.phase==='契約済み'&&c.steps.length){var dn=c.steps.filter(function(s){return s.done;}).length,pct=Math.round(dn/c.steps.length*100);h+='<div style="margin-top:10px"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:3px"><span>進捗</span><span>'+dn+'/'+c.steps.length+'</span></div><div class="progress-track"><div class="progress-fill" style="width:'+pct+'%"></div></div></div>';}
-h+='</div>';
-h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">';
-h+='<div style="font-size:10px;color:var(--text3)">'+daysAgo(c.lastContact)+'に連絡</div>';
-h+='<div class="toggle-wrap" onclick="event.stopPropagation();togUrg(data.customers.find(function(x){return x.id==='+c.id+'}))">';
-h+='<span class="toggle-label" style="color:'+(c.urgent?'var(--red)':'var(--text3)')+'">'+(c.urgent?'要対応':'対応済')+'</span>';
-h+='<div class="toggle '+(c.urgent?'toggle-on':'toggle-off')+'"><div class="toggle-dot"></div></div>';
-h+='</div></div></div>';});h+='</div>';}return h;}
+/* ========== Data Migration ========== */
+function migrateData(p) {
+  p.customers.forEach(function(c) {
+    if (!c.necks) c.necks = {};
+    NECKS.forEach(function(n) {
+      if (c.necks && typeof c.necks[n] === 'string') c.necks[n] = { s: c.necks[n], m: '' };
+      if (!c.necks[n]) c.necks[n] = { s: '未確認', m: '' };
+    });
+    if (!c.steps) c.steps = [];
+    if (!c.family) c.family = [];
+    if (!c.events) c.events = [];
+    if (typeof c.nextAction === 'string') {
+      c.actions = c.nextAction ? [{ t: c.nextAction, done: false }] : [];
+      delete c.nextAction;
+    }
+    if (!c.actions) c.actions = [];
+  });
+  if (!p.staff) p.staff = [];
+  if (!p.apiKey) p.apiKey = '';
+  if (!p.whisperKey) p.whisperKey = '';
+  if (!p.settings) p.settings = { bdNotify: 'both' };
+  if (!p.eventTypes) p.eventTypes = ['現場見学', '資金計画', '間取り提案', '土地案内', 'ショールーム'];
+  return p;
+}
 
-function rA(){var h='';if(!S.selId){h+='<div style="text-align:center;margin-bottom:16px"><div style="font-size:36px;margin-bottom:8px;opacity:0.4">◎</div><div style="color:var(--text3);font-size:13px">顧客を選択</div><div style="font-size:10px;color:var(--text3);margin-top:4px">長押しで並び替え</div></div>';h+='<div id="dragList">';data.customers.forEach(function(c,ci){h+='<div class="drag-item" data-idx="'+ci+'" data-id="'+c.id+'" ontouchstart="dragStart(event,'+ci+')" ontouchend="if(!S.dragged)clearTimeout(S.dragTimer)" onclick="if(!S.dragged){S.selId='+c.id+';render();}"><div style="display:flex;align-items:center;gap:12px"><div style="color:var(--text3);font-size:14px;flex-shrink:0">☰</div><div><div style="font-size:14px;font-weight:600">'+esc(c.name)+'様</div><div style="font-size:11px;color:var(--text3);margin-top:2px">'+c.phase+'</div></div></div></div>';});h+='</div>';return h;}
-var c=sel();if(!c)return'';
-h+='<div style="display:flex;align-items:center;gap:10px;margin-bottom:18px"><button onclick="S.selId=null;render()" class="btn-small btn-secondary">← 戻る</button><div style="font-weight:700;font-size:14px">'+esc(c.name)+'様</div></div>';
-h+='<button onclick="document.getElementById(\'audioUp\').click()" class="rec-btn" style="background:var(--surface2);color:var(--text2);border:1px dashed var(--border2)">📎 ボイスメモ等の音声ファイルを追加</button><input type="file" id="audioUp" accept="audio/*" style="display:none" onchange="handleAudio(this)">';
-h+='<div style="display:flex;gap:8px;margin-bottom:14px"><button onclick="document.getElementById(\'audioUp\').click()" class="btn btn-secondary" style="flex:1;font-size:12px;padding:10px">'+(S.transcribing?'⏳ 文字起こし中...':'📁 ボイスメモを選択')+'</button><input type="file" id="audioUp" accept="audio/*" style="display:none" onchange="transcribeAudio(this)"></div>';
-if(!data.whisperKey)h+='<div style="font-size:10px;color:var(--text3);text-align:center;margin-bottom:10px">設定でWhisper APIキーを登録すると音声ファイルから文字起こしできます</div>';
-h+='<textarea class="input" style="height:160px;margin-bottom:14px" placeholder="ボイスメモの文字起こしを貼り付け&#10;または商談内容を直接入力" oninput="var c=sel();if(c){c.memo=this.value;save();}">'+(c.memo?esc(c.memo):'')+'</textarea>';
-var ok=c.memo&&c.memo.trim();
-if(data.apiKey)h+='<button onclick="analyze()" '+(S.analyzing||!ok?'disabled':'')+' class="btn btn-primary" style="margin-bottom:14px;'+(ok?'':'opacity:0.4')+'">'+(S.analyzing?'⏳ 分析中...':'✨ AI分析')+'</button>';
-else{h+='<button onclick="analyze()" '+(ok?'':'disabled')+' class="btn btn-secondary" style="margin-bottom:8px;'+(ok?'':'opacity:0.4')+'">📋 プロンプトをコピー → Claudeへ</button>';h+='<div style="font-size:10px;color:var(--text3);text-align:center;margin-bottom:14px">設定でAPIキー登録→アプリ内分析可</div>';}
-if(c.aiResult)h+='<div class="ai-result"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-left:10px"><div style="font-size:12px;color:var(--accent);font-weight:700;letter-spacing:0.5px">✨ 分析結果</div><button onclick="copyAi()" class="btn-small" style="background:var(--surface2);color:var(--text2)">コピー</button></div><pre style="font-size:13px;white-space:pre-wrap;line-height:1.8;margin:0;font-family:inherit;padding-left:10px">'+esc(c.aiResult)+'</pre></div>';
-return h;}
+/* ========== Storage ========== */
+function loadFromLocal() {
+  try {
+    var d = localStorage.getItem(DB_KEY);
+    if (d) return migrateData(JSON.parse(d));
+  } catch (e) {}
+  return null;
+}
 
-function rS(){var h='<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px"><button onclick="switchTab(\'dashboard\')" class="btn-small btn-secondary">← 戻る</button><div style="font-size:16px;font-weight:700;letter-spacing:0.5px">設定</div></div>';h+='<div class="setting-item"><div class="setting-label">🔑 Anthropic APIキー</div><div class="setting-desc">AI分析機能に必要<br>取得：console.anthropic.com</div><input class="input" type="password" placeholder="sk-ant-..." value="'+esc(data.apiKey)+'" oninput="data.apiKey=this.value;save();"></div>';h+='<div class="setting-item"><div class="setting-label">🎙 Whisper APIキー（OpenAI）</div><div class="setting-desc">音声ファイルの文字起こしに必要<br>取得：platform.openai.com/api-keys</div><input class="input" type="password" placeholder="sk-..." value="'+esc(data.whisperKey)+'" oninput="data.whisperKey=this.value;save();"></div>';h+='<div class="setting-item"><div class="setting-label">💾 データ管理</div><div class="setting-desc">データはこの端末に保存されています</div><div style="display:flex;gap:8px"><button class="btn btn-secondary" style="flex:1" onclick="exportD()">エクスポート</button><button class="btn btn-secondary" style="flex:1" onclick="document.getElementById(\'imp\').click()">インポート</button></div><input type="file" id="imp" accept=".json" style="display:none" onchange="importD(this)"></div>';h+='<div class="setting-item"><div class="setting-label">⚠️ リセット</div><div class="setting-desc">すべて初期状態に戻します</div><button class="btn btn-danger" onclick="resetD()">リセット</button></div>';h+='<div style="text-align:center;color:var(--text3);font-size:10px;margin-top:28px;letter-spacing:1px"><span style="font-family:Cormorant Garamond,serif;font-size:13px;color:var(--accent);letter-spacing:2px">IEZUKURI PRO</span><br>v1.0</div>';return h;}
+function load() { return loadFromLocal() || defaultData(); }
 
-function rDet(){var c=sel();if(!c)return'';var h='<div class="modal-overlay" onclick="if(event.target===this)closeDet()"><div class="modal"><div class="modal-handle"></div>';
-h+='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px"><div style="flex:1;margin-right:10px"><input class="input" style="font-size:18px;font-weight:900;letter-spacing:0.5px;padding:8px 10px;background:transparent;border:1px solid transparent" value="'+esc(c.name)+'" onfocus="this.style.borderColor=\'var(--accent)\';this.style.background=\'var(--bg2)\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'" oninput="updField(sel(),\'name\',this.value)"><div style="display:flex;gap:6px;align-items:center;margin-top:5px;padding-left:10px">'+RANKS.map(function(r){return'<button onclick="updField(sel(),\'rank\',\''+r+'\');render()" class="badge '+rc(r)+'" style="font-size:10px;cursor:pointer;'+(c.rank===r?'outline:2px solid var(--text2)':'opacity:0.4')+'">'+r+'</button>';}).join('')+'<select class="input" style="font-size:11px;padding:4px 8px;background:transparent;border:1px solid transparent;color:var(--text3);width:auto" onchange="updField(sel(),\'phase\',this.value);render()">';PHASES.forEach(function(p){h+='<option'+(c.phase===p?' selected':'')+'>'+p+'</option>';});h+='</select></div></div><div style="display:flex;gap:8px;align-items:center"><div class="toggle-wrap" onclick="togUrg(sel())"><span class="toggle-label" style="color:'+(c.urgent?'var(--red)':'var(--text3)')+';font-size:10px">'+(c.urgent?'要対応':'対応済')+'</span><div class="toggle '+(c.urgent?'toggle-on':'toggle-off')+'" style="width:40px;height:22px"><div class="toggle-dot" style="width:18px;height:18px"></div></div></div><button onclick="closeDet()" style="background:none;color:var(--text3);font-size:18px;padding:4px">✕</button></div></div>';
-h+='<div class="detail-grid" style="margin-bottom:18px">';
-[['予算','budget'],['土地','land'],['競合','competitor'],['エリア','area'],['電話','phone'],['初回来場','firstVisit']].forEach(function(f){
-h+='<div class="detail-cell"><div class="detail-cell-label">'+f[0]+'</div>';
-if(f[1]==='firstVisit')h+='<input class="input" type="date" style="font-size:12px;padding:6px 8px;background:transparent;border:1px solid transparent" value="'+(c[f[1]]||'')+'" onfocus="this.style.borderColor=\'var(--accent)\';this.style.background=\'var(--bg)\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'" oninput="updField(sel(),\''+f[1]+'\',this.value)">';
-else h+='<input class="input" style="font-size:12px;font-weight:600;padding:6px 8px;background:transparent;border:1px solid transparent" value="'+esc(c[f[1]]||'')+'" placeholder="未入力" onfocus="this.style.borderColor=\'var(--accent)\';this.style.background=\'var(--bg)\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'" oninput="updField(sel(),\''+f[1]+'\',this.value)">';
-h+='</div>';});h+='</div>';
-h+='<div style="margin-bottom:18px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div class="label" style="margin-bottom:0">→ アクション</div></div>';
-h+='<div style="display:flex;gap:6px;margin-bottom:10px"><input class="input" id="newActInp" style="flex:1;font-size:13px;padding:10px 12px" placeholder="新しいアクションを入力" onkeydown="if(event.key===\'Enter\'){addAct(sel(),this.value);this.value=\'\';}">';
-h+='<button onclick="var i=document.getElementById(\'newActInp\');addAct(sel(),i.value);i.value=\'\';" class="btn-small btn-primary" style="flex-shrink:0">追加</button></div>';
-var undone=(c.actions||[]).filter(function(a){return!a.done;});
-var done=(c.actions||[]).filter(function(a){return a.done;});
-if(undone.length){undone.forEach(function(a){var idx=(c.actions||[]).indexOf(a);h+='<div class="check-item" style="justify-content:space-between"><div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0" onclick="togAct(sel(),'+idx+')"><div class="check-box"></div><div class="check-text" style="overflow:hidden;text-overflow:ellipsis">'+esc(a.t)+'</div></div><button onclick="delAct(sel(),'+idx+')" style="background:none;border:none;color:var(--text3);font-size:14px;padding:4px 6px;flex-shrink:0">✕</button></div>';});}
-if(done.length){h+='<div style="font-size:10px;color:var(--text3);margin:10px 0 6px;display:flex;align-items:center;gap:6px">完了済み（'+done.length+'件）<div class="section-line"></div></div>';
-done.forEach(function(a){var idx=(c.actions||[]).indexOf(a);h+='<div class="check-item" style="opacity:0.5;justify-content:space-between"><div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0" onclick="togAct(sel(),'+idx+')"><div class="check-box checked">✓</div><div class="check-text done" style="overflow:hidden;text-overflow:ellipsis">'+esc(a.t)+'</div></div><button onclick="delAct(sel(),'+idx+')" style="background:none;border:none;color:var(--text3);font-size:14px;padding:4px 6px;flex-shrink:0">✕</button></div>';});}
-if(!undone.length&&!done.length)h+='<div style="color:var(--text3);font-size:12px;text-align:center;padding:8px">アクションなし</div>';
-h+='</div>';
-h+='<div style="margin-bottom:18px"><div class="section-title"><span>🚦</span> ネック <div class="section-line"></div></div><div class="neck-grid" style="margin-bottom:10px">';
-NECKS.forEach(function(n){var ns=c.necks[n],cls=ns.s==='解決済み'?'resolved':ns.s==='要対応'?'issue':'';h+='<div class="neck-item '+cls+'" onclick="cycleN(sel(),\''+n+'\')"><div class="neck-icon">'+NECK_I[ns.s]+'</div><div class="neck-label">'+n+'</div><div class="neck-status">'+ns.s+'</div></div>';});h+='</div>';
-NECKS.forEach(function(n){if(c.necks[n].s==='未確認'&&!c.necks[n].m)return;var col=c.necks[n].s==='要対応'?'is-red':c.necks[n].s==='解決済み'?'is-green':'is-gray';h+='<div class="neck-memo-row"><div class="neck-memo-label '+col+'">'+NECK_I[c.necks[n].s]+' '+n+'</div><input class="input" style="font-size:12px;padding:8px 10px" placeholder="詳細メモ" value="'+esc(c.necks[n].m)+'" oninput="sel().necks[\''+n+'\'].m=this.value;save();"></div>';});h+='</div>';
-if(c.phase==='契約済み'||c.phase==='仮契約済み'){h+='<div style="margin-bottom:18px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="section-title" style="margin-bottom:0"><span>📋</span> 進捗</div><button class="btn-ghost" onclick="S.showStep=true;render()">＋</button></div>';if(!c.steps.length)h+='<div style="text-align:center;padding:12px"><button class="btn btn-secondary" style="font-size:12px" onclick="addDefSteps('+c.id+')">デフォルト項目を追加</button></div>';else{var dn=c.steps.filter(function(s){return s.done;}).length,pct=Math.round(dn/c.steps.length*100);h+='<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:4px"><span>'+pct+'%</span><span>'+dn+'/'+c.steps.length+'</span></div><div class="progress-track" style="margin-bottom:12px"><div class="progress-fill" style="width:'+pct+'%"></div></div>';c.steps.forEach(function(s,i){h+='<div class="check-item" style="justify-content:space-between"><div style="display:flex;align-items:center;gap:10px;flex:1" onclick="togStep(sel(),'+i+')"><div class="check-box'+(s.done?' checked':'')+'">'+(s.done?'✓':'')+'</div><div class="check-text'+(s.done?' done':'')+'">'+esc(s.name)+'</div></div><button onclick="event.stopPropagation();delStep(sel(),'+i+')" style="background:none;border:none;color:var(--text3);font-size:14px;padding:4px 6px;flex-shrink:0">✕</button></div>';});}h+='</div>';}
-h+='<div style="margin-bottom:18px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="section-title" style="margin-bottom:0"><span>👨‍👩‍👧</span> 家族</div><button class="btn-ghost" onclick="S.showFam=true;render()">＋</button></div>';
-if(!c.family.length)h+='<div style="color:var(--text3);font-size:12px;text-align:center;padding:12px">未登録</div>';
-else c.family.forEach(function(f,fi){h+='<div class="family-card" style="flex-direction:column;gap:8px"><div style="display:flex;justify-content:space-between;align-items:center;width:100%"><div style="display:flex;gap:6px;flex:1"><input class="input" style="font-size:12px;padding:6px 8px;background:transparent;border:1px solid transparent;flex:1" value="'+esc(f.name)+'" placeholder="名前" onfocus="this.style.borderColor=\'var(--accent)\';this.style.background=\'var(--bg)\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'" oninput="updFam(sel(),'+fi+',\'name\',this.value)"><input class="input" style="font-size:12px;padding:6px 8px;background:transparent;border:1px solid transparent;width:70px" value="'+esc(f.relation)+'" placeholder="続柄" onfocus="this.style.borderColor=\'var(--accent)\';this.style.background=\'var(--bg)\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'" oninput="updFam(sel(),'+fi+',\'relation\',this.value)"></div><button onclick="delFam(sel(),'+fi+')" style="background:none;border:none;color:var(--text3);font-size:14px;padding:4px">✕</button></div><div style="display:flex;gap:6px;align-items:center;width:100%"><input class="input" type="date" style="font-size:11px;padding:5px 8px;background:transparent;border:1px solid transparent;flex:1" value="'+(f.birthday||'')+'" onfocus="this.style.borderColor=\'var(--accent)\';this.style.background=\'var(--bg)\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'" oninput="updFam(sel(),'+fi+',\'birthday\',this.value)">'+(f.birthday?'<span style="font-size:10px;color:var(--text3);white-space:nowrap">'+age(f.birthday)+'</span>':'')+(f.birthday?'<button class="btn-small" style="background:var(--orange-dim);color:var(--orange);font-size:10px;flex-shrink:0" onclick="event.stopPropagation();genBd(\''+esc(c.name)+'\',\''+esc(f.name)+'\',\''+esc(f.relation)+'\',\''+f.birthday+'\')">🎂</button>':'')+'</div></div>';});h+='</div>';
-h+='<div style="margin-bottom:18px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="section-title" style="margin-bottom:0"><span>📅</span> イベント</div><button class="btn-ghost" onclick="S.showEvt=true;render()">＋</button></div>';
-if(!c.events||!c.events.length)h+='<div style="color:var(--text3);font-size:12px;text-align:center;padding:12px">予定なし</div>';
-else c.events.forEach(function(e,ei){h+='<div style="background:var(--bg2);border-radius:8px;padding:11px 13px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border)"><span style="font-size:13px;font-weight:600"><span style="background:var(--green-dim);color:var(--green);border-radius:5px;padding:2px 7px;font-size:10px;margin-right:8px;font-weight:700">'+esc(e.type)+'</span>'+e.date+'</span><button onclick="delEvt(sel(),'+ei+')" style="background:none;border:none;color:var(--text3);font-size:14px;padding:4px">✕</button></div>';});h+='</div>';
-h+='<div class="divider"></div><button class="btn btn-danger" onclick="delC('+c.id+')">この顧客を削除</button></div></div>';return h;}
-function rAdd(){var nc=S.nc;var scanned=nc.name||nc.phone||nc.budget;var h='<div class="modal-overlay"><div class="modal"><div class="modal-handle"></div><div style="font-size:16px;font-weight:800;margin-bottom:4px">'+(scanned?'📷 読取結果を確認':'顧客を追加')+'</div>';
-if(scanned)h+='<div style="font-size:11px;color:var(--accent);margin-bottom:16px">内容を確認・修正して登録してください</div>';
-else h+='<div style="margin-bottom:16px"></div>';
-h+='<div class="label">名前 *</div><input class="input" style="margin-bottom:12px" placeholder="田中 雄一" value="'+esc(nc.name)+'" oninput="S.nc.name=this.value">';
-h+='<div class="label">電話番号</div><input class="input" style="margin-bottom:12px" placeholder="090-1234-5678" type="tel" value="'+esc(nc.phone)+'" oninput="S.nc.phone=this.value">';
-h+='<div class="label">フェーズ</div><select class="input" style="margin-bottom:12px" onchange="S.nc.phase=this.value">';PHASES.forEach(function(p){h+='<option'+(nc.phase===p?' selected':'')+'>'+p+'</option>';});h+='</select>';
-h+='<div class="label">ランク</div><div class="rank-btns" style="margin-bottom:12px">';RANKS.forEach(function(r){h+='<button class="rank-btn'+(nc.rank===r?' sel-'+r.toLowerCase():'')+'" onclick="S.nc.rank=\''+r+'\';render()">'+r+'</button>';});h+='</div>';
-h+='<div class="label">予算</div><input class="input" style="margin-bottom:12px" placeholder="4,000万円" value="'+esc(nc.budget)+'" oninput="S.nc.budget=this.value">';
-h+='<div class="label">エリア</div><input class="input" style="margin-bottom:12px" placeholder="飯塚市" value="'+esc(nc.area)+'" oninput="S.nc.area=this.value">';
-h+='<div class="label">土地</div><input class="input" style="margin-bottom:12px" placeholder="土地あり / 土地なし" value="'+esc(nc.land)+'" oninput="S.nc.land=this.value">';
-h+='<div class="label">競合</div><input class="input" style="margin-bottom:12px" placeholder="積水ハウス" value="'+esc(nc.competitor)+'" oninput="S.nc.competitor=this.value">';
-h+='<div class="label">初回来場日</div><input class="input" type="date" style="margin-bottom:12px" value="'+(nc.firstVisit||new Date().toISOString().split('T')[0])+'" oninput="S.nc.firstVisit=this.value">';
-if(nc._family&&nc._family.length){h+='<div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid var(--border)"><div class="label" style="margin-bottom:6px">👨‍👩‍👧 読み取った家族情報</div>';nc._family.forEach(function(f){h+='<div style="font-size:12px;color:var(--text2);margin-bottom:2px">'+esc(f.name)+' ('+esc(f.relation)+')'+(f.birthday?' '+f.birthday:'')+'</div>';});h+='</div>';}
-if(nc._memo){h+='<div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid var(--border)"><div class="label" style="margin-bottom:4px">📝 その他メモ</div><div style="font-size:12px;color:var(--text2)">'+esc(nc._memo)+'</div></div>';}
-h+='<div style="display:flex;gap:10px"><button class="btn btn-secondary" style="flex:1" onclick="S.showAdd=false;S.nc=freshC();render()">キャンセル</button><button class="btn btn-primary" style="flex:1" onclick="addC()">登録</button></div></div></div>';return h;}
+function save() {
+  try { localStorage.setItem(DB_KEY, JSON.stringify(data)); } catch (e) {}
+  saveToSupabase();
+}
 
-function rFam(){return'<div class="modal-overlay"><div class="modal"><div class="modal-handle"></div><div style="font-size:16px;font-weight:800;margin-bottom:20px">家族を追加</div><div class="label">名前 *</div><input class="input" style="margin-bottom:12px" placeholder="サンプル 花子" oninput="S.nf.name=this.value"><div class="label">続柄</div><input class="input" style="margin-bottom:12px" placeholder="奥様 / ご主人 / 長男" oninput="S.nf.relation=this.value"><div class="label">生年月日</div><input class="input" type="date" style="margin-bottom:22px" oninput="S.nf.birthday=this.value"><div style="display:flex;gap:10px"><button class="btn btn-secondary" style="flex:1" onclick="S.showFam=false;S.nf={name:\'\',relation:\'\',birthday:\'\'};render()">キャンセル</button><button class="btn btn-primary" style="flex:1" onclick="addFam()">追加</button></div></div></div>';}
-function rEvt(){var h='<div class="modal-overlay"><div class="modal"><div class="modal-handle"></div><div style="font-size:16px;font-weight:800;margin-bottom:16px">イベント追加</div>';
-h+='<div class="label">種別 *（タップで選択）</div>';
-h+='<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">';
-(data.eventTypes||[]).forEach(function(t,i){
-h+='<div style="display:flex;align-items:center;gap:0"><button onclick="S.ne.type=\''+esc(t)+'\';render()" style="padding:7px 12px;border-radius:8px 0 0 8px;font-size:12px;font-weight:600;border:1px solid var(--border);background:'+(S.ne.type===t?'var(--accent)':'var(--surface2)')+';color:'+(S.ne.type===t?'var(--bg)':'var(--text2)')+'">'+esc(t)+'</button><button onclick="delEvtType('+i+')" style="padding:7px 6px;border-radius:0 8px 8px 0;font-size:10px;border:1px solid var(--border);border-left:none;background:var(--surface2);color:var(--text3)">✕</button></div>';});
-h+='</div>';
-h+='<div style="display:flex;gap:6px;margin-bottom:14px"><input class="input" id="newEvtType" style="flex:1;font-size:12px" placeholder="新しい種別を追加..." value="'+esc(S.ne.type||'')+'" oninput="S.ne.type=this.value"><button onclick="var v=document.getElementById(\'newEvtType\').value;if(v.trim())addEvtType(v)" class="btn-small" style="background:var(--surface2);color:var(--accent);border:1px solid var(--border);flex-shrink:0">＋保存</button></div>';
-h+='<div class="label">日付 *</div><input class="input" type="date" style="margin-bottom:22px" value="'+(S.ne.date||'')+'" oninput="S.ne.date=this.value">';
-h+='<div style="display:flex;gap:10px"><button class="btn btn-secondary" style="flex:1" onclick="S.showEvt=false;S.ne={type:\'\',date:\'\'};render()">キャンセル</button><button class="btn btn-primary" style="flex:1" onclick="addEvt()">追加</button></div></div></div>';return h;}
-function rStp(){return'<div class="modal-overlay"><div class="modal"><div class="modal-handle"></div><div style="font-size:16px;font-weight:800;margin-bottom:20px">項目追加</div><div class="label">項目名</div><input class="input" style="margin-bottom:22px" placeholder="例：外構打ち合わせ" oninput="S.ns=this.value"><div style="display:flex;gap:10px"><button class="btn btn-secondary" style="flex:1" onclick="S.showStep=false;S.ns=\'\';render()">キャンセル</button><button class="btn btn-primary" style="flex:1" onclick="addStp()">追加</button></div></div></div>';}
+/* ========== Sync Status Badge ========== */
+function showSyncStatus(type) {
+  var el = document.getElementById('syncBadge');
+  if (!el) return;
+  if (type === 'ok') {
+    el.className = 'sync-badge sync-ok';
+    el.textContent = '\u2713 同期済み';
+  } else if (type === 'fail') {
+    el.className = 'sync-badge sync-fail';
+    el.textContent = '\u00d7 オフライン';
+  } else if (type === 'ing') {
+    el.className = 'sync-badge sync-ing';
+    el.textContent = '\u2026同期中';
+  }
+}
+
+/* ========== Supabase Save/Load ========== */
+function sbHeaders() {
+  return {
+    'apikey': SUPABASE_KEY,
+    'Authorization': 'Bearer ' + SUPABASE_KEY,
+    'Content-Type': 'application/json',
+    'Prefer': 'return=minimal'
+  };
+}
+
+function saveToSupabase() {
+  showSyncStatus('ing');
+  var payload = { id: SB_ROW_ID, data: data, updated_at: new Date().toISOString() };
+  if (sbClient) {
+    sbClient.from('customers').upsert(payload).then(function(res) {
+      if (res.error) { showSyncStatus('fail'); }
+      else { showSyncStatus('ok'); }
+    }).catch(function() { showSyncStatus('fail'); });
+    return;
+  }
+  fetch(SUPABASE_URL + '/rest/v1/customers', {
+    method: 'POST',
+    headers: Object.assign({}, sbHeaders(), { 'Prefer': 'resolution=merge-duplicates,return=minimal' }),
+    body: JSON.stringify(payload)
+  }).then(function(r) {
+    if (r.ok) { showSyncStatus('ok'); }
+    else { showSyncStatus('fail'); }
+  }).catch(function() { showSyncStatus('fail'); });
+}
+
+function loadFromSupabase() {
+  showSyncStatus('ing');
+  if (sbClient) {
+    return sbClient.from('customers').select('data').eq('id', SB_ROW_ID).single().then(function(res) {
+      if (res.error || !res.data || !res.data.data) { showSyncStatus('fail'); return null; }
+      showSyncStatus('ok');
+      return migrateData(res.data.data);
+    }).catch(function() { showSyncStatus('fail'); return null; });
+  }
+  return fetch(SUPABASE_URL + '/rest/v1/customers?id=eq.' + SB_ROW_ID + '&select=data', {
+    headers: sbHeaders()
+  }).then(function(r) {
+    if (!r.ok) { showSyncStatus('fail'); return null; }
+    return r.json();
+  }).then(function(rows) {
+    if (!rows || !rows.length || !rows[0].data) { showSyncStatus('fail'); return null; }
+    showSyncStatus('ok');
+    return migrateData(rows[0].data);
+  }).catch(function() { showSyncStatus('fail'); return null; });
+}
+
+function syncNow() {
+  loadFromSupabase().then(function(sbData) {
+    if (sbData) {
+      data = sbData;
+      try { localStorage.setItem(DB_KEY, JSON.stringify(data)); } catch (e) {}
+      if (typeof render === 'function') render();
+    }
+  });
+}
+
+/* ========== Initialize Data ========== */
+var data = load();
+loadFromSupabase().then(function(sbData) {
+  if (sbData) {
+    data = sbData;
+    try { localStorage.setItem(DB_KEY, JSON.stringify(data)); } catch (e) {}
+    if (typeof render === 'function') render();
+  } else {
+    saveToSupabase();
+  }
+});
+setInterval(syncNow, 30000);
+
+/* ========== App State ========== */
+var S = {
+  tab: 'dashboard', phase: '追客中', selId: null,
+  showDet: false, showAdd: false, showFam: false, showEvt: false, showStep: false,
+  toast: null, analyzing: false, transcribing: false,
+  nc: freshC(), nf: { name: '', relation: '', birthday: '' },
+  ne: { type: '', date: '' }, ns: '',
+  dragged: false, dragIdx: null, dragTimer: null, dragEl: null,
+  dragStartY: 0, dragStartX: 0, dragMode: null
+};
+
+/* ========== Utility Functions ========== */
+function freshC() {
+  var n = {};
+  NECKS.forEach(function(k) { n[k] = { s: '未確認', m: '' }; });
+  return { name: '', phone: '', phase: '追客中', rank: 'A', budget: '', land: '', area: '', competitor: '', firstVisit: '', necks: n };
+}
+
+function sel() { return data.customers.find(function(c) { return c.id === S.selId; }); }
+
+function daysAgo(d) {
+  if (!d) return '-';
+  var x = Math.floor((new Date() - new Date(d)) / 864e5);
+  return x === 0 ? '今日' : x === 1 ? '昨日' : x + '日前';
+}
+
+function rc(r) { return 'badge-' + r.toLowerCase(); }
+
+function age(b) {
+  if (!b) return '';
+  var d = new Date(b), t = new Date(), a = t.getFullYear() - d.getFullYear();
+  if (t.getMonth() < d.getMonth() || (t.getMonth() === d.getMonth() && t.getDate() < d.getDate())) a--;
+  return a + '歳';
+}
+
+function esc(s) {
+  return (s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+function toast(m) { S.toast = m; render(); setTimeout(function() { S.toast = null; render(); }, 2500); }
+
+function uc() { return data.customers.filter(function(c) { return c.urgent && c.phase !== '引渡し済み'; }).length; }
+
+function ni(c) { var n = 0; NECKS.forEach(function(k) { if (c.necks[k].s === '要対応') n++; }); return n; }
+
+function nextAct(c) {
+  if (!c.actions) return '-';
+  var a = c.actions.find(function(x) { return !x.done; });
+  return a ? a.t : 'すべて完了';
+}
+
+/* ========== Navigation ========== */
+function switchTab(t) { S.tab = t; S.selId = null; S.showDet = false; render(); }
+function switchPhase(p) { S.phase = p; render(); }
+function selectC(id) { S.selId = id; S.showDet = true; render(); }
+function closeDet() { S.showDet = false; S.selId = null; render(); }
+function smoothTo(id) { var el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+
+/* ========== Customer Actions ========== */
+function cycleN(c, n) { var i = NECK_S.indexOf(c.necks[n].s); c.necks[n].s = NECK_S[(i + 1) % NECK_S.length]; save(); render(); }
+function togStep(c, i) { c.steps[i].done = !c.steps[i].done; save(); render(); }
+function togUrg(c) {
+  c.urgent = !c.urgent;
+  c.lastContact = new Date().toISOString().split('T')[0];
+  save(); render();
+  toast(c.urgent ? '要対応にしました' : '対応済みにしました');
+}
+function updField(c, f, v) { c[f] = v; save(); }
+function togAct(c, i) { c.actions[i].done = !c.actions[i].done; save(); render(); }
+function addAct(c, t) { if (!t.trim()) return; c.actions.unshift({ t: t, done: false }); save(); render(); }
+function delAct(c, i) { c.actions.splice(i, 1); save(); render(); }
+
+function addC() {
+  var nc = S.nc;
+  if (!nc.name.trim()) { alert('名前を入力してください'); return; }
+  var fam = nc._family || [];
+  var memo = nc._memo || '';
+  data.customers.push({
+    id: Date.now(), name: nc.name, phone: nc.phone, phase: nc.phase, rank: nc.rank,
+    budget: nc.budget, land: nc.land, area: nc.area, competitor: nc.competitor,
+    firstVisit: nc.firstVisit || new Date().toISOString().split('T')[0],
+    lastContact: new Date().toISOString().split('T')[0],
+    actions: [{ t: '初回フォロー', done: false }], urgent: false, memo: memo, aiResult: '',
+    family: fam, events: [], necks: nc.necks,
+    steps: nc.phase === '契約済み' ? DEF_STEPS.map(function(s) { return { name: s, done: false }; }) : []
+  });
+  save(); S.showAdd = false; S.nc = freshC(); toast('顧客を登録しました');
+}
+
+function delC(id) {
+  if (!confirm('削除しますか？')) return;
+  data.customers = data.customers.filter(function(c) { return c.id !== id; });
+  save(); closeDet(); toast('削除しました');
+}
+
+function addFam() {
+  var c = sel(); if (!c) return;
+  var f = S.nf; if (!f.name.trim()) return;
+  c.family.push({ name: f.name, relation: f.relation, birthday: f.birthday });
+  save(); S.showFam = false; S.nf = { name: '', relation: '', birthday: '' }; toast('家族を追加');
+}
+function updFam(c, i, field, val) { c.family[i][field] = val; save(); }
+function delFam(c, i) { if (confirm(c.family[i].name + 'を削除しますか？')) { c.family.splice(i, 1); save(); render(); } }
+function delEvt(c, i) { if (confirm('このイベントを削除しますか？')) { c.events.splice(i, 1); save(); render(); } }
+function addEvtType(t) { if (!t.trim()) return; if (data.eventTypes.indexOf(t) === -1) { data.eventTypes.push(t); save(); } S.ne.type = t; render(); }
+function delEvtType(i) { data.eventTypes.splice(i, 1); save(); render(); }
+function addEvt() {
+  var c = sel(); if (!c) return;
+  var e = S.ne; if (!e.type.trim() || !e.date) return;
+  c.events.push({ type: e.type, date: e.date });
+  save(); S.showEvt = false; S.ne = { type: '', date: '' }; toast('イベント追加');
+}
+function addStp() {
+  var c = sel(); if (!c || !S.ns.trim()) return;
+  c.steps.push({ name: S.ns, done: false });
+  save(); S.showStep = false; S.ns = ''; render();
+}
+function delStep(c, i) { c.steps.splice(i, 1); save(); render(); }
+function addDefSteps(id) {
+  var c = data.customers.find(function(x) { return x.id === id; }); if (!c) return;
+  c.steps = DEF_STEPS.map(function(s) { return { name: s, done: false }; });
+  save(); render();
+}
+
+/* ========== Sort ========== */
+function sortByDate() {
+  if (!confirm('最終連絡が古い順に並び替えますか？')) return;
+  var ph = S.phase;
+  var others = data.customers.filter(function(c) { return c.phase !== ph; });
+  var targets = data.customers.filter(function(c) { return c.phase === ph; });
+  targets.sort(function(a, b) { return (a.lastContact || '').localeCompare(b.lastContact || ''); });
+  data.customers = [];
+  PHASES.forEach(function(p) {
+    if (p === ph) { data.customers = data.customers.concat(targets); }
+    else { data.customers = data.customers.concat(others.filter(function(c) { return c.phase === p; })); }
+  });
+  save(); render(); toast('対応日付順に並び替えました');
+}
+
+function sortByRank() {
+  if (!confirm('熱量ランク順（S→A→B→C）に並び替えますか？')) return;
+  var ph = S.phase;
+  var others = data.customers.filter(function(c) { return c.phase !== ph; });
+  var targets = data.customers.filter(function(c) { return c.phase === ph; });
+  targets.sort(function(a, b) { return RANKS.indexOf(a.rank) - RANKS.indexOf(b.rank); });
+  data.customers = [];
+  PHASES.forEach(function(p) {
+    if (p === ph) { data.customers = data.customers.concat(targets); }
+    else { data.customers = data.customers.concat(others.filter(function(c) { return c.phase === p; })); }
+  });
+  save(); render(); toast('ランク順に並び替えました');
+}
+
+/* ========== Camera Scan ========== */
+function scanAnketo(inp) {
+  var f = inp.files[0]; if (!f) return;
+  if (!data.apiKey) { alert('設定からAnthropicのAPIキーを登録してください。'); inp.value = ''; return; }
+  toast('アンケートを読み取り中...');
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var img = new Image();
+    img.onload = function() {
+      var canvas = document.createElement('canvas');
+      var max = 1200, w = img.width, h = img.height;
+      if (w > h) { if (w > max) { h = h * max / w; w = max; } }
+      else { if (h > max) { w = w * max / h; h = max; } }
+      canvas.width = w; canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      var b64 = canvas.toDataURL('image/jpeg', 0.8).split(',')[1];
+      fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514', max_tokens: 1000,
+          messages: [{ role: 'user', content: [
+            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } },
+            { type: 'text', text: 'この来場アンケート用紙から顧客情報を読み取ってJSONで返してください。読み取れない項目は空文字にしてください。必ず以下のJSON形式のみで返してください（説明文不要）：\n{"name":"姓 名","phone":"電話番号","budget":"予算（万円付き）","area":"希望エリア","land":"土地あり or 土地なし","competitor":"検討中の他社","family":[{"name":"名前","relation":"続柄","birthday":"YYYY-MM-DD or 空"}],"memo":"その他気になる記載"}' }
+          ] }]
+        })
+      }).then(function(r) { return r.json(); }).then(function(d) {
+        var txt = d.content ? d.content.map(function(i) { return i.text || ''; }).join('') : '';
+        try {
+          var clean = txt.replace(/```json|```/g, '').trim();
+          var p = JSON.parse(clean);
+          S.nc = freshC();
+          if (p.name) S.nc.name = p.name;
+          if (p.phone) S.nc.phone = p.phone;
+          if (p.budget) S.nc.budget = p.budget;
+          if (p.area) S.nc.area = p.area;
+          if (p.land) S.nc.land = p.land;
+          if (p.competitor) S.nc.competitor = p.competitor;
+          S.nc._family = p.family || [];
+          S.nc._memo = p.memo || '';
+          S.showAdd = true; render(); toast('読み取り完了！内容を確認してください');
+        } catch (ex) {
+          alert('読み取り結果を解析できませんでした。\n手動で登録してください。\n\n読み取り内容：\n' + txt);
+          S.showAdd = true; render();
+        }
+      }).catch(function(ex) { alert('読み取りエラー：' + ex.message); });
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(f); inp.value = '';
+}
+
+/* ========== Drag & Drop ========== */
+function dragStart(e, idx, mode) {
+  var touch = e.touches[0];
+  S.dragStartY = touch.clientY; S.dragStartX = touch.clientX;
+  S.dragMode = mode || 'all';
+  S.dragTimer = setTimeout(function() {
+    S.dragged = true; S.dragIdx = idx;
+    var items = document.querySelectorAll('.drag-item');
+    var el = items[idx]; if (!el) return;
+    S.dragEl = el; el.classList.add('dragging');
+    if (navigator.vibrate) navigator.vibrate(30);
+    var list = document.getElementById('dragList');
+    if (list) {
+      list.addEventListener('touchmove', dragMove, { passive: false });
+      list.addEventListener('touchend', dragEnd);
+    }
+  }, 400);
+}
+
+function dragMove(e) {
+  if (!S.dragged) return;
+  e.preventDefault();
+  var touch = e.touches[0];
+  var items = document.querySelectorAll('.drag-item');
+  items.forEach(function(it) { it.classList.remove('drag-gap'); });
+  items.forEach(function(it, i) {
+    if (i === S.dragIdx) return;
+    var r = it.getBoundingClientRect();
+    var mid = r.top + r.height / 2;
+    if (touch.clientY > r.top - 10 && touch.clientY < r.bottom + 10) {
+      if (touch.clientY < mid) { it.classList.add('drag-gap'); }
+      else { var next = items[i + 1]; if (next && next !== S.dragEl) next.classList.add('drag-gap'); }
+    }
+  });
+  if (S.dragEl) {
+    var dy = touch.clientY - S.dragStartY;
+    var dx = touch.clientX - S.dragStartX;
+    dx = Math.max(-30, Math.min(30, dx));
+    S.dragEl.style.transform = 'translate(' + dx + 'px,' + dy + 'px) rotate(' + (dx * 0.15) + 'deg)';
+    S.dragEl.style.zIndex = '10';
+  }
+}
+
+function dragEnd(e) {
+  clearTimeout(S.dragTimer);
+  if (!S.dragged) { S.dragIdx = null; return; }
+  var touch = e.changedTouches[0];
+  var items = document.querySelectorAll('.drag-item');
+  var overIdx = null;
+  items.forEach(function(it, i) {
+    var r = it.getBoundingClientRect();
+    if (touch.clientY > r.top - 10 && touch.clientY < r.bottom + 10 && i !== S.dragIdx) overIdx = i;
+  });
+  if (overIdx !== null && S.dragIdx !== null && overIdx !== S.dragIdx) {
+    if (S.dragMode === 'phase') {
+      var filt = data.customers.filter(function(c) { return c.phase === S.phase; });
+      var fromId = filt[S.dragIdx] ? filt[S.dragIdx].id : null;
+      var toId = filt[overIdx] ? filt[overIdx].id : null;
+      if (fromId && toId) {
+        var cs = data.customers;
+        var ai = cs.findIndex(function(c) { return c.id === fromId; });
+        var moved = cs.splice(ai, 1)[0];
+        var bi = cs.findIndex(function(c) { return c.id === toId; });
+        if (overIdx > S.dragIdx) bi++;
+        cs.splice(bi, 0, moved);
+        save();
+      }
+    } else {
+      var cs2 = data.customers;
+      var moved2 = cs2.splice(S.dragIdx, 1)[0];
+      cs2.splice(overIdx, 0, moved2);
+      save();
+    }
+  }
+  S.dragged = false; S.dragIdx = null; S.dragEl = null; S.dragMode = null;
+  var list = document.getElementById('dragList');
+  if (list) { list.removeEventListener('touchmove', dragMove); list.removeEventListener('touchend', dragEnd); }
+  setTimeout(function() { S.dragged = false; render(); }, 50);
+}
+
+/* ========== Audio / AI ========== */
+function handleAudio(inp) {
+  var f = inp.files[0]; if (!f) return;
+  var c = sel(); if (!c) return;
+  toast(f.name + ' を追加しました');
+  var note = '【音声ファイル】' + f.name + '\n※ ボイスメモアプリで文字起こし後、下のテキスト欄に貼り付けてください\n\n';
+  c.memo = c.memo ? note + c.memo : note;
+  save(); render(); inp.value = '';
+}
+
+function transcribeAudio(inp) {
+  var f = inp.files[0]; if (!f) return;
+  if (!data.whisperKey) { alert('設定画面でWhisper APIキーを登録してください'); inp.value = ''; return; }
+  var c = sel(); if (!c) return;
+  S.transcribing = true; render();
+  var fd = new FormData(); fd.append('file', f); fd.append('model', 'whisper-1'); fd.append('language', 'ja');
+  fetch('https://api.openai.com/v1/audio/transcriptions', {
+    method: 'POST', headers: { 'Authorization': 'Bearer ' + data.whisperKey }, body: fd
+  }).then(function(r) { return r.json(); }).then(function(d) {
+    if (d.text) { c.memo = (c.memo ? c.memo + '\n' : '') + d.text; save(); toast('文字起こし完了'); }
+    else { alert('文字起こしに失敗しました：' + (d.error ? d.error.message : '不明なエラー')); }
+    S.transcribing = false; inp.value = ''; render();
+  }).catch(function(ex) { S.transcribing = false; inp.value = ''; alert('エラー: ' + ex.message); render(); });
+}
+
+function buildPrompt(c) {
+  var acts = (c.actions || []).filter(function(a) { return !a.done; }).map(function(a) { return a.t; }).join('、');
+  return '住宅営業コーチとして分析。簡潔に箇条書き。\n\n【顧客】' + c.name + '様\n【予算】' + c.budget +
+    '\n【フェーズ】' + c.phase + '\n【競合】' + (c.competitor || 'なし') + '\n【現在のアクション】' + (acts || 'なし') +
+    '\n【ネック】\n' + NECKS.map(function(n) {
+      return n + '：' + c.necks[n].s + (c.necks[n].m ? '（' + c.necks[n].m + '）' : '');
+    }).join('\n') + '\n\n【商談メモ】\n' + c.memo +
+    '\n\n■顧客の本音\n■次回アクション（優先順）\n■LINEメッセージ案\n■競合対策';
+}
+
+function analyze() {
+  var c = sel(); if (!c || !c.memo || !c.memo.trim()) return;
+  if (!data.apiKey) {
+    var p = buildPrompt(c);
+    if (navigator.clipboard) { navigator.clipboard.writeText(p).then(function() { toast('プロンプトをコピーしました'); }); }
+    return;
+  }
+  S.analyzing = true; render();
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content: buildPrompt(c) }] })
+  }).then(function(r) { return r.json(); }).then(function(d) {
+    var t = d.content ? d.content.map(function(i) { return i.text || ''; }).join('\n') : '分析失敗';
+    c.aiResult = t; save(); S.analyzing = false; render();
+  }).catch(function() { S.analyzing = false; render(); });
+}
+
+function copyAi() { var c = sel(); if (c && c.aiResult && navigator.clipboard) { navigator.clipboard.writeText(c.aiResult); toast('コピーしました'); } }
+
+function genBd(cn, fn, rel, bd) {
+  var a = bd ? age(bd) : '';
+  var m = cn + '様\n\nいつもお世話になっております。\n' + fn + '様' + (a ? '（' + a + '）' : '') + ' のお誕生日おめでとうございます\n素敵な一日をお過ごしください。\n\n今後ともよろしくお願いいたします。';
+  if (navigator.clipboard) { navigator.clipboard.writeText(m); toast('LINE文面をコピー'); } else { alert(m); }
+}
+
+/* ========== Export / Import / Reset ========== */
+function exportD() {
+  var b = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  var u = URL.createObjectURL(b);
+  var a = document.createElement('a'); a.href = u;
+  a.download = 'iezukuri_backup_' + new Date().toISOString().split('T')[0] + '.json';
+  a.click(); URL.revokeObjectURL(u); toast('エクスポート完了');
+}
+function importD(inp) {
+  var f = inp.files[0]; if (!f) return;
+  var r = new FileReader();
+  r.onload = function(e) {
+    try {
+      var d = JSON.parse(e.target.result);
+      if (d.customers && confirm('上書きしますか？')) { data = d; save(); render(); toast('インポート完了'); }
+    } catch (ex) { alert('形式エラー'); }
+  };
+  r.readAsText(f);
+}
+function resetD() {
+  if (confirm('全データを削除しますか？') && confirm('最終確認です')) { data = defaultData(); save(); render(); toast('リセット完了'); }
+}
+
+/* ========== Render Main ========== */
+function render() {
+  var h = renderHeader();
+  if (S.tab !== 'settings') h += renderTabs();
+  h += '<div class="content">';
+  if (S.tab === 'dashboard') h += renderDashboard();
+  else if (S.tab === 'customers') h += renderCustomers();
+  else if (S.tab === 'analyze') h += renderAnalyze();
+  else h += renderSettings();
+  h += '</div>';
+  if (S.showDet) h += renderDetail();
+  if (S.showAdd) h += renderAddCustomer();
+  if (S.showFam) h += renderAddFamily();
+  if (S.showEvt) h += renderAddEvent();
+  if (S.showStep) h += renderAddStep();
+  if (S.toast) h += '<div class="toast">' + S.toast + '</div>';
+  document.getElementById('app').innerHTML = h;
+  initSwipe();
+}
+
+/* ========== Swipe ========== */
+var swipeY = 0, swipeEl = null, swipeDist = 0;
+
+function initSwipe() {
+  var modals = document.querySelectorAll('.modal');
+  modals.forEach(function(m) {
+    m.addEventListener('touchstart', function(e) {
+      if (m.scrollTop <= 0) { swipeY = e.touches[0].clientY; swipeEl = m; swipeDist = 0; }
+      else { swipeEl = null; }
+    }, { passive: true });
+    m.addEventListener('touchmove', function(e) {
+      if (!swipeEl) return;
+      swipeDist = e.touches[0].clientY - swipeY;
+      if (swipeDist > 0) { swipeEl.style.transform = 'translateY(' + swipeDist + 'px)'; swipeEl.style.transition = 'none'; }
+    }, { passive: true });
+    m.addEventListener('touchend', function() {
+      if (!swipeEl) return;
+      if (swipeDist > 80) {
+        swipeEl.style.transform = 'translateY(100%)'; swipeEl.style.transition = 'transform 0.2s';
+        setTimeout(function() { closeDet(); S.showAdd = false; S.showFam = false; S.showEvt = false; S.showStep = false; render(); }, 200);
+      } else { swipeEl.style.transform = ''; swipeEl.style.transition = 'transform 0.2s'; }
+      swipeEl = null; swipeDist = 0;
+    });
+  });
+  if (S.tab === 'customers' && !S.showDet && !S.showAdd) {
+    var ct = document.querySelector('.content');
+    if (ct) {
+      var hSwipeX = 0;
+      ct.addEventListener('touchstart', function(e) { hSwipeX = e.touches[0].clientX; }, { passive: true });
+      ct.addEventListener('touchend', function(e) {
+        var dx = e.changedTouches[0].clientX - hSwipeX;
+        if (Math.abs(dx) < 60) return;
+        var idx = PHASES.indexOf(S.phase);
+        if (dx < -60 && idx < PHASES.length - 1) { S.phase = PHASES[idx + 1]; render(); }
+        else if (dx > 60 && idx > 0) { S.phase = PHASES[idx - 1]; render(); }
+      });
+    }
+  }
+}
+
+/* ========== Header & Tabs ========== */
+function renderHeader() {
+  var u = uc();
+  return '<div class="header"><div class="logo"><div class="logo-mark"><span>\u2302</span></div><div>' +
+    '<div class="logo-title">IEZUKURI PRO</div><div class="logo-sub">Housing Sales System</div>' +
+    '</div></div><div style="display:flex;align-items:center;gap:10px">' +
+    (u ? '<div class="alert-badge">\u8981\u5bfe\u5fdc ' + u + '</div>' : '') +
+    '<button onclick="switchTab(\'settings\')" style="background:none;color:var(--text3);font-size:18px;padding:4px">\u2699</button>' +
+    '</div></div>';
+}
+
+function renderTabs() {
+  var ts = [
+    { id: 'dashboard', ic: '\u25c8', l: '\u30c0\u30c3\u30b7\u30e5' },
+    { id: 'customers', ic: '\u25c9', l: '\u9867\u5ba2\u7ba1\u7406' },
+    { id: 'analyze', ic: '\u25ce', l: '\u5546\u8ac7\u5206\u6790' }
+  ];
+  return '<div class="tab-bar">' + ts.map(function(t) {
+    return '<button class="tab-btn' + (S.tab === t.id ? ' active' : '') + '" onclick="switchTab(\'' + t.id + '\')">' +
+      '<span class="tab-icon">' + t.ic + '</span>' + t.l + '</button>';
+  }).join('') + '</div>';
+}
+
+/* ========== Dashboard ========== */
+function renderDashboard() {
+  var cs = data.customers;
+  var ur = cs.filter(function(c) { return c.urgent && c.phase !== '引渡し済み'; });
+  var today = new Date(), ts = today.toISOString().split('T')[0];
+  var bds = [], evs = [];
+
+  cs.forEach(function(c) {
+    (c.family || []).forEach(function(f) {
+      if (!f.birthday) return;
+      var bd = new Date(f.birthday);
+      var ty = new Date(today.getFullYear(), bd.getMonth(), bd.getDate());
+      var df = Math.floor((ty - today) / 864e5);
+      if (df >= -1 && df <= 7) bds.push({ cn: c.name, fn: f.name, rel: f.relation, bd: f.birthday, df: df });
+    });
+    (c.events || []).forEach(function(e) {
+      if (e.date >= ts) evs.push({ type: e.type, date: e.date, cn: c.name });
+    });
+  });
+  evs.sort(function(a, b) { return a.date.localeCompare(b.date); });
+
+  var h = '<div class="stats">' +
+    '<div class="stat stat-a" onclick="switchTab(\'analyze\')"><div style="font-size:16px;margin-bottom:2px">\u25c8</div><div class="stat-num" style="color:var(--accent)">' + cs.length + '</div><div class="stat-label">\u9867\u5ba2\u6570</div></div>' +
+    '<div class="stat stat-r" onclick="smoothTo(\'sec-urgent\')"><div style="font-size:16px;margin-bottom:2px">\u25c6</div><div class="stat-num" style="color:var(--red)">' + ur.length + '</div><div class="stat-label">\u8981\u5bfe\u5fdc</div></div>' +
+    '<div class="stat stat-g" onclick="smoothTo(\'sec-events\')"><div style="font-size:16px;margin-bottom:2px">\u25c7</div><div class="stat-num" style="color:var(--green)">' + evs.length + '</div><div class="stat-label">\u30a4\u30d9\u30f3\u30c8</div></div>' +
+    '<div class="stat stat-o" onclick="smoothTo(\'sec-birthday\')"><div style="font-size:16px;margin-bottom:2px">\ud83c\udf82</div><div class="stat-num" style="color:var(--orange)">' + bds.length + '</div><div class="stat-label">\u8a95\u751f\u65e5</div></div>' +
+    '</div>';
+
+  h += '<div id="sec-urgent" class="section-title" style="margin-top:20px"><span>\u26a1</span> \u8981\u5bfe\u5fdc <div class="section-line"></div></div>';
+  if (!ur.length) { h += '<div class="empty" style="padding:20px"><div class="empty-text" style="color:var(--green)">\u5bfe\u5fdc\u5b8c\u4e86 \u2713</div></div>'; }
+  else {
+    ur.forEach(function(c) {
+      h += '<div class="card card-urgent" onclick="selectC(' + c.id + ')">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">' +
+        '<div><span style="font-weight:700;font-size:14px">' + esc(c.name) + '\u69d8</span> <span class="badge ' + rc(c.rank) + '">' + c.rank + '</span></div>' +
+        '<span style="font-size:11px;color:var(--text3)">' + daysAgo(c.lastContact) + '</span></div>' +
+        '<div style="font-size:12px;color:var(--text2);margin-bottom:8px">\u2192 ' + esc(nextAct(c)) + '</div>' +
+        '<div style="display:flex;gap:7px">' + NECKS.map(function(n) {
+          return '<div style="display:flex;align-items:center;gap:2px"><span style="font-size:9px;color:var(--text3)">' + n + '</span><span style="font-size:11px">' + NECK_I[c.necks[n].s] + '</span></div>';
+        }).join('') + '</div></div>';
+    });
+  }
+
+  h += '<div id="sec-events" class="section-title" style="margin-top:20px"><span>\ud83d\udcc5</span> \u30a4\u30d9\u30f3\u30c8 <div class="section-line"></div></div>';
+  if (!evs.length) { h += '<div class="empty" style="padding:20px"><div class="empty-text">\u4e88\u5b9a\u306a\u3057</div></div>'; }
+  else {
+    evs.slice(0, 6).forEach(function(e) {
+      h += '<div class="card card-green" style="display:flex;justify-content:space-between;align-items:center">' +
+        '<div><span style="background:var(--green-dim);color:var(--green);border-radius:5px;padding:2px 8px;font-size:10px;font-weight:700;margin-right:8px">' + esc(e.type) + '</span>' +
+        '<span style="font-size:13px;font-weight:600">' + esc(e.cn) + '\u69d8</span></div>' +
+        '<span style="font-size:12px;color:var(--text3)">' + e.date + '</span></div>';
+    });
+  }
+
+  if (bds.length) {
+    h += '<div id="sec-birthday" class="section-title" style="margin-top:20px"><span>\ud83c\udf82</span> \u76f4\u8fd1\u306e\u8a95\u751f\u65e5 <div class="section-line"></div></div>';
+    bds.sort(function(a, b) { return a.df - b.df; });
+    bds.forEach(function(b) {
+      var col, bg, lbl;
+      if (b.df <= 0) { col = '#b5785a'; bg = '#b5785a18'; lbl = '\ud83c\udf89 \u4eca\u65e5\uff01'; }
+      else if (b.df === 1) { col = '#d4a24e'; bg = '#d4a24e18'; lbl = '\u660e\u65e5'; }
+      else if (b.df === 2) { col = '#7a9e7e'; bg = '#7a9e7e18'; lbl = '\u3042\u30682\u65e5'; }
+      else { col = '#8a9a9e'; bg = '#8a9a9e14'; lbl = '\u3042\u3068' + b.df + '\u65e5'; }
+      h += '<div class="card" style="display:flex;justify-content:space-between;align-items:center;border-left:3px solid ' + col + '">' +
+        '<div><div style="font-weight:700;font-size:13px">' + esc(b.cn) + '\u69d8 / ' + esc(b.fn) + ' <span style="color:var(--text3);font-size:11px">' + age(b.bd) + '</span></div>' +
+        '<div style="font-size:11px;color:' + col + ';font-weight:700;margin-top:2px;display:flex;align-items:center;gap:4px">' +
+        '<span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:' + col + '"></span>' + lbl + '</div></div>' +
+        '<button class="btn-small" style="background:' + bg + ';color:' + col + '" onclick="genBd(\'' + esc(b.cn) + '\',\'' + esc(b.fn) + '\',\'' + esc(b.rel) + '\',\'' + b.bd + '\')">LINE\u751f\u6210</button></div>';
+    });
+  }
+  return h;
+}
+
+/* ========== Customers List ========== */
+function renderCustomers() {
+  var filt = data.customers.filter(function(c) { return c.phase === S.phase; });
+  var h = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">' +
+    '<div style="font-size:15px;font-weight:700;letter-spacing:0.5px">顧客一覧</div>' +
+    '<div style="display:flex;gap:6px">' +
+    '<button class="btn-small" style="background:var(--surface2);color:var(--accent);border:1px solid var(--border)" onclick="document.getElementById(\'scanInp\').click()">📷 読取</button>' +
+    '<button class="btn-small btn-primary" onclick="S.showAdd=true;render()">＋ 新規</button>' +
+    '</div></div>' +
+    '<input type="file" id="scanInp" accept="image/*" capture="environment" style="display:none" onchange="scanAnketo(this)">' +
+    '<div class="phase-tabs">';
+
+  PHASES.forEach(function(p) {
+    var n = data.customers.filter(function(c) { return c.phase === p; }).length;
+    h += '<button class="phase-tab' + (S.phase === p ? ' active' : '') + '" onclick="switchPhase(\'' + p + '\')">' + p + '（' + n + '）</button>';
+  });
+  h += '</div>';
+
+  if (filt.length > 1) {
+    h += '<div style="display:flex;gap:6px;margin-bottom:14px">' +
+      '<button onclick="sortByDate()" class="btn-small" style="background:var(--surface2);color:var(--text2);border:1px solid var(--border)">📅 日付順</button>' +
+      '<button onclick="sortByRank()" class="btn-small" style="background:var(--surface2);color:var(--text2);border:1px solid var(--border)">🔥 ランク順</button></div>';
+  }
+
+  if (!filt.length) {
+    h += '<div class="empty"><div class="empty-icon">◻️</div><div class="empty-text">該当なし</div></div>';
+  } else {
+    h += '<div id="dragList">';
+    filt.forEach(function(c, ci) {
+      var iss = ni(c);
+      h += '<div class="drag-item' + (c.urgent ? ' card-urgent' : ' card-accent') + '" data-idx="' + ci + '" ontouchstart="dragStart(event,' + ci + ',\'phase\')" ontouchend="if(!S.dragged)clearTimeout(S.dragTimer)">';
+      h += '<div onclick="if(!S.dragged)selectC(' + c.id + ')">';
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px"><div style="display:flex;align-items:center;gap:8px">' +
+        '<span style="color:var(--text3);font-size:12px;margin-right:2px">☰</span>' +
+        '<span style="font-weight:700;font-size:15px">' + esc(c.name) + '様</span>' +
+        '<span class="badge ' + rc(c.rank) + '">' + c.rank + '</span>';
+      if (c.urgent) h += '<span class="badge" style="background:var(--red-dim);color:var(--red)">要対応</span>';
+      h += '</div><span style="font-size:11px;color:var(--text3)">' + daysAgo(c.lastContact) + '</span></div>';
+      h += '<div style="font-size:12px;color:var(--text2);margin-bottom:8px">→ ' + esc(nextAct(c)) + '</div>';
+      h += '<div style="display:flex;gap:7px;flex-wrap:wrap">';
+      NECKS.forEach(function(n) {
+        h += '<div style="display:flex;align-items:center;gap:2px"><span style="font-size:9px;color:var(--text3)">' + n + '</span><span style="font-size:11px">' + NECK_I[c.necks[n].s] + '</span></div>';
+      });
+      if (iss) h += '<span style="font-size:10px;color:var(--red);font-weight:700;margin-left:auto">ネック' + iss + '</span>';
+      h += '</div>';
+
+      if (c.phase === '契約済み' && c.steps.length) {
+        var dn = c.steps.filter(function(s) { return s.done; }).length;
+        var pct = Math.round(dn / c.steps.length * 100);
+        h += '<div style="margin-top:10px"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:3px"><span>進捗</span><span>' + dn + '/' + c.steps.length + '</span></div>' +
+          '<div class="progress-track"><div class="progress-fill" style="width:' + pct + '%"></div></div></div>';
+      }
+      h += '</div>';
+      h += '<div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">';
+      h += '<div style="font-size:10px;color:var(--text3)">' + daysAgo(c.lastContact) + 'に連絡</div>';
+      h += '<div class="toggle-wrap" onclick="event.stopPropagation();togUrg(data.customers.find(function(x){return x.id===' + c.id + '}))">';
+      h += '<span class="toggle-label" style="color:' + (c.urgent ? 'var(--red)' : 'var(--text3)') + '">' + (c.urgent ? '要対応' : '対応済') + '</span>';
+      h += '<div class="toggle ' + (c.urgent ? 'toggle-on' : 'toggle-off') + '"><div class="toggle-dot"></div></div>';
+      h += '</div></div></div>';
+    });
+    h += '</div>';
+  }
+  return h;
+}
+
+/* ========== Analyze ========== */
+function renderAnalyze() {
+  var h = '';
+  if (!S.selId) {
+    h += '<div style="text-align:center;margin-bottom:16px"><div style="font-size:36px;margin-bottom:8px;opacity:0.4">◎</div>' +
+      '<div style="color:var(--text3);font-size:13px">顧客を選択</div>' +
+      '<div style="font-size:10px;color:var(--text3);margin-top:4px">長押しで並び替え</div></div>';
+    h += '<div id="dragList">';
+    data.customers.forEach(function(c, ci) {
+      h += '<div class="drag-item" data-idx="' + ci + '" data-id="' + c.id + '" ontouchstart="dragStart(event,' + ci + ')" ontouchend="if(!S.dragged)clearTimeout(S.dragTimer)" onclick="if(!S.dragged){S.selId=' + c.id + ';render();}">' +
+        '<div style="display:flex;align-items:center;gap:12px"><div style="color:var(--text3);font-size:14px;flex-shrink:0">☰</div><div>' +
+        '<div style="font-size:14px;font-weight:600">' + esc(c.name) + '様</div>' +
+        '<div style="font-size:11px;color:var(--text3);margin-top:2px">' + c.phase + '</div></div></div></div>';
+    });
+    h += '</div>';
+    return h;
+  }
+
+  var c = sel(); if (!c) return '';
+  h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:18px">' +
+    '<button onclick="S.selId=null;render()" class="btn-small btn-secondary">← 戻る</button>' +
+    '<div style="font-weight:700;font-size:14px">' + esc(c.name) + '様</div></div>';
+
+  h += '<button onclick="document.getElementById(\'audioUp\').click()" class="rec-btn" style="background:var(--surface2);color:var(--text2);border:1px dashed var(--border2)">📎 ボイスメモ等の音声ファイルを追加</button>' +
+    '<input type="file" id="audioUp" accept="audio/*" style="display:none" onchange="handleAudio(this)">';
+
+  h += '<div style="display:flex;gap:8px;margin-bottom:14px">' +
+    '<button onclick="document.getElementById(\'audioUp2\').click()" class="btn btn-secondary" style="flex:1;font-size:12px;padding:10px">' +
+    (S.transcribing ? '⏳ 文字起こし中...' : '📁 ボイスメモを選択') + '</button>' +
+    '<input type="file" id="audioUp2" accept="audio/*" style="display:none" onchange="transcribeAudio(this)"></div>';
+
+  if (!data.whisperKey) h += '<div style="font-size:10px;color:var(--text3);text-align:center;margin-bottom:10px">設定でWhisper APIキーを登録すると音声ファイルから文字起こしできます</div>';
+
+  h += '<textarea class="input" style="height:160px;margin-bottom:14px" placeholder="ボイスメモの文字起こしを貼り付け&#10;または商談内容を直接入力" oninput="var c=sel();if(c){c.memo=this.value;save();}">' + (c.memo ? esc(c.memo) : '') + '</textarea>';
+
+  var ok = c.memo && c.memo.trim();
+  if (data.apiKey) {
+    h += '<button onclick="analyze()" ' + (S.analyzing || !ok ? 'disabled' : '') + ' class="btn btn-primary" style="margin-bottom:14px;' + (ok ? '' : 'opacity:0.4') + '">' +
+      (S.analyzing ? '⏳ 分析中...' : '✨ AI分析') + '</button>';
+  } else {
+    h += '<button onclick="analyze()" ' + (ok ? '' : 'disabled') + ' class="btn btn-secondary" style="margin-bottom:8px;' + (ok ? '' : 'opacity:0.4') + '">📋 プロンプトをコピー → Claudeへ</button>' +
+      '<div style="font-size:10px;color:var(--text3);text-align:center;margin-bottom:14px">設定でAPIキー登録→アプリ内分析可</div>';
+  }
+
+  if (c.aiResult) {
+    h += '<div class="ai-result"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-left:10px">' +
+      '<div style="font-size:12px;color:var(--accent);font-weight:700;letter-spacing:0.5px">✨ 分析結果</div>' +
+      '<button onclick="copyAi()" class="btn-small" style="background:var(--surface2);color:var(--text2)">コピー</button></div>' +
+      '<pre style="font-size:13px;white-space:pre-wrap;line-height:1.8;margin:0;font-family:inherit;padding-left:10px">' + esc(c.aiResult) + '</pre></div>';
+  }
+  return h;
+}
+
+/* ========== Settings ========== */
+function renderSettings() {
+  var h = '<div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">' +
+    '<button onclick="switchTab(\'dashboard\')" class="btn-small btn-secondary">← 戻る</button>' +
+    '<div style="font-size:16px;font-weight:700;letter-spacing:0.5px">設定</div></div>';
+
+  h += '<div class="setting-item"><div class="setting-label">🔑 Anthropic APIキー</div>' +
+    '<div class="setting-desc">AI分析機能に必要<br>取得：console.anthropic.com</div>' +
+    '<input class="input" type="password" placeholder="sk-ant-..." value="' + esc(data.apiKey) + '" oninput="data.apiKey=this.value;save();"></div>';
+
+  h += '<div class="setting-item"><div class="setting-label">🎙 Whisper APIキー（OpenAI）</div>' +
+    '<div class="setting-desc">音声ファイルの文字起こしに必要<br>取得：platform.openai.com/api-keys</div>' +
+    '<input class="input" type="password" placeholder="sk-..." value="' + esc(data.whisperKey) + '" oninput="data.whisperKey=this.value;save();"></div>';
+
+  h += '<div class="setting-item"><div class="setting-label">☁️ クラウド同期</div>' +
+    '<div class="setting-desc">Supabaseにデータを自動同期しています（30秒ごと）</div>' +
+    '<button class="btn btn-primary" style="margin-top:8px" onclick="syncNow();toast(\'同期を実行しました\')">今すぐ同期</button></div>';
+
+  h += '<div class="setting-item"><div class="setting-label">💾 データ管理</div>' +
+    '<div class="setting-desc">データはこの端末とクラウドに保存されています</div>' +
+    '<div style="display:flex;gap:8px">' +
+    '<button class="btn btn-secondary" style="flex:1" onclick="exportD()">エクスポート</button>' +
+    '<button class="btn btn-secondary" style="flex:1" onclick="document.getElementById(\'imp\').click()">インポート</button></div>' +
+    '<input type="file" id="imp" accept=".json" style="display:none" onchange="importD(this)"></div>';
+
+  h += '<div class="setting-item"><div class="setting-label">⚠️ リセット</div>' +
+    '<div class="setting-desc">すべて初期状態に戻します</div>' +
+    '<button class="btn btn-danger" onclick="resetD()">リセット</button></div>';
+
+  h += '<div style="text-align:center;color:var(--text3);font-size:10px;margin-top:28px;letter-spacing:1px">' +
+    '<span style="font-family:Cormorant Garamond,serif;font-size:13px;color:var(--accent);letter-spacing:2px">IEZUKURI PRO</span><br>v1.0</div>';
+  return h;
+}
+
+/* ========== Detail Modal ========== */
+function renderDetail() {
+  var c = sel(); if (!c) return '';
+  var h = '<div class="modal-overlay" onclick="if(event.target===this)closeDet()"><div class="modal"><div class="modal-handle"></div>';
+
+  // Name, Rank, Phase, Toggle, Close
+  h += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px"><div style="flex:1;margin-right:10px">' +
+    '<input class="input" style="font-size:18px;font-weight:900;letter-spacing:0.5px;padding:8px 10px;background:transparent;border:1px solid transparent" value="' + esc(c.name) + '" onfocus="this.style.borderColor=\'var(--accent)\';this.style.background=\'var(--bg2)\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'" oninput="updField(sel(),\'name\',this.value)">' +
+    '<div style="display:flex;gap:6px;align-items:center;margin-top:5px;padding-left:10px">';
+  RANKS.forEach(function(r) {
+    h += '<button onclick="updField(sel(),\'rank\',\'' + r + '\');render()" class="badge ' + rc(r) + '" style="font-size:10px;cursor:pointer;' + (c.rank === r ? 'outline:2px solid var(--text2)' : 'opacity:0.4') + '">' + r + '</button>';
+  });
+  h += '<select class="input" style="font-size:11px;padding:4px 8px;background:transparent;border:1px solid transparent;color:var(--text3);width:auto" onchange="updField(sel(),\'phase\',this.value);render()">';
+  PHASES.forEach(function(p) { h += '<option' + (c.phase === p ? ' selected' : '') + '>' + p + '</option>'; });
+  h += '</select></div></div>';
+  h += '<div style="display:flex;gap:8px;align-items:center">' +
+    '<div class="toggle-wrap" onclick="togUrg(sel())"><span class="toggle-label" style="color:' + (c.urgent ? 'var(--red)' : 'var(--text3)') + ';font-size:10px">' + (c.urgent ? '要対応' : '対応済') + '</span>' +
+    '<div class="toggle ' + (c.urgent ? 'toggle-on' : 'toggle-off') + '" style="width:40px;height:22px"><div class="toggle-dot" style="width:18px;height:18px"></div></div></div>' +
+    '<button onclick="closeDet()" style="background:none;color:var(--text3);font-size:18px;padding:4px">✕</button></div></div>';
+
+  // Detail grid
+  h += '<div class="detail-grid" style="margin-bottom:18px">';
+  [['予算','budget'],['土地','land'],['競合','competitor'],['エリア','area'],['電話','phone'],['初回来場','firstVisit']].forEach(function(f) {
+    h += '<div class="detail-cell"><div class="detail-cell-label">' + f[0] + '</div>';
+    if (f[1] === 'firstVisit') {
+      h += '<input class="input" type="date" style="font-size:12px;padding:6px 8px;background:transparent;border:1px solid transparent" value="' + (c[f[1]] || '') + '" onfocus="this.style.borderColor=\'var(--accent)\';this.style.background=\'var(--bg)\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'" oninput="updField(sel(),\'' + f[1] + '\',this.value)">';
+    } else {
+      h += '<input class="input" style="font-size:12px;font-weight:600;padding:6px 8px;background:transparent;border:1px solid transparent" value="' + esc(c[f[1]] || '') + '" placeholder="未入力" onfocus="this.style.borderColor=\'var(--accent)\';this.style.background=\'var(--bg)\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'" oninput="updField(sel(),\'' + f[1] + '\',this.value)">';
+    }
+    h += '</div>';
+  });
+  h += '</div>';
+
+  // Actions (Google Keep style)
+  h += '<div style="margin-bottom:18px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div class="label" style="margin-bottom:0">→ アクション</div></div>';
+  h += '<div style="display:flex;gap:6px;margin-bottom:10px"><input class="input" id="newActInp" style="flex:1;font-size:13px;padding:10px 12px" placeholder="新しいアクションを入力" onkeydown="if(event.key===\'Enter\'){addAct(sel(),this.value);this.value=\'\';}">';
+  h += '<button onclick="var i=document.getElementById(\'newActInp\');addAct(sel(),i.value);i.value=\'\';" class="btn-small btn-primary" style="flex-shrink:0">追加</button></div>';
+
+  var undone = (c.actions || []).filter(function(a) { return !a.done; });
+  var done = (c.actions || []).filter(function(a) { return a.done; });
+
+  if (undone.length) {
+    undone.forEach(function(a) {
+      var idx = (c.actions || []).indexOf(a);
+      h += '<div class="check-item" style="justify-content:space-between"><div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0" onclick="togAct(sel(),' + idx + ')"><div class="check-box"></div><div class="check-text" style="overflow:hidden;text-overflow:ellipsis">' + esc(a.t) + '</div></div><button onclick="delAct(sel(),' + idx + ')" style="background:none;border:none;color:var(--text3);font-size:14px;padding:4px 6px;flex-shrink:0">✕</button></div>';
+    });
+  }
+  if (done.length) {
+    h += '<div style="font-size:10px;color:var(--text3);margin:10px 0 6px;display:flex;align-items:center;gap:6px">完了済み（' + done.length + '件）<div class="section-line"></div></div>';
+    done.forEach(function(a) {
+      var idx = (c.actions || []).indexOf(a);
+      h += '<div class="check-item" style="opacity:0.5;justify-content:space-between"><div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0" onclick="togAct(sel(),' + idx + ')"><div class="check-box checked">✓</div><div class="check-text done" style="overflow:hidden;text-overflow:ellipsis">' + esc(a.t) + '</div></div><button onclick="delAct(sel(),' + idx + ')" style="background:none;border:none;color:var(--text3);font-size:14px;padding:4px 6px;flex-shrink:0">✕</button></div>';
+    });
+  }
+  if (!undone.length && !done.length) h += '<div style="color:var(--text3);font-size:12px;text-align:center;padding:8px">アクションなし</div>';
+  h += '</div>';
+
+  // Necks
+  h += '<div style="margin-bottom:18px"><div class="section-title"><span>🚦</span> ネック <div class="section-line"></div></div><div class="neck-grid" style="margin-bottom:10px">';
+  NECKS.forEach(function(n) {
+    var ns = c.necks[n], cls = ns.s === '解決済み' ? 'resolved' : ns.s === '要対応' ? 'issue' : '';
+    h += '<div class="neck-item ' + cls + '" onclick="cycleN(sel(),\'' + n + '\')"><div class="neck-icon">' + NECK_I[ns.s] + '</div><div class="neck-label">' + n + '</div><div class="neck-status">' + ns.s + '</div></div>';
+  });
+  h += '</div>';
+  NECKS.forEach(function(n) {
+    if (c.necks[n].s === '未確認' && !c.necks[n].m) return;
+    var col = c.necks[n].s === '要対応' ? 'is-red' : c.necks[n].s === '解決済み' ? 'is-green' : 'is-gray';
+    h += '<div class="neck-memo-row"><div class="neck-memo-label ' + col + '">' + NECK_I[c.necks[n].s] + ' ' + n + '</div>' +
+      '<input class="input" style="font-size:12px;padding:8px 10px" placeholder="詳細メモ" value="' + esc(c.necks[n].m) + '" oninput="sel().necks[\'' + n + '\'].m=this.value;save();"></div>';
+  });
+  h += '</div>';
+
+  // Steps (契約済み・仮契約済み only)
+  if (c.phase === '契約済み' || c.phase === '仮契約済み') {
+    h += '<div style="margin-bottom:18px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="section-title" style="margin-bottom:0"><span>📋</span> 進捗</div><button class="btn-ghost" onclick="S.showStep=true;render()">＋</button></div>';
+    if (!c.steps.length) {
+      h += '<div style="text-align:center;padding:12px"><button class="btn btn-secondary" style="font-size:12px" onclick="addDefSteps(' + c.id + ')">デフォルト項目を追加</button></div>';
+    } else {
+      var dn = c.steps.filter(function(s) { return s.done; }).length;
+      var pct = Math.round(dn / c.steps.length * 100);
+      h += '<div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-bottom:4px"><span>' + pct + '%</span><span>' + dn + '/' + c.steps.length + '</span></div>' +
+        '<div class="progress-track" style="margin-bottom:12px"><div class="progress-fill" style="width:' + pct + '%"></div></div>';
+      c.steps.forEach(function(s, i) {
+        h += '<div class="check-item" style="justify-content:space-between"><div style="display:flex;align-items:center;gap:10px;flex:1" onclick="togStep(sel(),' + i + ')"><div class="check-box' + (s.done ? ' checked' : '') + '">' + (s.done ? '✓' : '') + '</div><div class="check-text' + (s.done ? ' done' : '') + '">' + esc(s.name) + '</div></div><button onclick="event.stopPropagation();delStep(sel(),' + i + ')" style="background:none;border:none;color:var(--text3);font-size:14px;padding:4px 6px;flex-shrink:0">✕</button></div>';
+      });
+    }
+    h += '</div>';
+  }
+
+  // Family
+  h += '<div style="margin-bottom:18px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="section-title" style="margin-bottom:0"><span>👨‍👩‍👧</span> 家族</div><button class="btn-ghost" onclick="S.showFam=true;render()">＋</button></div>';
+  if (!c.family.length) {
+    h += '<div style="color:var(--text3);font-size:12px;text-align:center;padding:12px">未登録</div>';
+  } else {
+    c.family.forEach(function(f, fi) {
+      h += '<div class="family-card" style="flex-direction:column;gap:8px"><div style="display:flex;justify-content:space-between;align-items:center;width:100%"><div style="display:flex;gap:6px;flex:1">' +
+        '<input class="input" style="font-size:12px;padding:6px 8px;background:transparent;border:1px solid transparent;flex:1" value="' + esc(f.name) + '" placeholder="名前" onfocus="this.style.borderColor=\'var(--accent)\';this.style.background=\'var(--bg)\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'" oninput="updFam(sel(),' + fi + ',\'name\',this.value)">' +
+        '<input class="input" style="font-size:12px;padding:6px 8px;background:transparent;border:1px solid transparent;width:70px" value="' + esc(f.relation) + '" placeholder="続柄" onfocus="this.style.borderColor=\'var(--accent)\';this.style.background=\'var(--bg)\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'" oninput="updFam(sel(),' + fi + ',\'relation\',this.value)">' +
+        '</div><button onclick="delFam(sel(),' + fi + ')" style="background:none;border:none;color:var(--text3);font-size:14px;padding:4px">✕</button></div>' +
+        '<div style="display:flex;gap:6px;align-items:center;width:100%">' +
+        '<input class="input" type="date" style="font-size:11px;padding:5px 8px;background:transparent;border:1px solid transparent;flex:1" value="' + (f.birthday || '') + '" onfocus="this.style.borderColor=\'var(--accent)\';this.style.background=\'var(--bg)\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'" oninput="updFam(sel(),' + fi + ',\'birthday\',this.value)">' +
+        (f.birthday ? '<span style="font-size:10px;color:var(--text3);white-space:nowrap">' + age(f.birthday) + '</span>' : '') +
+        (f.birthday ? '<button class="btn-small" style="background:var(--orange-dim);color:var(--orange);font-size:10px;flex-shrink:0" onclick="event.stopPropagation();genBd(\'' + esc(c.name) + '\',\'' + esc(f.name) + '\',\'' + esc(f.relation) + '\',\'' + f.birthday + '\')">🎂</button>' : '') +
+        '</div></div>';
+    });
+  }
+  h += '</div>';
+
+  // Events
+  h += '<div style="margin-bottom:18px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div class="section-title" style="margin-bottom:0"><span>📅</span> イベント</div><button class="btn-ghost" onclick="S.showEvt=true;render()">＋</button></div>';
+  if (!c.events || !c.events.length) {
+    h += '<div style="color:var(--text3);font-size:12px;text-align:center;padding:12px">予定なし</div>';
+  } else {
+    c.events.forEach(function(e, ei) {
+      h += '<div style="background:var(--bg2);border-radius:8px;padding:11px 13px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;border:1px solid var(--border)">' +
+        '<span style="font-size:13px;font-weight:600"><span style="background:var(--green-dim);color:var(--green);border-radius:5px;padding:2px 7px;font-size:10px;margin-right:8px;font-weight:700">' + esc(e.type) + '</span>' + e.date + '</span>' +
+        '<button onclick="delEvt(sel(),' + ei + ')" style="background:none;border:none;color:var(--text3);font-size:14px;padding:4px">✕</button></div>';
+    });
+  }
+  h += '</div>';
+
+  // Delete button
+  h += '<div class="divider"></div><button class="btn btn-danger" onclick="delC(' + c.id + ')">この顧客を削除</button>';
+  h += '</div></div>';
+  return h;
+}
+
+/* ========== Add Customer Modal ========== */
+function renderAddCustomer() {
+  var nc = S.nc;
+  var scanned = nc.name || nc.phone || nc.budget;
+  var h = '<div class="modal-overlay"><div class="modal"><div class="modal-handle"></div>' +
+    '<div style="font-size:16px;font-weight:800;margin-bottom:4px">' + (scanned ? '📷 読取結果を確認' : '顧客を追加') + '</div>';
+  if (scanned) h += '<div style="font-size:11px;color:var(--accent);margin-bottom:16px">内容を確認・修正して登録してください</div>';
+  else h += '<div style="margin-bottom:16px"></div>';
+
+  h += '<div class="label">名前 *</div><input class="input" style="margin-bottom:12px" placeholder="田中 雄一" value="' + esc(nc.name) + '" oninput="S.nc.name=this.value">';
+  h += '<div class="label">電話番号</div><input class="input" style="margin-bottom:12px" placeholder="090-1234-5678" type="tel" value="' + esc(nc.phone) + '" oninput="S.nc.phone=this.value">';
+  h += '<div class="label">フェーズ</div><select class="input" style="margin-bottom:12px" onchange="S.nc.phase=this.value">';
+  PHASES.forEach(function(p) { h += '<option' + (nc.phase === p ? ' selected' : '') + '>' + p + '</option>'; });
+  h += '</select>';
+  h += '<div class="label">ランク</div><div class="rank-btns" style="margin-bottom:12px">';
+  RANKS.forEach(function(r) { h += '<button class="rank-btn' + (nc.rank === r ? ' sel-' + r.toLowerCase() : '') + '" onclick="S.nc.rank=\'' + r + '\';render()">' + r + '</button>'; });
+  h += '</div>';
+  h += '<div class="label">予算</div><input class="input" style="margin-bottom:12px" placeholder="4,000万円" value="' + esc(nc.budget) + '" oninput="S.nc.budget=this.value">';
+  h += '<div class="label">エリア</div><input class="input" style="margin-bottom:12px" placeholder="飯塚市" value="' + esc(nc.area) + '" oninput="S.nc.area=this.value">';
+  h += '<div class="label">土地</div><input class="input" style="margin-bottom:12px" placeholder="土地あり / 土地なし" value="' + esc(nc.land) + '" oninput="S.nc.land=this.value">';
+  h += '<div class="label">競合</div><input class="input" style="margin-bottom:12px" placeholder="積水ハウス" value="' + esc(nc.competitor) + '" oninput="S.nc.competitor=this.value">';
+  h += '<div class="label">初回来場日</div><input class="input" type="date" style="margin-bottom:12px" value="' + (nc.firstVisit || new Date().toISOString().split('T')[0]) + '" oninput="S.nc.firstVisit=this.value">';
+
+  if (nc._family && nc._family.length) {
+    h += '<div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid var(--border)"><div class="label" style="margin-bottom:6px">👨‍👩‍👧 読み取った家族情報</div>';
+    nc._family.forEach(function(f) { h += '<div style="font-size:12px;color:var(--text2);margin-bottom:2px">' + esc(f.name) + ' (' + esc(f.relation) + ')' + (f.birthday ? ' ' + f.birthday : '') + '</div>'; });
+    h += '</div>';
+  }
+  if (nc._memo) {
+    h += '<div style="background:var(--bg2);border-radius:10px;padding:12px;margin-bottom:12px;border:1px solid var(--border)"><div class="label" style="margin-bottom:4px">📝 その他メモ</div><div style="font-size:12px;color:var(--text2)">' + esc(nc._memo) + '</div></div>';
+  }
+  h += '<div style="display:flex;gap:10px"><button class="btn btn-secondary" style="flex:1" onclick="S.showAdd=false;S.nc=freshC();render()">キャンセル</button><button class="btn btn-primary" style="flex:1" onclick="addC()">登録</button></div>';
+  h += '</div></div>';
+  return h;
+}
+
+/* ========== Add Family Modal ========== */
+function renderAddFamily() {
+  return '<div class="modal-overlay"><div class="modal"><div class="modal-handle"></div>' +
+    '<div style="font-size:16px;font-weight:800;margin-bottom:20px">家族を追加</div>' +
+    '<div class="label">名前 *</div><input class="input" style="margin-bottom:12px" placeholder="サンプル 花子" oninput="S.nf.name=this.value">' +
+    '<div class="label">続柄</div><input class="input" style="margin-bottom:12px" placeholder="奥様 / ご主人 / 長男" oninput="S.nf.relation=this.value">' +
+    '<div class="label">生年月日</div><input class="input" type="date" style="margin-bottom:22px" oninput="S.nf.birthday=this.value">' +
+    '<div style="display:flex;gap:10px"><button class="btn btn-secondary" style="flex:1" onclick="S.showFam=false;S.nf={name:\'\',relation:\'\',birthday:\'\'};render()">キャンセル</button><button class="btn btn-primary" style="flex:1" onclick="addFam()">追加</button></div>' +
+    '</div></div>';
+}
+
+/* ========== Add Event Modal ========== */
+function renderAddEvent() {
+  var h = '<div class="modal-overlay"><div class="modal"><div class="modal-handle"></div>' +
+    '<div style="font-size:16px;font-weight:800;margin-bottom:16px">イベント追加</div>' +
+    '<div class="label">種別 *（タップで選択）</div>' +
+    '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">';
+  (data.eventTypes || []).forEach(function(t, i) {
+    h += '<div style="display:flex;align-items:center;gap:0">' +
+      '<button onclick="S.ne.type=\'' + esc(t) + '\';render()" style="padding:7px 12px;border-radius:8px 0 0 8px;font-size:12px;font-weight:600;border:1px solid var(--border);background:' + (S.ne.type === t ? 'var(--accent)' : 'var(--surface2)') + ';color:' + (S.ne.type === t ? 'var(--bg)' : 'var(--text2)') + '">' + esc(t) + '</button>' +
+      '<button onclick="delEvtType(' + i + ')" style="padding:7px 6px;border-radius:0 8px 8px 0;font-size:10px;border:1px solid var(--border);border-left:none;background:var(--surface2);color:var(--text3)">✕</button></div>';
+  });
+  h += '</div>';
+  h += '<div style="display:flex;gap:6px;margin-bottom:14px"><input class="input" id="newEvtType" style="flex:1;font-size:12px" placeholder="新しい種別を追加..." value="' + esc(S.ne.type || '') + '" oninput="S.ne.type=this.value">' +
+    '<button onclick="var v=document.getElementById(\'newEvtType\').value;if(v.trim())addEvtType(v)" class="btn-small" style="background:var(--surface2);color:var(--accent);border:1px solid var(--border);flex-shrink:0">＋保存</button></div>';
+  h += '<div class="label">日付 *</div><input class="input" type="date" style="margin-bottom:22px" value="' + (S.ne.date || '') + '" oninput="S.ne.date=this.value">';
+  h += '<div style="display:flex;gap:10px"><button class="btn btn-secondary" style="flex:1" onclick="S.showEvt=false;S.ne={type:\'\',date:\'\'};render()">キャンセル</button><button class="btn btn-primary" style="flex:1" onclick="addEvt()">追加</button></div>';
+  h += '</div></div>';
+  return h;
+}
+
+/* ========== Add Step Modal ========== */
+function renderAddStep() {
+  return '<div class="modal-overlay"><div class="modal"><div class="modal-handle"></div>' +
+    '<div style="font-size:16px;font-weight:800;margin-bottom:20px">項目追加</div>' +
+    '<div class="label">項目名</div><input class="input" style="margin-bottom:22px" placeholder="例：外構打ち合わせ" oninput="S.ns=this.value">' +
+    '<div style="display:flex;gap:10px"><button class="btn btn-secondary" style="flex:1" onclick="S.showStep=false;S.ns=\'\';render()">キャンセル</button><button class="btn btn-primary" style="flex:1" onclick="addStp()">追加</button></div>' +
+    '</div></div>';
+}
+
+/* ========== Initial Render ========== */
 render();
 </script>
 </body>
