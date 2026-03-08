@@ -413,7 +413,7 @@ var S = {
   nc: freshC(), nf: { name: '', relation: '', birthday: '' },
   ne: { type: '', date: '' }, ns: '',
   dragged: false, dragIdx: null, dragTimer: null, dragEl: null,
-  dragStartY: 0, dragStartX: 0, dragMode: null
+  dragStartY: 0, dragStartX: 0, dragMode: null, dragGapIdx: -1
 };
 
 /* ========== Utility Functions ========== */
@@ -614,6 +614,7 @@ function dragStart(e, idx, mode) {
   var touch = e.touches[0];
   S.dragStartY = touch.clientY; S.dragStartX = touch.clientX;
   S.dragMode = mode || 'all';
+  S.dragGapIdx = -1;
   S.dragTimer = setTimeout(function() {
     S.dragged = true; S.dragIdx = idx;
     var items = document.querySelectorAll('.drag-item');
@@ -633,16 +634,38 @@ function dragMove(e) {
   e.preventDefault();
   var touch = e.touches[0];
   var items = document.querySelectorAll('.drag-item');
-  items.forEach(function(it) { it.classList.remove('drag-gap'); });
-  items.forEach(function(it, i) {
-    if (i === S.dragIdx) return;
-    var r = it.getBoundingClientRect();
+  var gapIdx = -1;
+
+  // Determine gap position: gapIdx means "insert BEFORE item[gapIdx]"
+  // If gapIdx === items.length, insert at the end
+  for (var i = 0; i < items.length; i++) {
+    if (i === S.dragIdx) continue;
+    var r = items[i].getBoundingClientRect();
     var mid = r.top + r.height / 2;
-    if (touch.clientY > r.top - 10 && touch.clientY < r.bottom + 10) {
-      if (touch.clientY < mid) { it.classList.add('drag-gap'); }
-      else { var next = items[i + 1]; if (next && next !== S.dragEl) next.classList.add('drag-gap'); }
+    if (touch.clientY < mid) {
+      gapIdx = i;
+      break;
     }
-  });
+  }
+  // If no item found (finger is below all items), insert at end
+  if (gapIdx === -1) {
+    gapIdx = items.length;
+  }
+
+  // Adjust gapIdx so it skips over the dragged item visually
+  // Don't show gap at the dragged item's original position
+  if (gapIdx === S.dragIdx || gapIdx === S.dragIdx + 1) {
+    gapIdx = -1; // No visible gap needed (item stays in place)
+  }
+
+  S.dragGapIdx = gapIdx;
+
+  // Apply visual gap: the gap opens ABOVE the item at gapIdx
+  items.forEach(function(it) { it.classList.remove('drag-gap'); });
+  if (gapIdx >= 0 && gapIdx < items.length) {
+    items[gapIdx].classList.add('drag-gap');
+  }
+
   if (S.dragEl) {
     var dy = touch.clientY - S.dragStartY;
     var dx = touch.clientX - S.dragStartX;
@@ -655,35 +678,55 @@ function dragMove(e) {
 function dragEnd(e) {
   clearTimeout(S.dragTimer);
   if (!S.dragged) { S.dragIdx = null; return; }
-  var touch = e.changedTouches[0];
-  var items = document.querySelectorAll('.drag-item');
-  var overIdx = null;
-  items.forEach(function(it, i) {
-    var r = it.getBoundingClientRect();
-    if (touch.clientY > r.top - 10 && touch.clientY < r.bottom + 10 && i !== S.dragIdx) overIdx = i;
-  });
-  if (overIdx !== null && S.dragIdx !== null && overIdx !== S.dragIdx) {
+
+  var gapIdx = S.dragGapIdx;
+  var fromIdx = S.dragIdx;
+
+  if (gapIdx >= 0 && fromIdx !== null && gapIdx !== fromIdx && gapIdx !== fromIdx + 1) {
     if (S.dragMode === 'phase') {
       var filt = data.customers.filter(function(c) { return c.phase === S.phase; });
-      var fromId = filt[S.dragIdx] ? filt[S.dragIdx].id : null;
-      var toId = filt[overIdx] ? filt[overIdx].id : null;
-      if (fromId && toId) {
+      var fromId = filt[fromIdx] ? filt[fromIdx].id : null;
+      if (fromId) {
         var cs = data.customers;
-        var ai = cs.findIndex(function(c) { return c.id === fromId; });
-        var moved = cs.splice(ai, 1)[0];
-        var bi = cs.findIndex(function(c) { return c.id === toId; });
-        if (overIdx > S.dragIdx) bi++;
-        cs.splice(bi, 0, moved);
+        var globalFrom = cs.findIndex(function(c) { return c.id === fromId; });
+        var moved = cs.splice(globalFrom, 1)[0];
+
+        // Calculate target: gapIdx is "insert before filt[gapIdx]"
+        // After removing the dragged item, adjust index
+        var targetIdx;
+        if (gapIdx >= filt.length) {
+          // Insert at end: find position after last item of this phase
+          var lastInPhase = -1;
+          for (var k = 0; k < cs.length; k++) {
+            if (cs[k].phase === S.phase) lastInPhase = k;
+          }
+          targetIdx = lastInPhase + 1;
+        } else {
+          // Adjust gapIdx if it was after the removed item
+          var adjustedGap = gapIdx > fromIdx ? gapIdx - 1 : gapIdx;
+          var remainFilt = cs.filter(function(c) { return c.phase === S.phase; });
+          var targetId = remainFilt[adjustedGap] ? remainFilt[adjustedGap].id : null;
+          if (targetId) {
+            targetIdx = cs.findIndex(function(c) { return c.id === targetId; });
+          } else {
+            targetIdx = cs.length;
+          }
+        }
+        cs.splice(targetIdx, 0, moved);
         save();
       }
     } else {
+      // 'all' mode (analyze tab)
       var cs2 = data.customers;
-      var moved2 = cs2.splice(S.dragIdx, 1)[0];
-      cs2.splice(overIdx, 0, moved2);
+      var moved2 = cs2.splice(fromIdx, 1)[0];
+      // After removing, adjust gapIdx
+      var insertAt = gapIdx > fromIdx ? gapIdx - 1 : gapIdx;
+      cs2.splice(insertAt, 0, moved2);
       save();
     }
   }
-  S.dragged = false; S.dragIdx = null; S.dragEl = null; S.dragMode = null;
+
+  S.dragged = false; S.dragIdx = null; S.dragEl = null; S.dragMode = null; S.dragGapIdx = -1;
   var list = document.getElementById('dragList');
   if (list) { list.removeEventListener('touchmove', dragMove); list.removeEventListener('touchend', dragEnd); }
   setTimeout(function() { S.dragged = false; render(); }, 50);
