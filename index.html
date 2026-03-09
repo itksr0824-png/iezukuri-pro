@@ -215,10 +215,17 @@ select.input { -webkit-appearance: none; }
 
 .drag-item {
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
-  padding: 15px 16px; margin-bottom: 8px; transition: margin 0.25s ease, box-shadow 0.15s, opacity 0.15s, transform 0.25s ease; position: relative;
+  padding: 15px 16px; margin-bottom: 8px; position: relative;
+  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out, border-color 0.2s;
 }
-.drag-item.dragging { opacity: 0.85; box-shadow: 0 12px 32px rgba(0,0,0,0.5); z-index: 10; border-color: var(--accent); transition: none; }
-.drag-item.drag-gap { margin-top: 54px; }
+.drag-item.dragging {
+  box-shadow: 0 16px 40px rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 10; border-color: var(--accent); transition: none;
+  transform-origin: center center;
+}
+.drag-item.drag-shrink { transform: scale(0.98); }
+.drag-item.drag-gap { transform: translateY(62px) scale(0.98); }
+.drag-item.drag-gap-up { transform: translateY(-62px) scale(0.98); }
 
 .ai-result { background: var(--surface); border-radius: var(--radius); padding: 18px; border: 1px solid var(--border); position: relative; overflow: hidden; }
 .ai-result::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: linear-gradient(180deg, var(--accent), var(--green)); }
@@ -631,6 +638,7 @@ function scanAnketo(inp) {
 
 /* ========== Drag & Drop ========== */
 var dragInsertIdx = -1;
+var dragItemRects = [];
 
 function dragStart(e, idx, mode) {
   var touch = e.touches[0];
@@ -643,13 +651,30 @@ function dragStart(e, idx, mode) {
     document.documentElement.style.overflow = 'hidden';
     var items = document.querySelectorAll('.drag-item');
     var el = items[idx]; if (!el) return;
-    S.dragEl = el; el.classList.add('dragging');
-    if (navigator.vibrate) navigator.vibrate(30);
+    S.dragEl = el;
+    // Snapshot rects before any transforms
+    dragItemRects = [];
+    for (var i = 0; i < items.length; i++) {
+      var r = items[i].getBoundingClientRect();
+      dragItemRects.push({ top: r.top, height: r.height, midY: r.top + r.height / 2 });
+    }
+    S.dragItemH = dragItemRects[idx].height + 8;
+    // Float-up animation
+    el.style.transition = 'box-shadow 0.15s ease-out, border-color 0.15s ease-out';
+    el.classList.add('dragging');
+    el.style.transform = 'scale(1.03)';
+    // Shrink neighbors
+    for (var j = 0; j < items.length; j++) {
+      if (j !== idx) items[j].classList.add('drag-shrink');
+    }
+    if (navigator.vibrate) navigator.vibrate(10);
     var list = document.getElementById('dragList');
     if (list) {
       list.addEventListener('touchmove', dragMove, { passive: false });
       list.addEventListener('touchend', dragEnd);
     }
+    // After float-up, disable transition for free drag
+    setTimeout(function() { if (S.dragEl) S.dragEl.style.transition = 'none'; }, 160);
   }, 400);
 }
 
@@ -660,62 +685,49 @@ function dragMove(e) {
   var fingerY = touch.clientY;
   var items = document.querySelectorAll('.drag-item');
   var fromIdx = S.dragIdx;
+  var itemH = S.dragItemH || 62;
 
-  // Build list of non-dragged items with their midpoints
+  // Use snapshotted rects for stable midpoint calculation
   var slots = [];
   for (var i = 0; i < items.length; i++) {
     if (i === fromIdx) continue;
-    var r = items[i].getBoundingClientRect();
-    slots.push({ domIdx: i, midY: r.top + r.height / 2 });
+    slots.push({ domIdx: i, midY: dragItemRects[i].midY });
   }
 
-  // Find where the finger is: which slot gap?
-  // insertPos = position in the slots array where dragged item should go
-  var insertPos = slots.length; // default: end
+  var insertPos = slots.length;
   for (var j = 0; j < slots.length; j++) {
-    if (fingerY < slots[j].midY) {
-      insertPos = j;
-      break;
-    }
+    if (fingerY < slots[j].midY) { insertPos = j; break; }
   }
 
-  // Convert insertPos back to original array index
-  // slots[insertPos] is the item that will come AFTER the dragged item
-  // So we insert BEFORE slots[insertPos].domIdx in DOM terms
-  var gapDomIdx = -1; // which DOM item gets the gap class (gap opens above it)
-  if (insertPos < slots.length) {
-    gapDomIdx = slots[insertPos].domIdx;
-  }
+  var gapDomIdx = insertPos < slots.length ? slots[insertPos].domIdx : -1;
 
-  // Calculate the actual array insert index
-  // In the original array (before any removal), the dragged item is at fromIdx
-  // After removing fromIdx, the remaining items are in order
-  // insertPos is position among remaining items, so that's the splice index
   if (insertPos === fromIdx || (insertPos === fromIdx && gapDomIdx === -1)) {
-    // No movement needed
     dragInsertIdx = -1;
   } else {
-    // insertPos is the index in the "remaining items" array
-    // But we need to convert to the full array index (including the dragged item)
-    // If insertPos >= fromIdx, the actual full-array index is insertPos + 1
-    // (because the dragged item still occupies fromIdx)
-    // But since we'll splice(fromIdx,1) first then splice(insertPos,...),
-    // we just store insertPos directly as the post-removal index
     dragInsertIdx = insertPos;
   }
 
-  // Show visual gap
-  items.forEach(function(it) { it.classList.remove('drag-gap'); });
-  if (gapDomIdx >= 0 && gapDomIdx < items.length && dragInsertIdx >= 0) {
-    items[gapDomIdx].classList.add('drag-gap');
+  // Animate neighbors with translateY
+  for (var k = 0; k < items.length; k++) {
+    if (k === fromIdx) continue;
+    items[k].classList.remove('drag-gap', 'drag-gap-up');
+    if (dragInsertIdx >= 0) {
+      if (k < fromIdx && k >= gapDomIdx && gapDomIdx >= 0) {
+        items[k].classList.add('drag-gap');
+      } else if (k > fromIdx && gapDomIdx >= 0 && k < gapDomIdx) {
+        items[k].classList.add('drag-gap-up');
+      } else if (gapDomIdx === -1 && k > fromIdx) {
+        items[k].classList.add('drag-gap-up');
+      }
+    }
   }
 
-  // Move the dragged element visually
+  // Move dragged element
   if (S.dragEl) {
     var dy = fingerY - S.dragStartY;
     var dx = touch.clientX - S.dragStartX;
     dx = Math.max(-30, Math.min(30, dx));
-    S.dragEl.style.transform = 'translate(' + dx + 'px,' + dy + 'px) rotate(' + (dx * 0.15) + 'deg)';
+    S.dragEl.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(1.03) rotate(' + (dx * 0.12) + 'deg)';
     S.dragEl.style.zIndex = '10';
   }
 }
@@ -725,53 +737,70 @@ function dragEnd(e) {
   if (!S.dragged) { S.dragIdx = null; return; }
 
   var fromIdx = S.dragIdx;
-  var toIdx = dragInsertIdx; // post-removal index among visible items
+  var toIdx = dragInsertIdx;
+  var items = document.querySelectorAll('.drag-item');
 
-  if (toIdx >= 0 && fromIdx !== null) {
-    if (S.dragMode === 'phase') {
-      // Phase mode: items are filtered by phase
-      var filt = data.customers.filter(function(c) { return c.phase === S.phase; });
-      var fromId = filt[fromIdx] ? filt[fromIdx].id : null;
-      if (fromId) {
-        // Remove from global array
-        var cs = data.customers;
-        var globalFrom = cs.findIndex(function(c) { return c.id === fromId; });
-        var moved = cs.splice(globalFrom, 1)[0];
+  // Calculate drop target Y offset
+  var dropDy = 0;
+  if (toIdx >= 0 && fromIdx !== null && dragItemRects.length) {
+    var targetVisualIdx = toIdx >= fromIdx ? toIdx + 1 : toIdx;
+    if (targetVisualIdx >= dragItemRects.length) targetVisualIdx = dragItemRects.length - 1;
+    dropDy = dragItemRects[targetVisualIdx].top - dragItemRects[fromIdx].top;
+  }
 
-        // Build remaining filtered list to find target position
-        var remaining = cs.filter(function(c) { return c.phase === S.phase; });
-        var globalTarget;
-        if (toIdx >= remaining.length) {
-          // Insert after the last item of this phase
-          var lastGlobal = -1;
-          for (var k = 0; k < cs.length; k++) {
-            if (cs[k].phase === S.phase) lastGlobal = k;
-          }
-          globalTarget = lastGlobal + 1;
-        } else {
-          // Insert before remaining[toIdx]
-          var targetId = remaining[toIdx].id;
-          globalTarget = cs.findIndex(function(c) { return c.id === targetId; });
-        }
-        cs.splice(globalTarget, 0, moved);
-        save();
-      }
-    } else {
-      // All mode: direct array manipulation
-      var cs2 = data.customers;
-      var moved2 = cs2.splice(fromIdx, 1)[0];
-      cs2.splice(toIdx, 0, moved2);
-      save();
+  // Animate dragged item to drop position
+  if (S.dragEl) {
+    S.dragEl.style.transition = 'transform 0.25s ease-out, box-shadow 0.25s ease-out';
+    S.dragEl.style.transform = 'translateY(' + dropDy + 'px) scale(1)';
+  }
+  // Remove neighbor transforms
+  for (var i = 0; i < items.length; i++) {
+    if (i !== fromIdx) {
+      items[i].classList.remove('drag-gap', 'drag-gap-up', 'drag-shrink');
     }
   }
 
-  document.body.style.overflow = '';
-  document.documentElement.style.overflow = '';
-  S.dragged = false; S.dragIdx = null; S.dragEl = null; S.dragMode = null;
-  dragInsertIdx = -1;
-  var list = document.getElementById('dragList');
-  if (list) { list.removeEventListener('touchmove', dragMove); list.removeEventListener('touchend', dragEnd); }
-  setTimeout(function() { S.dragged = false; render(); }, 50);
+  // After animation, commit data and re-render
+  setTimeout(function() {
+    if (toIdx >= 0 && fromIdx !== null) {
+      if (S.dragMode === 'phase') {
+        var filt = data.customers.filter(function(c) { return c.phase === S.phase; });
+        var fromId = filt[fromIdx] ? filt[fromIdx].id : null;
+        if (fromId) {
+          var cs = data.customers;
+          var globalFrom = cs.findIndex(function(c) { return c.id === fromId; });
+          var moved = cs.splice(globalFrom, 1)[0];
+          var remaining = cs.filter(function(c) { return c.phase === S.phase; });
+          var globalTarget;
+          if (toIdx >= remaining.length) {
+            var lastGlobal = -1;
+            for (var k = 0; k < cs.length; k++) {
+              if (cs[k].phase === S.phase) lastGlobal = k;
+            }
+            globalTarget = lastGlobal + 1;
+          } else {
+            var targetId = remaining[toIdx].id;
+            globalTarget = cs.findIndex(function(c) { return c.id === targetId; });
+          }
+          cs.splice(globalTarget, 0, moved);
+          save();
+        }
+      } else {
+        var cs2 = data.customers;
+        var moved2 = cs2.splice(fromIdx, 1)[0];
+        cs2.splice(toIdx, 0, moved2);
+        save();
+      }
+    }
+
+    document.body.style.overflow = '';
+    document.documentElement.style.overflow = '';
+    S.dragged = false; S.dragIdx = null; S.dragEl = null; S.dragMode = null;
+    dragInsertIdx = -1; dragItemRects = [];
+    var list = document.getElementById('dragList');
+    if (list) { list.removeEventListener('touchmove', dragMove); list.removeEventListener('touchend', dragEnd); }
+    render();
+  }, 270);
 }
 
 /* ========== Audio / AI ========== */
