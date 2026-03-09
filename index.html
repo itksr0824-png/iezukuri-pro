@@ -216,11 +216,13 @@ select.input { -webkit-appearance: none; }
 .drag-item {
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 15px 16px; margin-bottom: 8px; position: relative;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.2s;
+  transition: transform 0.25s ease-out;
+  will-change: transform;
 }
 .drag-item.dragging {
-  box-shadow: 0 16px 40px rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.3);
-  z-index: 10; border-color: var(--accent); transition: none;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 6px 16px rgba(0,0,0,0.3);
+  z-index: 100; border-color: var(--accent); opacity: 1;
+  transition: none;
 }
 
 .ai-result { background: var(--surface); border-radius: var(--radius); padding: 18px; border: 1px solid var(--border); position: relative; overflow: hidden; }
@@ -633,157 +635,153 @@ function scanAnketo(inp) {
 }
 
 /* ========== Drag & Drop ========== */
-var dragInsertIdx = -1;
-var dragRects = []; // snapshotted original positions {top, height, midY}
+var D = { rects: [], insertAt: -1 };
 
 function dragStart(e, idx, mode) {
-  var touch = e.touches[0];
-  S.dragStartY = touch.clientY; S.dragStartX = touch.clientX;
+  var t = e.touches[0];
+  S.dragStartY = t.clientY;
+  S.dragStartX = t.clientX;
   S.dragMode = mode || 'all';
-  dragInsertIdx = -1;
+  D.insertAt = -1;
   S.dragTimer = setTimeout(function() {
-    S.dragged = true; S.dragIdx = idx;
+    S.dragged = true;
+    S.dragIdx = idx;
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
     var items = document.querySelectorAll('.drag-item');
-    var el = items[idx]; if (!el) return;
+    var el = items[idx];
+    if (!el) return;
     S.dragEl = el;
-    // Snapshot all rects before transforms
-    dragRects = [];
+    // Snapshot rects
+    D.rects = [];
     for (var i = 0; i < items.length; i++) {
       var r = items[i].getBoundingClientRect();
-      dragRects.push({ top: r.top, height: r.height, midY: r.top + r.height / 2 });
+      D.rects.push({ top: r.top, h: r.height, mid: r.top + r.height / 2 });
     }
-    S.dragItemH = dragRects[idx].height + 8; // height + margin
-    // Float-up
-    el.style.transition = 'box-shadow 0.15s ease, border-color 0.15s ease';
+    D.step = D.rects[idx].h + 8;
+    // Lift up
     el.classList.add('dragging');
-    el.style.transform = 'scale(1.03)';
+    el.style.transform = 'scale(1.05)';
+    el.style.zIndex = '100';
     if (navigator.vibrate) navigator.vibrate(10);
     var list = document.getElementById('dragList');
     if (list) {
       list.addEventListener('touchmove', dragMove, { passive: false });
       list.addEventListener('touchend', dragEnd);
     }
-    setTimeout(function() { if (S.dragEl) S.dragEl.style.transition = 'none'; }, 160);
   }, 400);
 }
 
 function dragMove(e) {
   if (!S.dragged) return;
   e.preventDefault();
-  var touch = e.touches[0];
-  var fingerY = touch.clientY;
+  var t = e.touches[0];
+  var fy = t.clientY;
   var items = document.querySelectorAll('.drag-item');
-  var fromIdx = S.dragIdx;
-  var h = S.dragItemH;
+  var from = S.dragIdx;
+  var step = D.step;
 
-  // For each non-dragged item, decide if it should shift
-  // Items ABOVE fromIdx: if finger is above their midY, they stay.
-  //   If finger is below their midY, they need to shift DOWN (+h) to make room.
-  // Items BELOW fromIdx: if finger is below their midY, they stay.
-  //   If finger is above their midY, they need to shift UP (-h) to make room.
-  var newIdx = fromIdx; // where the dragged item would land
+  // Determine where the dragged item wants to be inserted.
+  // Walk through items in original order, find which slot the finger is in.
+  // Slot i = between item i-1 and item i (slot 0 = before first, slot n = after last).
+  // We compare fingerY against each non-dragged item's original midpoint.
+  var pos = from; // default: original position (no move)
+  // Count items that need to shift
   for (var i = 0; i < items.length; i++) {
-    if (i === fromIdx) continue;
-    var mid = dragRects[i].midY;
-    if (i < fromIdx) {
-      // Item is above the original position
-      if (fingerY < mid) {
-        // Finger is above this item's center — shift it down
-        items[i].style.transform = 'translateY(' + h + 'px)';
+    if (i === from) continue;
+    if (i < from) {
+      // Above original pos: shift down if finger is above this item's mid
+      if (fy < D.rects[i].mid) {
+        items[i].style.transform = 'translateY(' + step + 'px)';
       } else {
         items[i].style.transform = '';
       }
     } else {
-      // Item is below the original position
-      if (fingerY > mid) {
-        // Finger is below this item's center — shift it up
-        items[i].style.transform = 'translateY(' + (-h) + 'px)';
+      // Below original pos: shift up if finger is below this item's mid
+      if (fy > D.rects[i].mid) {
+        items[i].style.transform = 'translateY(-' + step + 'px)';
       } else {
         items[i].style.transform = '';
       }
     }
   }
 
-  // Calculate insert index: count how many items below fromIdx shifted up
-  // plus the items above fromIdx that did NOT shift down
-  newIdx = fromIdx;
+  // Compute target index from finger position
+  // The target is: how many non-dragged items have their midpoint above the finger?
+  var above = 0;
   for (var j = 0; j < items.length; j++) {
-    if (j === fromIdx) continue;
-    if (j < fromIdx && fingerY < dragRects[j].midY) {
-      // This item shifted down, so dragged item goes before it
-      newIdx--;
-    }
-    if (j > fromIdx && fingerY > dragRects[j].midY) {
-      // This item shifted up, so dragged item goes after it
-      newIdx++;
-    }
+    if (j === from) continue;
+    if (D.rects[j].mid < fy) above++;
   }
-  dragInsertIdx = (newIdx !== fromIdx) ? newIdx : -1;
+  D.insertAt = above; // this is the post-removal index
 
-  // Move dragged element with finger
+  // Move dragged element
   if (S.dragEl) {
-    var dy = fingerY - S.dragStartY;
-    var dx = touch.clientX - S.dragStartX;
-    dx = Math.max(-30, Math.min(30, dx));
-    S.dragEl.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(1.03) rotate(' + (dx * 0.12) + 'deg)';
-    S.dragEl.style.zIndex = '10';
+    var dy = fy - S.dragStartY;
+    var dx = t.clientX - S.dragStartX;
+    dx = Math.max(-20, Math.min(20, dx));
+    S.dragEl.style.transform = 'translate(' + dx + 'px,' + dy + 'px) scale(1.05)';
+    S.dragEl.style.zIndex = '100';
   }
 }
 
-function dragEnd(e) {
+function dragEnd() {
   clearTimeout(S.dragTimer);
   if (!S.dragged) { S.dragIdx = null; return; }
 
-  var fromIdx = S.dragIdx;
-  var toIdx = dragInsertIdx;
+  var from = S.dragIdx;
+  var to = D.insertAt;
   var items = document.querySelectorAll('.drag-item');
+  var moved = (to >= 0 && to !== from);
 
-  // Animate dragged item to target position
-  var dropDy = 0;
-  if (toIdx >= 0 && fromIdx !== null && dragRects.length) {
-    dropDy = dragRects[toIdx].top - dragRects[fromIdx].top;
+  // Compute where the dragged item should land visually
+  if (moved && S.dragEl && D.rects.length) {
+    // Target visual position: the slot at index 'to' in the post-removal list
+    // In terms of original indices, if to >= from, the target original index is to+1
+    // (because removing from shifts everything above it down by 1)
+    var origTarget = to >= from ? to + 1 : to;
+    if (origTarget >= D.rects.length) origTarget = D.rects.length - 1;
+    var dy = D.rects[origTarget].top - D.rects[from].top;
+    S.dragEl.style.transition = 'transform 0.2s ease-out';
+    S.dragEl.style.transform = 'translateY(' + dy + 'px) scale(1)';
+  } else if (S.dragEl) {
+    S.dragEl.style.transition = 'transform 0.2s ease-out';
+    S.dragEl.style.transform = 'scale(1)';
   }
 
-  if (S.dragEl) {
-    S.dragEl.style.transition = 'transform 0.25s ease-out, box-shadow 0.25s ease-out';
-    S.dragEl.style.transform = 'translateY(' + dropDy + 'px) scale(1)';
-  }
-  // Reset neighbor transforms
+  // Clear neighbor shifts
   for (var i = 0; i < items.length; i++) {
-    if (i !== fromIdx) items[i].style.transform = '';
+    if (i !== from) items[i].style.transform = '';
   }
 
-  // After animation, commit data and re-render
   setTimeout(function() {
-    if (toIdx >= 0 && fromIdx !== null) {
+    // Commit data
+    if (moved) {
       if (S.dragMode === 'phase') {
         var filt = data.customers.filter(function(c) { return c.phase === S.phase; });
-        var fromId = filt[fromIdx] ? filt[fromIdx].id : null;
+        var fromId = filt[from] ? filt[from].id : null;
         if (fromId) {
           var cs = data.customers;
-          var globalFrom = cs.findIndex(function(c) { return c.id === fromId; });
-          var moved = cs.splice(globalFrom, 1)[0];
-          var remaining = cs.filter(function(c) { return c.phase === S.phase; });
-          var globalTarget;
-          if (toIdx >= remaining.length) {
-            var lastGlobal = -1;
+          var gi = cs.findIndex(function(c) { return c.id === fromId; });
+          var item = cs.splice(gi, 1)[0];
+          var rem = cs.filter(function(c) { return c.phase === S.phase; });
+          var gt;
+          if (to >= rem.length) {
+            var last = -1;
             for (var k = 0; k < cs.length; k++) {
-              if (cs[k].phase === S.phase) lastGlobal = k;
+              if (cs[k].phase === S.phase) last = k;
             }
-            globalTarget = lastGlobal + 1;
+            gt = last + 1;
           } else {
-            var targetId = remaining[toIdx].id;
-            globalTarget = cs.findIndex(function(c) { return c.id === targetId; });
+            gt = cs.findIndex(function(c) { return c.id === rem[to].id; });
           }
-          cs.splice(globalTarget, 0, moved);
+          cs.splice(gt, 0, item);
           save();
         }
       } else {
         var cs2 = data.customers;
-        var moved2 = cs2.splice(fromIdx, 1)[0];
-        cs2.splice(toIdx, 0, moved2);
+        var m = cs2.splice(from, 1)[0];
+        cs2.splice(to, 0, m);
         save();
       }
     }
@@ -791,11 +789,11 @@ function dragEnd(e) {
     document.body.style.overflow = '';
     document.documentElement.style.overflow = '';
     S.dragged = false; S.dragIdx = null; S.dragEl = null; S.dragMode = null;
-    dragInsertIdx = -1; dragRects = [];
+    D.insertAt = -1; D.rects = [];
     var list = document.getElementById('dragList');
     if (list) { list.removeEventListener('touchmove', dragMove); list.removeEventListener('touchend', dragEnd); }
     render();
-  }, 270);
+  }, 220);
 }
 
 /* ========== Audio / AI ========== */
