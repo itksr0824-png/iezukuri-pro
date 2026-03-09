@@ -216,16 +216,12 @@ select.input { -webkit-appearance: none; }
 .drag-item {
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 15px 16px; margin-bottom: 8px; position: relative;
-  transition: transform 0.3s ease-out, box-shadow 0.3s ease-out, border-color 0.2s;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.2s;
 }
 .drag-item.dragging {
   box-shadow: 0 16px 40px rgba(0,0,0,0.55), 0 4px 12px rgba(0,0,0,0.3);
   z-index: 10; border-color: var(--accent); transition: none;
-  transform-origin: center center;
 }
-.drag-item.drag-shrink { transform: scale(0.98); }
-.drag-item.drag-gap { transform: translateY(62px) scale(0.98); }
-.drag-item.drag-gap-up { transform: translateY(-62px) scale(0.98); }
 
 .ai-result { background: var(--surface); border-radius: var(--radius); padding: 18px; border: 1px solid var(--border); position: relative; overflow: hidden; }
 .ai-result::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: linear-gradient(180deg, var(--accent), var(--green)); }
@@ -638,7 +634,7 @@ function scanAnketo(inp) {
 
 /* ========== Drag & Drop ========== */
 var dragInsertIdx = -1;
-var dragItemRects = [];
+var dragRects = []; // snapshotted original positions {top, height, midY}
 
 function dragStart(e, idx, mode) {
   var touch = e.touches[0];
@@ -652,28 +648,23 @@ function dragStart(e, idx, mode) {
     var items = document.querySelectorAll('.drag-item');
     var el = items[idx]; if (!el) return;
     S.dragEl = el;
-    // Snapshot rects before any transforms
-    dragItemRects = [];
+    // Snapshot all rects before transforms
+    dragRects = [];
     for (var i = 0; i < items.length; i++) {
       var r = items[i].getBoundingClientRect();
-      dragItemRects.push({ top: r.top, height: r.height, midY: r.top + r.height / 2 });
+      dragRects.push({ top: r.top, height: r.height, midY: r.top + r.height / 2 });
     }
-    S.dragItemH = dragItemRects[idx].height + 8;
-    // Float-up animation
-    el.style.transition = 'box-shadow 0.15s ease-out, border-color 0.15s ease-out';
+    S.dragItemH = dragRects[idx].height + 8; // height + margin
+    // Float-up
+    el.style.transition = 'box-shadow 0.15s ease, border-color 0.15s ease';
     el.classList.add('dragging');
     el.style.transform = 'scale(1.03)';
-    // Shrink neighbors
-    for (var j = 0; j < items.length; j++) {
-      if (j !== idx) items[j].classList.add('drag-shrink');
-    }
     if (navigator.vibrate) navigator.vibrate(10);
     var list = document.getElementById('dragList');
     if (list) {
       list.addEventListener('touchmove', dragMove, { passive: false });
       list.addEventListener('touchend', dragEnd);
     }
-    // After float-up, disable transition for free drag
     setTimeout(function() { if (S.dragEl) S.dragEl.style.transition = 'none'; }, 160);
   }, 400);
 }
@@ -685,44 +676,53 @@ function dragMove(e) {
   var fingerY = touch.clientY;
   var items = document.querySelectorAll('.drag-item');
   var fromIdx = S.dragIdx;
-  var itemH = S.dragItemH || 62;
+  var h = S.dragItemH;
 
-  // Use snapshotted rects for stable midpoint calculation
-  var slots = [];
+  // For each non-dragged item, decide if it should shift
+  // Items ABOVE fromIdx: if finger is above their midY, they stay.
+  //   If finger is below their midY, they need to shift DOWN (+h) to make room.
+  // Items BELOW fromIdx: if finger is below their midY, they stay.
+  //   If finger is above their midY, they need to shift UP (-h) to make room.
+  var newIdx = fromIdx; // where the dragged item would land
   for (var i = 0; i < items.length; i++) {
     if (i === fromIdx) continue;
-    slots.push({ domIdx: i, midY: dragItemRects[i].midY });
-  }
-
-  var insertPos = slots.length;
-  for (var j = 0; j < slots.length; j++) {
-    if (fingerY < slots[j].midY) { insertPos = j; break; }
-  }
-
-  var gapDomIdx = insertPos < slots.length ? slots[insertPos].domIdx : -1;
-
-  if (insertPos === fromIdx || (insertPos === fromIdx && gapDomIdx === -1)) {
-    dragInsertIdx = -1;
-  } else {
-    dragInsertIdx = insertPos;
-  }
-
-  // Animate neighbors with translateY
-  for (var k = 0; k < items.length; k++) {
-    if (k === fromIdx) continue;
-    items[k].classList.remove('drag-gap', 'drag-gap-up');
-    if (dragInsertIdx >= 0) {
-      if (k < fromIdx && k >= gapDomIdx && gapDomIdx >= 0) {
-        items[k].classList.add('drag-gap');
-      } else if (k > fromIdx && gapDomIdx >= 0 && k < gapDomIdx) {
-        items[k].classList.add('drag-gap-up');
-      } else if (gapDomIdx === -1 && k > fromIdx) {
-        items[k].classList.add('drag-gap-up');
+    var mid = dragRects[i].midY;
+    if (i < fromIdx) {
+      // Item is above the original position
+      if (fingerY < mid) {
+        // Finger is above this item's center — shift it down
+        items[i].style.transform = 'translateY(' + h + 'px)';
+      } else {
+        items[i].style.transform = '';
+      }
+    } else {
+      // Item is below the original position
+      if (fingerY > mid) {
+        // Finger is below this item's center — shift it up
+        items[i].style.transform = 'translateY(' + (-h) + 'px)';
+      } else {
+        items[i].style.transform = '';
       }
     }
   }
 
-  // Move dragged element
+  // Calculate insert index: count how many items below fromIdx shifted up
+  // plus the items above fromIdx that did NOT shift down
+  newIdx = fromIdx;
+  for (var j = 0; j < items.length; j++) {
+    if (j === fromIdx) continue;
+    if (j < fromIdx && fingerY < dragRects[j].midY) {
+      // This item shifted down, so dragged item goes before it
+      newIdx--;
+    }
+    if (j > fromIdx && fingerY > dragRects[j].midY) {
+      // This item shifted up, so dragged item goes after it
+      newIdx++;
+    }
+  }
+  dragInsertIdx = (newIdx !== fromIdx) ? newIdx : -1;
+
+  // Move dragged element with finger
   if (S.dragEl) {
     var dy = fingerY - S.dragStartY;
     var dx = touch.clientX - S.dragStartX;
@@ -740,24 +740,19 @@ function dragEnd(e) {
   var toIdx = dragInsertIdx;
   var items = document.querySelectorAll('.drag-item');
 
-  // Calculate drop target Y offset
+  // Animate dragged item to target position
   var dropDy = 0;
-  if (toIdx >= 0 && fromIdx !== null && dragItemRects.length) {
-    var targetVisualIdx = toIdx >= fromIdx ? toIdx + 1 : toIdx;
-    if (targetVisualIdx >= dragItemRects.length) targetVisualIdx = dragItemRects.length - 1;
-    dropDy = dragItemRects[targetVisualIdx].top - dragItemRects[fromIdx].top;
+  if (toIdx >= 0 && fromIdx !== null && dragRects.length) {
+    dropDy = dragRects[toIdx].top - dragRects[fromIdx].top;
   }
 
-  // Animate dragged item to drop position
   if (S.dragEl) {
     S.dragEl.style.transition = 'transform 0.25s ease-out, box-shadow 0.25s ease-out';
     S.dragEl.style.transform = 'translateY(' + dropDy + 'px) scale(1)';
   }
-  // Remove neighbor transforms
+  // Reset neighbor transforms
   for (var i = 0; i < items.length; i++) {
-    if (i !== fromIdx) {
-      items[i].classList.remove('drag-gap', 'drag-gap-up', 'drag-shrink');
-    }
+    if (i !== fromIdx) items[i].style.transform = '';
   }
 
   // After animation, commit data and re-render
@@ -796,7 +791,7 @@ function dragEnd(e) {
     document.body.style.overflow = '';
     document.documentElement.style.overflow = '';
     S.dragged = false; S.dragIdx = null; S.dragEl = null; S.dragMode = null;
-    dragInsertIdx = -1; dragItemRects = [];
+    dragInsertIdx = -1; dragRects = [];
     var list = document.getElementById('dragList');
     if (list) { list.removeEventListener('touchmove', dragMove); list.removeEventListener('touchend', dragEnd); }
     render();
