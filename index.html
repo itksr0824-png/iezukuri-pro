@@ -1202,10 +1202,18 @@ function renderDetail() {
 
   // Detail grid
   h += '<div class="detail-grid" style="margin-bottom:18px">';
-  [['予算','budget'],['土地','land'],['競合','competitor'],['エリア','area'],['電話','phone'],['初回来場','firstVisit']].forEach(function(f) {
+  [['予算','budget'],['土地','land'],['競合','competitor'],['エリア（建築地住所）','area'],['電話','phone'],['初回来場','firstVisit']].forEach(function(f) {
     h += '<div class="detail-cell"><div class="detail-cell-label">' + f[0] + '</div>';
     if (f[1] === 'firstVisit') {
       h += '<input class="input" type="date" style="font-size:12px;padding:6px 8px;background:transparent;border:1px solid transparent" value="' + (c[f[1]] || '') + '" onfocus="this.style.borderColor=\'var(--accent)\';this.style.background=\'var(--bg)\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'" oninput="updField(sel(),\'' + f[1] + '\',this.value)">';
+    } else if (f[1] === 'area') {
+      h += '<div style="position:relative"><input class="input" style="font-size:12px;font-weight:600;padding:6px ' + (c.area ? '32px' : '8px') + ' 6px 8px;background:transparent;border:1px solid transparent" value="' + esc(c.area || '') + '" placeholder="未入力" onfocus="this.style.borderColor=\'var(--accent)\';this.style.background=\'var(--bg)\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'" oninput="updField(sel(),\'area\',this.value);render()">';
+      if (c.area) h += '<a href="https://maps.google.com/?q=' + encodeURIComponent(c.area) + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="position:absolute;right:2px;top:50%;transform:translateY(-50%);font-size:18px;padding:4px 6px;text-decoration:none;line-height:1">\ud83d\udccd</a>';
+      h += '</div>';
+    } else if (f[1] === 'phone') {
+      h += '<div style="position:relative"><input class="input" style="font-size:12px;font-weight:600;padding:6px ' + (c.phone ? '32px' : '8px') + ' 6px 8px;background:transparent;border:1px solid transparent" value="' + esc(c.phone || '') + '" placeholder="未入力" onfocus="this.style.borderColor=\'var(--accent)\';this.style.background=\'var(--bg)\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'" oninput="updField(sel(),\'phone\',this.value);render()">';
+      if (c.phone) h += '<a href="tel:' + esc(c.phone) + '" onclick="event.stopPropagation()" style="position:absolute;right:2px;top:50%;transform:translateY(-50%);font-size:18px;padding:4px 6px;text-decoration:none;line-height:1">\ud83d\udcde</a>';
+      h += '</div>';
     } else {
       h += '<input class="input" style="font-size:12px;font-weight:600;padding:6px 8px;background:transparent;border:1px solid transparent" value="' + esc(c[f[1]] || '') + '" placeholder="未入力" onfocus="this.style.borderColor=\'var(--accent)\';this.style.background=\'var(--bg)\'" onblur="this.style.borderColor=\'transparent\';this.style.background=\'transparent\'" oninput="updField(sel(),\'' + f[1] + '\',this.value)">';
     }
