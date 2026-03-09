@@ -639,6 +639,8 @@ function dragStart(e, idx, mode) {
   dragInsertIdx = -1;
   S.dragTimer = setTimeout(function() {
     S.dragged = true; S.dragIdx = idx;
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
     var items = document.querySelectorAll('.drag-item');
     var el = items[idx]; if (!el) return;
     S.dragEl = el; el.classList.add('dragging');
@@ -763,6 +765,8 @@ function dragEnd(e) {
     }
   }
 
+  document.body.style.overflow = '';
+  document.documentElement.style.overflow = '';
   S.dragged = false; S.dragIdx = null; S.dragEl = null; S.dragMode = null;
   dragInsertIdx = -1;
   var list = document.getElementById('dragList');
