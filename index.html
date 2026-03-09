@@ -610,10 +610,13 @@ function scanAnketo(inp) {
 }
 
 /* ========== Drag & Drop ========== */
+var dragInsertIdx = -1;
+
 function dragStart(e, idx, mode) {
   var touch = e.touches[0];
   S.dragStartY = touch.clientY; S.dragStartX = touch.clientX;
   S.dragMode = mode || 'all';
+  dragInsertIdx = -1;
   S.dragTimer = setTimeout(function() {
     S.dragged = true; S.dragIdx = idx;
     var items = document.querySelectorAll('.drag-item');
@@ -632,19 +635,62 @@ function dragMove(e) {
   if (!S.dragged) return;
   e.preventDefault();
   var touch = e.touches[0];
+  var fingerY = touch.clientY;
   var items = document.querySelectorAll('.drag-item');
-  items.forEach(function(it) { it.classList.remove('drag-gap'); });
-  items.forEach(function(it, i) {
-    if (i === S.dragIdx) return;
-    var r = it.getBoundingClientRect();
-    var mid = r.top + r.height / 2;
-    if (touch.clientY > r.top - 10 && touch.clientY < r.bottom + 10) {
-      if (touch.clientY < mid) { it.classList.add('drag-gap'); }
-      else { var next = items[i + 1]; if (next && next !== S.dragEl) next.classList.add('drag-gap'); }
+  var fromIdx = S.dragIdx;
+
+  // Build list of non-dragged items with their midpoints
+  var slots = [];
+  for (var i = 0; i < items.length; i++) {
+    if (i === fromIdx) continue;
+    var r = items[i].getBoundingClientRect();
+    slots.push({ domIdx: i, midY: r.top + r.height / 2 });
+  }
+
+  // Find where the finger is: which slot gap?
+  // insertPos = position in the slots array where dragged item should go
+  var insertPos = slots.length; // default: end
+  for (var j = 0; j < slots.length; j++) {
+    if (fingerY < slots[j].midY) {
+      insertPos = j;
+      break;
     }
-  });
+  }
+
+  // Convert insertPos back to original array index
+  // slots[insertPos] is the item that will come AFTER the dragged item
+  // So we insert BEFORE slots[insertPos].domIdx in DOM terms
+  var gapDomIdx = -1; // which DOM item gets the gap class (gap opens above it)
+  if (insertPos < slots.length) {
+    gapDomIdx = slots[insertPos].domIdx;
+  }
+
+  // Calculate the actual array insert index
+  // In the original array (before any removal), the dragged item is at fromIdx
+  // After removing fromIdx, the remaining items are in order
+  // insertPos is position among remaining items, so that's the splice index
+  if (insertPos === fromIdx || (insertPos === fromIdx && gapDomIdx === -1)) {
+    // No movement needed
+    dragInsertIdx = -1;
+  } else {
+    // insertPos is the index in the "remaining items" array
+    // But we need to convert to the full array index (including the dragged item)
+    // If insertPos >= fromIdx, the actual full-array index is insertPos + 1
+    // (because the dragged item still occupies fromIdx)
+    // But since we'll splice(fromIdx,1) first then splice(insertPos,...),
+    // we just store insertPos directly as the post-removal index
+    dragInsertIdx = insertPos;
+  }
+
+  // Show visual gap
+  items.forEach(function(it) { it.classList.remove('drag-gap'); });
+  if (gapDomIdx >= 0 && gapDomIdx < items.length && dragInsertIdx >= 0) {
+    items[gapDomIdx].classList.add('drag-gap');
+  }
+
+  // Move the dragged element visually
   if (S.dragEl) {
-    var dy = touch.clientY - S.dragStartY;
+    var dy = fingerY - S.dragStartY;
     var dx = touch.clientX - S.dragStartX;
     dx = Math.max(-30, Math.min(30, dx));
     S.dragEl.style.transform = 'translate(' + dx + 'px,' + dy + 'px) rotate(' + (dx * 0.15) + 'deg)';
@@ -655,35 +701,50 @@ function dragMove(e) {
 function dragEnd(e) {
   clearTimeout(S.dragTimer);
   if (!S.dragged) { S.dragIdx = null; return; }
-  var touch = e.changedTouches[0];
-  var items = document.querySelectorAll('.drag-item');
-  var overIdx = null;
-  items.forEach(function(it, i) {
-    var r = it.getBoundingClientRect();
-    if (touch.clientY > r.top - 10 && touch.clientY < r.bottom + 10 && i !== S.dragIdx) overIdx = i;
-  });
-  if (overIdx !== null && S.dragIdx !== null && overIdx !== S.dragIdx) {
+
+  var fromIdx = S.dragIdx;
+  var toIdx = dragInsertIdx; // post-removal index among visible items
+
+  if (toIdx >= 0 && fromIdx !== null) {
     if (S.dragMode === 'phase') {
+      // Phase mode: items are filtered by phase
       var filt = data.customers.filter(function(c) { return c.phase === S.phase; });
-      var fromId = filt[S.dragIdx] ? filt[S.dragIdx].id : null;
-      var toId = filt[overIdx] ? filt[overIdx].id : null;
-      if (fromId && toId) {
+      var fromId = filt[fromIdx] ? filt[fromIdx].id : null;
+      if (fromId) {
+        // Remove from global array
         var cs = data.customers;
-        var ai = cs.findIndex(function(c) { return c.id === fromId; });
-        var moved = cs.splice(ai, 1)[0];
-        var bi = cs.findIndex(function(c) { return c.id === toId; });
-        if (overIdx > S.dragIdx) bi++;
-        cs.splice(bi, 0, moved);
+        var globalFrom = cs.findIndex(function(c) { return c.id === fromId; });
+        var moved = cs.splice(globalFrom, 1)[0];
+
+        // Build remaining filtered list to find target position
+        var remaining = cs.filter(function(c) { return c.phase === S.phase; });
+        var globalTarget;
+        if (toIdx >= remaining.length) {
+          // Insert after the last item of this phase
+          var lastGlobal = -1;
+          for (var k = 0; k < cs.length; k++) {
+            if (cs[k].phase === S.phase) lastGlobal = k;
+          }
+          globalTarget = lastGlobal + 1;
+        } else {
+          // Insert before remaining[toIdx]
+          var targetId = remaining[toIdx].id;
+          globalTarget = cs.findIndex(function(c) { return c.id === targetId; });
+        }
+        cs.splice(globalTarget, 0, moved);
         save();
       }
     } else {
+      // All mode: direct array manipulation
       var cs2 = data.customers;
-      var moved2 = cs2.splice(S.dragIdx, 1)[0];
-      cs2.splice(overIdx, 0, moved2);
+      var moved2 = cs2.splice(fromIdx, 1)[0];
+      cs2.splice(toIdx, 0, moved2);
       save();
     }
   }
+
   S.dragged = false; S.dragIdx = null; S.dragEl = null; S.dragMode = null;
+  dragInsertIdx = -1;
   var list = document.getElementById('dragList');
   if (list) { list.removeEventListener('touchmove', dragMove); list.removeEventListener('touchend', dragEnd); }
   setTimeout(function() { S.dragged = false; render(); }, 50);
