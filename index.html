@@ -743,23 +743,56 @@ function dragEnd() {
   var items = document.querySelectorAll('.drag-item');
   var didMove = (to !== from);
 
-  // Snap dragged item to target
+  // Compute target position for dragged item based on where items currently sit
   if (didMove && S.dragEl) {
-    var offset = (to - from) * dragItemH;
-    if (to > from) offset -= dragItemH; // adjust because item removed before insert
+    // Figure out the pixel offset the dragged item needs to travel
+    // Reset dragged item transform momentarily to get its natural rect
+    var savedTransform = S.dragEl.style.transform;
+    S.dragEl.style.transition = 'none';
+    S.dragEl.style.transform = 'none';
+    S.dragEl.offsetHeight; // force reflow
+    var fromRect = S.dragEl.getBoundingClientRect();
+    S.dragEl.style.transform = savedTransform;
+    S.dragEl.offsetHeight; // force reflow
+
+    // Get target slot position: where the gap currently is
+    // The gap is at 'to' index (accounting for shifts already applied)
+    var targetY;
+    if (to > from) {
+      // Dragging down: items between from+1..to-1 shifted up by dragItemH
+      // Target slot is where item[to-1] originally was (its shifted position bottom)
+      var ref = items[to - 1];
+      var refRect = ref.getBoundingClientRect();
+      targetY = refRect.bottom + 4 - fromRect.height; // 4 = half gap
+    } else {
+      // Dragging up: items between to..from-1 shifted down by dragItemH
+      // Target slot is where item[to] originally was (its shifted position top)
+      var ref2 = items[to];
+      var refRect2 = ref2.getBoundingClientRect();
+      targetY = refRect2.top - 4; // 4 = half gap
+    }
+    var dropOffset = targetY - fromRect.top;
+
+    // Animate dragged item to the target slot
     S.dragEl.style.transition = 'transform 0.2s ease-out';
-    S.dragEl.style.transform = 'translateY(' + offset + 'px) scale(1)';
+    S.dragEl.style.transform = 'translateY(' + dropOffset + 'px) scale(1)';
+    S.dragEl.style.zIndex = '100';
   } else if (S.dragEl) {
+    // No move - just animate back to original position
     S.dragEl.style.transition = 'transform 0.2s ease-out';
     S.dragEl.style.transform = 'scale(1)';
   }
 
-  // Clear neighbor shifts
-  for (var i = 0; i < items.length; i++) {
-    if (i !== from) items[i].style.transform = '';
-  }
+  // Keep neighbor transforms as-is during animation (no clearing!)
 
   setTimeout(function() {
+    // Disable transitions on all items before DOM update
+    for (var k = 0; k < items.length; k++) {
+      items[k].style.transition = 'none';
+      items[k].style.transform = '';
+      items[k].style.zIndex = '';
+    }
+
     if (didMove) {
       // Convert to post-removal index for array splice
       var spliceIdx = to > from ? to - 1 : to;
@@ -774,8 +807,8 @@ function dragEnd() {
           var gt;
           if (spliceIdx >= rem.length) {
             var last = -1;
-            for (var k = 0; k < cs.length; k++) {
-              if (cs[k].phase === S.phase) last = k;
+            for (var m = 0; m < cs.length; m++) {
+              if (cs[m].phase === S.phase) last = m;
             }
             gt = last + 1;
           } else {
